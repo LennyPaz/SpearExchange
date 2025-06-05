@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Spear Exchange - FSU Student Marketplace</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #8B2635, #A0344A);
+            color: white;
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #8B2635;
+            font-weight: bold;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: opacity 0.3s;
+        }
+
+        .nav-links a:hover {
+            opacity: 0.8;
+        }
+
+        .search-bar {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .search-input {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 25px;
+            width: 250px;
+            outline: none;
+        }
+
+        .cart-icon {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #FFD700;
+            color: #8B2635;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #8B2635, #A0344A);
+            color: white;
+            text-align: center;
+            padding: 4rem 2rem;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+            animation: fadeInUp 1s ease-out 0.2s both;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            animation: fadeInUp 1s ease-out 0.4s both;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #FFD700;
+            color: #8B2635;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .section {
+            padding: 4rem 0;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            color: #8B2635;
+        }
+
+        .featured-items {
+            background: #f8f9fa;
+        }
+
+        .items-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .item-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .item-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        .item-image {
+            height: 200px;
+            background: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: #6c757d;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .item-badge {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            background: #8B2635;
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .item-info {
+            padding: 1.5rem;
+        }
+
+        .item-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+
+        .item-seller {
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .item-price {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #8B2635;
+            margin-bottom: 1rem;
+        }
+
+        .item-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-small {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            flex: 1;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #8B2635;
+            color: #8B2635;
+        }
+
+        .btn-outline:hover {
+            background: #8B2635;
+            color: white;
+        }
+
+        .view-all {
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        .features {
+            background: white;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+        }
+
+        .feature {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #8B2635, #A0344A);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            color: white;
+            font-size: 2rem;
+        }
+
+        .feature h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #8B2635;
+        }
+
+        .categories {
+            background: #f8f9fa;
+        }
+
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .category-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .category-card:hover {
+            border-color: #8B2635;
+            transform: translateY(-3px);
+        }
+
+        .category-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .newsletter {
+            background: linear-gradient(135deg, #8B2635, #A0344A);
+            color: white;
+            text-align: center;
+        }
+
+        .newsletter-form {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .newsletter-input {
+            padding: 1rem;
+            border: none;
+            border-radius: 8px;
+            width: 300px;
+            outline: none;
+        }
+
+        .footer {
+            background: #2c3e50;
+            color: white;
+            padding: 3rem 0 1rem;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-section h4 {
+            margin-bottom: 1rem;
+            color: #FFD700;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-section a {
+            color: #bdc3c7;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-section a:hover {
+            color: white;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid #34495e;
+            color: #bdc3c7;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 2rem;
+            border-radius: 12px;
+            width: 80%;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: black;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .search-input {
+                width: 200px;
+            }
+
+            .items-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .newsletter-form {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .newsletter-input {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav">
+            <div class="logo">
+                <div class="logo-icon">SE</div>
+                <span>The Spear Exchange</span>
+            </div>
+            
+            <div class="nav-links">
+                <a href="#home">Home</a>
+                <a href="#categories">Categories</a>
+                <a href="#sell">Sell Items</a>
+                <a href="#about">About</a>
+                <a href="#contact">Contact</a>
+            </div>
+
+            <div class="search-bar">
+                <input type="text" class="search-input" placeholder="Search items...">
+                <div class="cart-icon" onclick="openCart()">
+                    🛒
+                    <span class="cart-count">0</span>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="container">
+            <h1>Welcome to The Spear Exchange</h1>
+            <p>Buy and sell with fellow FSU students safely and easily</p>
+            <div class="cta-buttons">
+                <a href="#featured" class="btn btn-primary">Start Shopping</a>
+                <a href="#sell" class="btn btn-secondary">Sell Your Items</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Categories Section -->
+    <section class="section categories" id="categories">
+        <div class="container">
+            <h2 class="section-title">Browse Categories</h2>
+            <div class="categories-grid">
+                <div class="category-card" onclick="filterCategory('electronics')">
+                    <div class="category-icon">📱</div>
+                    <h3>Electronics</h3>
+                    <p>Phones, Laptops, Gadgets</p>
+                </div>
+                <div class="category-card" onclick="filterCategory('textbooks')">
+                    <div class="category-icon">📚</div>
+                    <h3>Textbooks</h3>
+                    <p>Course Materials</p>
+                </div>
+                <div class="category-card" onclick="filterCategory('furniture')">
+                    <div class="category-icon">🪑</div>
+                    <h3>Furniture</h3>
+                    <p>Dorm & Apartment Items</p>
+                </div>
+                <div class="category-card" onclick="filterCategory('clothing')">
+                    <div class="category-icon">👕</div>
+                    <h3>Clothing</h3>
+                    <p>FSU Gear & Fashion</p>
+                </div>
+                <div class="category-card" onclick="filterCategory('sports')">
+                    <div class="category-icon">⚽</div>
+                    <h3>Sports</h3>
+                    <p>Equipment & Gear</p>
+                </div>
+                <div class="category-card" onclick="filterCategory('other')">
+                    <div class="category-icon">🎒</div>
+                    <h3>Other</h3>
+                    <p>Miscellaneous Items</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Items -->
+    <section class="section featured-items" id="featured">
+        <div class="container">
+            <h2 class="section-title">Featured Items</h2>
+            <div class="items-grid">
+                <div class="item-card">
+                    <div class="item-image">
+                        <span>MacBook Pro 13-inch</span>
+                        <div class="item-badge">On Sale</div>
+                    </div>
+                    <div class="item-info">
+                        <h3 class="item-title">MacBook Pro 13-inch</h3>
+                        <p class="item-seller">by Sarah M.</p>
+                        <div class="item-price">$899</div>
+                        <div class="item-actions">
+                            <button class="btn btn-primary btn-small" onclick="addToCart('macbook')">Add to Cart</button>
+                            <button class="btn btn-outline btn-small" onclick="viewItem('macbook')">View Details</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="item-card">
+                    <div class="item-image">
+                        <span>Calculus Textbook</span>
+                        <div class="item-badge">Great Deal</div>
+                    </div>
+                    <div class="item-info">
+                        <h3 class="item-title">Calculus Textbook</h3>
+                        <p class="item-seller">by Mike B.</p>
+                        <div class="item-price">$45</div>
+                        <div class="item-actions">
+                            <button class="btn btn-primary btn-small" onclick="addToCart('textbook')">Add to Cart</button>
+                            <button class="btn btn-outline btn-small" onclick="viewItem('textbook')">View Details</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="item-card">
+                    <div class="item-image">
+                        <span>Dorm Mini Fridge</span>
+                        <div class="item-badge">Popular</div>
+                    </div>
+                    <div class="item-info">
+                        <h3 class="item-title">Dorm Mini Fridge</h3>
+                        <p class="item-seller">by Emma L.</p>
+                        <div class="item-price">$120</div>
+                        <div class="item-actions">
+                            <button class="btn btn-primary btn-small" onclick="addToCart('fridge')">Add to Cart</button>
+                            <button class="btn btn-outline btn-small" onclick="viewItem('fridge')">View Details</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="item-card">
+                    <div class="item-image">
+                        <span>FSU Jersey</span>
+                        <div class="item-badge">New</div>
+                    </div>
+                    <div class="item-info">
+                        <h3 class="item-title">FSU Jersey</h3>
+                        <p class="item-seller">by Alex K.</p>
+                        <div class="item-price">$25</div>
+                        <div class="item-actions">
+                            <button class="btn btn-primary btn-small" onclick="addToCart('jersey')">Add to Cart</button>
+                            <button class="btn btn-outline btn-small" onclick="viewItem('jersey')">View Details</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="item-card">
+                    <div class="item-image">
+                        <span>Gaming Chair</span>
+                        <div class="item-badge">Like New</div>
+                    </div>
+                    <div class="item-info">
+                        <h3 class="item-title">Gaming Chair</h3>
+                        <p class="item-seller">by Chris P.</p>
+                        <div class="item-price">$180</div>
+                        <div class="item-actions">
+                            <button class="btn btn-primary btn-small" onclick="addToCart('chair')">Add to Cart</button>
+                            <button class="btn btn-outline btn-small" onclick="viewItem('chair')">View Details</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="item-card">
+                    <div class="item-image">
+                        <span>iPhone 13</span>
+                        <div class="item-badge">Trending</div>
+                    </div>
+                    <div class="item-info">
+                        <h3 class="item-title">iPhone 13</h3>
+                        <p class="item-seller">by Lisa W.</p>
+                        <div class="item-price">$650</div>
+                        <div class="item-actions">
+                            <button class="btn btn-primary btn-small" onclick="addToCart('iphone')">Add to Cart</button>
+                            <button class="btn btn-outline btn-small" onclick="viewItem('iphone')">View Details</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="view-all">
+                <a href="#" class="btn btn-primary">View All Items</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="section features" id="about">
+        <div class="container">
+            <h2 class="section-title">Why Choose The Spear Exchange?</h2>
+            <div class="features-grid">
+                <div class="feature">
+                    <div class="feature-icon">🔒</div>
+                    <h3>Safe & Secure</h3>
+                    <p>FSU email verification ensures you're dealing with fellow students</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">💰</div>
+                    <h3>Great Prices</h3>
+                    <p>Student-friendly prices on textbooks, electronics, and more</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">📍</div>
+                    <h3>Local Pickup</h3>
+                    <p>Meet on campus for convenient and safe transactions</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Newsletter Section -->
+    <section class="section newsletter">
+        <div class="container">
+            <h2>Stay Updated</h2>
+            <p>Get notified about new items and great deals from fellow Seminoles</p>
+            <div class="newsletter-form">
+                <input type="email" class="newsletter-input" placeholder="Enter your FSU email">
+                <button class="btn btn-primary">Subscribe</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-section">
+                    <h4>The Spear Exchange</h4>
+                    <p>The trusted marketplace for FSU students to buy and sell items safely within the Seminole community.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="#home">Home</a></li>
+                        <li><a href="#categories">Categories</a></li>
+                        <li><a href="#sell">Sell Items</a></li>
+                        <li><a href="#featured">Featured</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Support</h4>
+                    <ul>
+                        <li><a href="#">Help Center</a></li>
+                        <li><a href="#">Safety Guidelines</a></li>
+                        <li><a href="#">Report an Issue</a></li>
+                        <li><a href="#contact">Contact Us</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Connect</h4>
+                    <ul>
+                        <li><a href="#">Facebook</a></li>
+                        <li><a href="#">Instagram</a></li>
+                        <li><a href="#">Twitter</a></li>
+                        <li><a href="#">Discord</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 The Spear Exchange. Made for FSU students, by FSU students.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Cart Modal -->
+    <div id="cartModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeCart()">&times;</span>
+            <h2>Shopping Cart</h2>
+            <div id="cartItems">
+                <p>Your cart is empty</p>
+            </div>
+            <div style="margin-top: 2rem;">
+                <button class="btn btn-primary">Checkout</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let cart = [];
+        let cartCount = 0;
+
+        function addToCart(item) {
+            cart.push(item);
+            cartCount++;
+            updateCartCount();
+            showNotification(`Added ${item} to cart!`);
+        }
+
+        function updateCartCount() {
+            document.querySelector('.cart-count').textContent = cartCount;
+        }
+
+        function openCart() {
+            document.getElementById('cartModal').style.display = 'block';
+            updateCartDisplay();
+        }
+
+        function closeCart() {
+            document.getElementById('cartModal').style.display = 'none';
+        }
+
+        function updateCartDisplay() {
+            const cartItems = document.getElementById('cartItems');
+            if (cart.length === 0) {
+                cartItems.innerHTML = '<p>Your cart is empty</p>';
+            } else {
+                cartItems.innerHTML = cart.map(item => `<p>• ${item}</p>`).join('');
+            }
+        }
+
+        function viewItem(item) {
+            alert(`Viewing details for ${item}. In a real app, this would open a detailed product page.`);
+        }
+
+        function filterCategory(category) {
+            showNotification(`Filtering by ${category}. In a real app, this would show filtered results.`);
+        }
+
+        function showNotification(message) {
+            // Create a simple notification
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 100px;
+                right: 20px;
+                background: #8B2635;
+                color: white;
+                padding: 1rem;
+                border-radius: 8px;
+                z-index: 1001;
+                animation: slideIn 0.3s ease-out;
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('cartModal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        // Add some interactive animations
+        document.addEventListener('DOMContentLoaded', function() {
+            // Smooth scrolling for navigation links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+
+            // Search functionality
+            document.querySelector('.search-input').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    showNotification(`Searching for "${this.value}"`);
+                }
+            });
+
+            // Newsletter subscription
+            document.querySelector('.newsletter-form button').addEventListener('click', function() {
+                const email = document.querySelector('.newsletter-input').value;
+                if (email) {
+                    showNotification('Thanks for subscribing!');
+                    document.querySelector('.newsletter-input').value = '';
+                }
+            });
+        });
+
+        // Add CSS for slideIn animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                to {  
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
