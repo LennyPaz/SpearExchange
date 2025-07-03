@@ -4,7 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Spear Exchange - FSU Student Marketplace</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
+        :root {
+            --primary-color: #8B2635;
+            --primary-dark: #6B1B2A;
+            --accent-color: #FFD700;
+            --text-dark: #2C3E50;
+            --text-light: #5A6C7D;
+            --background-light: #F8FAFC;
+            --white: #FFFFFF;
+            --shadow-light: 0 2px 10px rgba(0,0,0,0.08);
+            --shadow-medium: 0 8px 30px rgba(0,0,0,0.12);
+            --border-radius: 12px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -12,377 +27,367 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             line-height: 1.6;
-            color: #333;
+            color: var(--text-dark);
+            overflow-x: hidden;
         }
 
+        /* Header Styles */
         .header {
-            background: linear-gradient(135deg, #8B2635, #A0344A);
-            color: white;
-            padding: 1rem 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(139, 38, 53, 0.1);
             position: sticky;
             top: 0;
-            z-index: 100;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+            transition: var(--transition);
+        }
+
+        .header.scrolled {
+            box-shadow: var(--shadow-medium);
         }
 
         .nav {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 2rem;
+            padding: 1rem 2rem;
         }
 
         .logo {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            font-size: 1.5rem;
-            font-weight: bold;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--primary-color);
         }
 
         .logo-icon {
-            width: 40px;
-            height: 40px;
-            background: white;
-            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #8B2635;
-            font-weight: bold;
+            color: white;
+            font-weight: 700;
+            font-size: 1.2rem;
+            box-shadow: var(--shadow-light);
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .nav-links {
             display: flex;
-            gap: 2rem;
+            gap: 2.5rem;
             align-items: center;
         }
 
         .nav-links a {
-            color: white;
+            color: var(--text-dark);
             text-decoration: none;
             font-weight: 500;
-            transition: opacity 0.3s;
+            position: relative;
+            transition: var(--transition);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 0;
+            background: var(--primary-color);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
         }
 
         .nav-links a:hover {
-            opacity: 0.8;
+            color: var(--primary-color);
         }
 
-        .search-bar {
+        .auth-buttons {
             display: flex;
             gap: 1rem;
             align-items: center;
-        }
-
-        .search-input {
-            padding: 0.5rem 1rem;
-            border: none;
-            border-radius: 25px;
-            width: 250px;
-            outline: none;
-        }
-
-        .cart-icon {
-            position: relative;
-            cursor: pointer;
-        }
-
-        .cart-count {
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            background: #FFD700;
-            color: #8B2635;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.8rem;
-            font-weight: bold;
-        }
-
-        .hero {
-            background: linear-gradient(135deg, #8B2635, #A0344A);
-            color: white;
-            text-align: center;
-            padding: 4rem 2rem;
-        }
-
-        .hero h1 {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            animation: fadeInUp 1s ease-out;
-        }
-
-        .hero p {
-            font-size: 1.2rem;
-            margin-bottom: 2rem;
-            opacity: 0.9;
-            animation: fadeInUp 1s ease-out 0.2s both;
-        }
-
-        .cta-buttons {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            flex-wrap: wrap;
-            animation: fadeInUp 1s ease-out 0.4s both;
         }
 
         .btn {
-            padding: 1rem 2rem;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1rem;
-            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--border-radius);
             text-decoration: none;
-            display: inline-block;
-            transition: all 0.3s ease;
-        }
-
-        .btn-primary {
-            background: #FFD700;
-            color: #8B2635;
-        }
-
-        .btn-secondary {
-            background: transparent;
-            color: white;
-            border: 2px solid white;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 2rem;
-        }
-
-        .section {
-            padding: 4rem 0;
-        }
-
-        .section-title {
-            text-align: center;
-            font-size: 2.5rem;
-            margin-bottom: 3rem;
-            color: #8B2635;
-        }
-
-        .featured-items {
-            background: #f8f9fa;
-        }
-
-        .items-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            margin-bottom: 2rem;
-        }
-
-        .item-card {
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        .item-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-        }
-
-        .item-image {
-            height: 200px;
-            background: #e9ecef;
-            display: flex;
+            font-weight: 600;
+            transition: var(--transition);
+            cursor: pointer;
+            border: none;
+            font-size: 0.95rem;
+            display: inline-flex;
             align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            color: #6c757d;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .item-badge {
-            position: absolute;
-            top: 1rem;
-            left: 1rem;
-            background: #8B2635;
-            color: white;
-            padding: 0.3rem 0.8rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: bold;
-        }
-
-        .item-info {
-            padding: 1.5rem;
-        }
-
-        .item-title {
-            font-size: 1.2rem;
-            font-weight: bold;
-            margin-bottom: 0.5rem;
-            color: #333;
-        }
-
-        .item-seller {
-            color: #6c757d;
-            font-size: 0.9rem;
-            margin-bottom: 1rem;
-        }
-
-        .item-price {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #8B2635;
-            margin-bottom: 1rem;
-        }
-
-        .item-actions {
-            display: flex;
             gap: 0.5rem;
-        }
-
-        .btn-small {
-            padding: 0.5rem 1rem;
-            font-size: 0.9rem;
-            flex: 1;
         }
 
         .btn-outline {
             background: transparent;
-            border: 2px solid #8B2635;
-            color: #8B2635;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
         }
 
         .btn-outline:hover {
-            background: #8B2635;
+            background: var(--primary-color);
             color: white;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
         }
 
-        .view-all {
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            box-shadow: var(--shadow-light);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 6rem 2rem 4rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.05"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.05"/><circle cx="50" cy="10" r="1" fill="white" opacity="0.03"/><circle cx="10" cy="60" r="1" fill="white" opacity="0.04"/><circle cx="90" cy="40" r="1" fill="white" opacity="0.05"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+        }
+
+        .hero-content {
+            max-width: 1400px;
+            margin: 0 auto;
             text-align: center;
-            margin-top: 2rem;
+            position: relative;
+            z-index: 2;
         }
 
-        .features {
-            background: white;
+        .hero h1 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+            animation: fadeInUp 0.8s ease-out;
         }
 
-        .features-grid {
+        .hero-subtitle {
+            font-size: clamp(1.1rem, 2vw, 1.4rem);
+            margin-bottom: 3rem;
+            opacity: 0.95;
+            font-weight: 400;
+            animation: fadeInUp 0.8s ease-out 0.2s both;
+        }
+
+        .hero-cta {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            animation: fadeInUp 0.8s ease-out 0.4s both;
+        }
+
+        .btn-hero {
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            border-radius: var(--border-radius);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+        }
+
+        /* Featured Listings Section */
+        .featured-section {
+            padding: 6rem 2rem;
+            background: var(--background-light);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-title {
+            font-size: clamp(2rem, 3vw, 2.5rem);
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 1rem;
+        }
+
+        .section-subtitle {
+            font-size: 1.2rem;
+            color: var(--text-light);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .listings-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 3rem;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
         }
 
-        .feature {
-            text-align: center;
-            padding: 2rem;
+        .listing-card {
+            background: white;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-light);
+            transition: var(--transition);
+            position: relative;
+            cursor: pointer;
         }
 
-        .feature-icon {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, #8B2635, #A0344A);
-            border-radius: 50%;
+        .listing-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .listing-image {
+            height: 220px;
+            background: linear-gradient(135deg, #f1f3f4, #e8eaed);
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 1.5rem;
-            color: white;
-            font-size: 2rem;
-        }
-
-        .feature h3 {
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-            color: #8B2635;
-        }
-
-        .categories {
-            background: #f8f9fa;
-        }
-
-        .categories-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .category-card {
-            background: white;
-            padding: 2rem;
-            border-radius: 12px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border: 2px solid transparent;
-        }
-
-        .category-card:hover {
-            border-color: #8B2635;
-            transform: translateY(-3px);
-        }
-
-        .category-icon {
             font-size: 3rem;
+            color: #9aa0a6;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .listing-badge {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            background: var(--primary-color);
+            color: white;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            z-index: 10;
+        }
+
+        .listing-info {
+            padding: 1.5rem;
+        }
+
+        .listing-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--text-dark);
+            line-height: 1.4;
+        }
+
+        .listing-seller {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .listing-price {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
             margin-bottom: 1rem;
         }
 
-        .newsletter {
-            background: linear-gradient(135deg, #8B2635, #A0344A);
-            color: white;
-            text-align: center;
-        }
-
-        .newsletter-form {
+        .listing-actions {
             display: flex;
-            gap: 1rem;
-            justify-content: center;
-            margin-top: 2rem;
-            flex-wrap: wrap;
+            gap: 0.75rem;
         }
 
-        .newsletter-input {
-            padding: 1rem;
-            border: none;
+        .btn-small {
+            padding: 0.6rem 1.2rem;
+            font-size: 0.9rem;
+            flex: 1;
+            text-align: center;
             border-radius: 8px;
-            width: 300px;
-            outline: none;
         }
 
+        .view-more {
+            text-align: center;
+            margin-top: 3rem;
+        }
+
+        .btn-large {
+            padding: 1rem 2.5rem;
+            font-size: 1.1rem;
+        }
+
+        /* Footer */
         .footer {
-            background: #2c3e50;
+            background: var(--text-dark);
             color: white;
-            padding: 3rem 0 1rem;
+            padding: 4rem 2rem 2rem;
         }
 
-        .footer-grid {
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-            margin-bottom: 2rem;
+            gap: 3rem;
+            margin-bottom: 3rem;
         }
 
         .footer-section h4 {
-            margin-bottom: 1rem;
-            color: #FFD700;
+            color: var(--accent-color);
+            margin-bottom: 1.5rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .footer-section p {
+            color: #94a3b8;
+            line-height: 1.7;
         }
 
         .footer-section ul {
@@ -390,13 +395,13 @@
         }
 
         .footer-section ul li {
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.75rem;
         }
 
         .footer-section a {
-            color: #bdc3c7;
+            color: #94a3b8;
             text-decoration: none;
-            transition: color 0.3s;
+            transition: var(--transition);
         }
 
         .footer-section a:hover {
@@ -406,43 +411,30 @@
         .footer-bottom {
             text-align: center;
             padding-top: 2rem;
-            border-top: 1px solid #34495e;
-            color: #bdc3c7;
+            border-top: 1px solid #475569;
+            color: #94a3b8;
         }
 
-        .modal {
+        /* Mobile Navigation */
+        .mobile-menu-btn {
             display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.5);
-        }
-
-        .modal-content {
-            background-color: white;
-            margin: 15% auto;
-            padding: 2rem;
-            border-radius: 12px;
-            width: 80%;
-            max-width: 500px;
-            text-align: center;
-        }
-
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
+            flex-direction: column;
+            gap: 4px;
+            background: none;
+            border: none;
             cursor: pointer;
+            padding: 0.5rem;
         }
 
-        .close:hover {
-            color: black;
+        .mobile-menu-btn span {
+            width: 25px;
+            height: 3px;
+            background: var(--text-dark);
+            border-radius: 2px;
+            transition: var(--transition);
         }
 
+        /* Animations */
         @keyframes fadeInUp {
             from {
                 opacity: 0;
@@ -454,273 +446,319 @@
             }
         }
 
+        .fade-in {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        /* Responsive Design */
         @media (max-width: 768px) {
-            .nav {
-                flex-direction: column;
-                gap: 1rem;
+            .nav-links {
+                display: none;
             }
 
-            .hero h1 {
-                font-size: 2rem;
+            .mobile-menu-btn {
+                display: flex;
             }
 
-            .search-input {
-                width: 200px;
+            .auth-buttons {
+                gap: 0.5rem;
             }
 
-            .items-grid {
-                grid-template-columns: 1fr;
+            .btn {
+                padding: 0.6rem 1rem;
+                font-size: 0.9rem;
             }
 
-            .newsletter-form {
+            .hero {
+                padding: 4rem 1rem 3rem;
+            }
+
+            .hero-cta {
                 flex-direction: column;
                 align-items: center;
             }
 
-            .newsletter-input {
+            .btn-hero {
                 width: 100%;
-                max-width: 300px;
+                max-width: 280px;
+            }
+
+            .featured-section {
+                padding: 4rem 1rem;
+            }
+
+            .listings-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .footer {
+                padding: 3rem 1rem 2rem;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .nav {
+                padding: 0.75rem 1rem;
+            }
+
+            .logo-text {
+                font-size: 1.2rem;
+            }
+
+            .logo-icon {
+                width: 40px;
+                height: 40px;
             }
         }
     </style>
 </head>
 <body>
     <!-- Header -->
-    <header class="header">
+    <header class="header" id="header">
         <nav class="nav">
-            <div class="logo">
+            <a href="#" class="logo">
                 <div class="logo-icon">SE</div>
-                <span>The Spear Exchange</span>
-            </div>
+                <span class="logo-text">The Spear Exchange</span>
+            </a>
             
             <div class="nav-links">
                 <a href="#home">Home</a>
-                <a href="#categories">Categories</a>
-                <a href="#sell">Sell Items</a>
+                <a href="#featured">Featured</a>
                 <a href="#about">About</a>
                 <a href="#contact">Contact</a>
             </div>
 
-            <div class="search-bar">
-                <input type="text" class="search-input" placeholder="Search items...">
-                <div class="cart-icon" onclick="openCart()">
-                    🛒
-                    <span class="cart-count">0</span>
-                </div>
+            <div class="auth-buttons">
+                <a href="login.html" class="btn btn-outline">Login</a>
+                <a href="signup.html" class="btn btn-primary">Sign Up</a>
             </div>
+
+            <button class="mobile-menu-btn">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
         </nav>
     </header>
 
     <!-- Hero Section -->
     <section class="hero" id="home">
-        <div class="container">
+        <div class="hero-content">
             <h1>Welcome to The Spear Exchange</h1>
-            <p>Buy and sell with fellow FSU students safely and easily</p>
-            <div class="cta-buttons">
-                <a href="#featured" class="btn btn-primary">Start Shopping</a>
-                <a href="#sell" class="btn btn-secondary">Sell Your Items</a>
+            <p class="hero-subtitle">The trusted marketplace for FSU students to buy, sell, and trade safely within the Seminole community</p>
+            <div class="hero-cta">
+                <a href="#featured" class="btn btn-primary btn-hero">
+                    <i class="fas fa-search"></i>
+                    Start Shopping
+                </a>
+                <a href="login.html" class="btn btn-secondary btn-hero">
+                    <i class="fas fa-plus"></i>
+                    List Your Items
+                </a>
             </div>
         </div>
     </section>
 
-    <!-- Categories Section -->
-    <section class="section categories" id="categories">
+    <!-- Featured Listings Section -->
+    <section class="featured-section" id="featured">
         <div class="container">
-            <h2 class="section-title">Browse Categories</h2>
-            <div class="categories-grid">
-                <div class="category-card" onclick="filterCategory('electronics')">
-                    <div class="category-icon">📱</div>
-                    <h3>Electronics</h3>
-                    <p>Phones, Laptops, Gadgets</p>
+            <div class="section-header">
+                <h2 class="section-title">Featured Listings</h2>
+                <p class="section-subtitle">Discover great deals from your fellow Seminoles</p>
+            </div>
+
+            <div class="listings-grid">
+                <!-- Listing 1 -->
+                <div class="listing-card" onclick="viewListing('macbook')">
+                    <div class="listing-image">
+                        <i class="fas fa-laptop"></i>
+                        <div class="listing-badge">Featured</div>
+                    </div>
+                    <div class="listing-info">
+                        <h3 class="listing-title">MacBook Pro 13-inch (2022)</h3>
+                        <p class="listing-seller">
+                            <i class="fas fa-user-circle"></i>
+                            by Sarah M.
+                        </p>
+                        <div class="listing-price">$899</div>
+                        <div class="listing-actions">
+                            <a href="login.html" class="btn btn-primary btn-small">View Details</a>
+                            <a href="login.html" class="btn btn-outline btn-small">Message</a>
+                        </div>
+                    </div>
                 </div>
-                <div class="category-card" onclick="filterCategory('textbooks')">
-                    <div class="category-icon">📚</div>
-                    <h3>Textbooks</h3>
-                    <p>Course Materials</p>
+
+                <!-- Listing 2 -->
+                <div class="listing-card" onclick="viewListing('textbook')">
+                    <div class="listing-image">
+                        <i class="fas fa-book"></i>
+                        <div class="listing-badge">Great Deal</div>
+                    </div>
+                    <div class="listing-info">
+                        <h3 class="listing-title">Calculus III Textbook</h3>
+                        <p class="listing-seller">
+                            <i class="fas fa-user-circle"></i>
+                            by Mike B.
+                        </p>
+                        <div class="listing-price">$45</div>
+                        <div class="listing-actions">
+                            <a href="login.html" class="btn btn-primary btn-small">View Details</a>
+                            <a href="login.html" class="btn btn-outline btn-small">Message</a>
+                        </div>
+                    </div>
                 </div>
-                <div class="category-card" onclick="filterCategory('furniture')">
-                    <div class="category-icon">🪑</div>
-                    <h3>Furniture</h3>
-                    <p>Dorm & Apartment Items</p>
+
+                <!-- Listing 3 -->
+                <div class="listing-card" onclick="viewListing('fridge')">
+                    <div class="listing-image">
+                        <i class="fas fa-snowflake"></i>
+                        <div class="listing-badge">Like New</div>
+                    </div>
+                    <div class="listing-info">
+                        <h3 class="listing-title">Dorm Mini Fridge</h3>
+                        <p class="listing-seller">
+                            <i class="fas fa-user-circle"></i>
+                            by Emma L.
+                        </p>
+                        <div class="listing-price">$120</div>
+                        <div class="listing-actions">
+                            <a href="login.html" class="btn btn-primary btn-small">View Details</a>
+                            <a href="login.html" class="btn btn-outline btn-small">Message</a>
+                        </div>
+                    </div>
                 </div>
-                <div class="category-card" onclick="filterCategory('clothing')">
-                    <div class="category-icon">👕</div>
-                    <h3>Clothing</h3>
-                    <p>FSU Gear & Fashion</p>
+
+                <!-- Listing 4 -->
+                <div class="listing-card" onclick="viewListing('jersey')">
+                    <div class="listing-image">
+                        <i class="fas fa-tshirt"></i>
+                        <div class="listing-badge">Popular</div>
+                    </div>
+                    <div class="listing-info">
+                        <h3 class="listing-title">FSU Football Jersey #5</h3>
+                        <p class="listing-seller">
+                            <i class="fas fa-user-circle"></i>
+                            by Alex K.
+                        </p>
+                        <div class="listing-price">$35</div>
+                        <div class="listing-actions">
+                            <a href="login.html" class="btn btn-primary btn-small">View Details</a>
+                            <a href="login.html" class="btn btn-outline btn-small">Message</a>
+                        </div>
+                    </div>
                 </div>
-                <div class="category-card" onclick="filterCategory('sports')">
-                    <div class="category-icon">⚽</div>
-                    <h3>Sports</h3>
-                    <p>Equipment & Gear</p>
+
+                <!-- Listing 5 -->
+                <div class="listing-card" onclick="viewListing('chair')">
+                    <div class="listing-image">
+                        <i class="fas fa-chair"></i>
+                        <div class="listing-badge">Trending</div>
+                    </div>
+                    <div class="listing-info">
+                        <h3 class="listing-title">Ergonomic Desk Chair</h3>
+                        <p class="listing-seller">
+                            <i class="fas fa-user-circle"></i>
+                            by Chris P.
+                        </p>
+                        <div class="listing-price">$180</div>
+                        <div class="listing-actions">
+                            <a href="login.html" class="btn btn-primary btn-small">View Details</a>
+                            <a href="login.html" class="btn btn-outline btn-small">Message</a>
+                        </div>
+                    </div>
                 </div>
-                <div class="category-card" onclick="filterCategory('other')">
-                    <div class="category-icon">🎒</div>
-                    <h3>Other</h3>
-                    <p>Miscellaneous Items</p>
+
+                <!-- Listing 6 -->
+                <div class="listing-card" onclick="viewListing('iphone')">
+                    <div class="listing-image">
+                        <i class="fas fa-mobile-alt"></i>
+                        <div class="listing-badge">Hot</div>
+                    </div>
+                    <div class="listing-info">
+                        <h3 class="listing-title">iPhone 14 Pro (128GB)</h3>
+                        <p class="listing-seller">
+                            <i class="fas fa-user-circle"></i>
+                            by Lisa W.
+                        </p>
+                        <div class="listing-price">$750</div>
+                        <div class="listing-actions">
+                            <a href="login.html" class="btn btn-primary btn-small">View Details</a>
+                            <a href="login.html" class="btn btn-outline btn-small">Message</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Listing 7 -->
+                <div class="listing-card" onclick="viewListing('bike')">
+                    <div class="listing-image">
+                        <i class="fas fa-bicycle"></i>
+                        <div class="listing-badge">Great Deal</div>
+                    </div>
+                    <div class="listing-info">
+                        <h3 class="listing-title">Campus Cruiser Bike</h3>
+                        <p class="listing-seller">
+                            <i class="fas fa-user-circle"></i>
+                            by Jordan R.
+                        </p>
+                        <div class="listing-price">$95</div>
+                        <div class="listing-actions">
+                            <a href="login.html" class="btn btn-primary btn-small">View Details</a>
+                            <a href="login.html" class="btn btn-outline btn-small">Message</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Listing 8 -->
+                <div class="listing-card" onclick="viewListing('keyboard')">
+                    <div class="listing-image">
+                        <i class="fas fa-keyboard"></i>
+                        <div class="listing-badge">New</div>
+                    </div>
+                    <div class="listing-info">
+                        <h3 class="listing-title">Mechanical Gaming Keyboard</h3>
+                        <p class="listing-seller">
+                            <i class="fas fa-user-circle"></i>
+                            by Taylor M.
+                        </p>
+                        <div class="listing-price">$85</div>
+                        <div class="listing-actions">
+                            <a href="login.html" class="btn btn-primary btn-small">View Details</a>
+                            <a href="login.html" class="btn btn-outline btn-small">Message</a>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
 
-    <!-- Featured Items -->
-    <section class="section featured-items" id="featured">
-        <div class="container">
-            <h2 class="section-title">Featured Items</h2>
-            <div class="items-grid">
-                <div class="item-card">
-                    <div class="item-image">
-                        <span>MacBook Pro 13-inch</span>
-                        <div class="item-badge">On Sale</div>
-                    </div>
-                    <div class="item-info">
-                        <h3 class="item-title">MacBook Pro 13-inch</h3>
-                        <p class="item-seller">by Sarah M.</p>
-                        <div class="item-price">$899</div>
-                        <div class="item-actions">
-                            <button class="btn btn-primary btn-small" onclick="addToCart('macbook')">Add to Cart</button>
-                            <button class="btn btn-outline btn-small" onclick="viewItem('macbook')">View Details</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="item-card">
-                    <div class="item-image">
-                        <span>Calculus Textbook</span>
-                        <div class="item-badge">Great Deal</div>
-                    </div>
-                    <div class="item-info">
-                        <h3 class="item-title">Calculus Textbook</h3>
-                        <p class="item-seller">by Mike B.</p>
-                        <div class="item-price">$45</div>
-                        <div class="item-actions">
-                            <button class="btn btn-primary btn-small" onclick="addToCart('textbook')">Add to Cart</button>
-                            <button class="btn btn-outline btn-small" onclick="viewItem('textbook')">View Details</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="item-card">
-                    <div class="item-image">
-                        <span>Dorm Mini Fridge</span>
-                        <div class="item-badge">Popular</div>
-                    </div>
-                    <div class="item-info">
-                        <h3 class="item-title">Dorm Mini Fridge</h3>
-                        <p class="item-seller">by Emma L.</p>
-                        <div class="item-price">$120</div>
-                        <div class="item-actions">
-                            <button class="btn btn-primary btn-small" onclick="addToCart('fridge')">Add to Cart</button>
-                            <button class="btn btn-outline btn-small" onclick="viewItem('fridge')">View Details</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="item-card">
-                    <div class="item-image">
-                        <span>FSU Jersey</span>
-                        <div class="item-badge">New</div>
-                    </div>
-                    <div class="item-info">
-                        <h3 class="item-title">FSU Jersey</h3>
-                        <p class="item-seller">by Alex K.</p>
-                        <div class="item-price">$25</div>
-                        <div class="item-actions">
-                            <button class="btn btn-primary btn-small" onclick="addToCart('jersey')">Add to Cart</button>
-                            <button class="btn btn-outline btn-small" onclick="viewItem('jersey')">View Details</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="item-card">
-                    <div class="item-image">
-                        <span>Gaming Chair</span>
-                        <div class="item-badge">Like New</div>
-                    </div>
-                    <div class="item-info">
-                        <h3 class="item-title">Gaming Chair</h3>
-                        <p class="item-seller">by Chris P.</p>
-                        <div class="item-price">$180</div>
-                        <div class="item-actions">
-                            <button class="btn btn-primary btn-small" onclick="addToCart('chair')">Add to Cart</button>
-                            <button class="btn btn-outline btn-small" onclick="viewItem('chair')">View Details</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="item-card">
-                    <div class="item-image">
-                        <span>iPhone 13</span>
-                        <div class="item-badge">Trending</div>
-                    </div>
-                    <div class="item-info">
-                        <h3 class="item-title">iPhone 13</h3>
-                        <p class="item-seller">by Lisa W.</p>
-                        <div class="item-price">$650</div>
-                        <div class="item-actions">
-                            <button class="btn btn-primary btn-small" onclick="addToCart('iphone')">Add to Cart</button>
-                            <button class="btn btn-outline btn-small" onclick="viewItem('iphone')">View Details</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="view-all">
-                <a href="#" class="btn btn-primary">View All Items</a>
-            </div>
-        </div>
-    </section>
-
-    <!-- Features Section -->
-    <section class="section features" id="about">
-        <div class="container">
-            <h2 class="section-title">Why Choose The Spear Exchange?</h2>
-            <div class="features-grid">
-                <div class="feature">
-                    <div class="feature-icon">🔒</div>
-                    <h3>Safe & Secure</h3>
-                    <p>FSU email verification ensures you're dealing with fellow students</p>
-                </div>
-                <div class="feature">
-                    <div class="feature-icon">💰</div>
-                    <h3>Great Prices</h3>
-                    <p>Student-friendly prices on textbooks, electronics, and more</p>
-                </div>
-                <div class="feature">
-                    <div class="feature-icon">📍</div>
-                    <h3>Local Pickup</h3>
-                    <p>Meet on campus for convenient and safe transactions</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Newsletter Section -->
-    <section class="section newsletter">
-        <div class="container">
-            <h2>Stay Updated</h2>
-            <p>Get notified about new items and great deals from fellow Seminoles</p>
-            <div class="newsletter-form">
-                <input type="email" class="newsletter-input" placeholder="Enter your FSU email">
-                <button class="btn btn-primary">Subscribe</button>
+            <div class="view-more">
+                <a href="login.html" class="btn btn-primary btn-large">
+                    <i class="fas fa-arrow-right"></i>
+                    View More Listings
+                </a>
             </div>
         </div>
     </section>
 
     <!-- Footer -->
-    <footer class="footer">
+    <footer class="footer" id="about">
         <div class="container">
-            <div class="footer-grid">
+            <div class="footer-content">
                 <div class="footer-section">
                     <h4>The Spear Exchange</h4>
-                    <p>The trusted marketplace for FSU students to buy and sell items safely within the Seminole community.</p>
+                    <p>The trusted marketplace for FSU students to buy, sell, and trade goods and services safely within the Seminole community. Built by students, for students.</p>
                 </div>
                 <div class="footer-section">
                     <h4>Quick Links</h4>
                     <ul>
                         <li><a href="#home">Home</a></li>
-                        <li><a href="#categories">Categories</a></li>
-                        <li><a href="#sell">Sell Items</a></li>
-                        <li><a href="#featured">Featured</a></li>
+                        <li><a href="#featured">Featured Items</a></li>
+                        <li><a href="login.html">Login</a></li>
+                        <li><a href="signup.html">Sign Up</a></li>
                     </ul>
                 </div>
                 <div class="footer-section">
@@ -732,155 +770,77 @@
                         <li><a href="#contact">Contact Us</a></li>
                     </ul>
                 </div>
-                <div class="footer-section">
-                    <h4>Connect</h4>
+                <div class="footer-section" id="contact">
+                    <h4>Contact Info</h4>
                     <ul>
-                        <li><a href="#">Facebook</a></li>
-                        <li><a href="#">Instagram</a></li>
-                        <li><a href="#">Twitter</a></li>
-                        <li><a href="#">Discord</a></li>
+                        <li>Email: support@spearexchange.fsu.edu</li>
+                        <li>Campus: Florida State University</li>
+                        <li>Hours: 24/7 Online Support</li>
                     </ul>
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2025 The Spear Exchange. Made for FSU students, by FSU students.</p>
+                <p>&copy; 2025 The Spear Exchange. Made for FSU students, by FSU students. | <a href="#">Terms of Service</a> | <a href="#">Privacy Policy</a></p>
             </div>
         </div>
     </footer>
 
-    <!-- Cart Modal -->
-    <div id="cartModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeCart()">&times;</span>
-            <h2>Shopping Cart</h2>
-            <div id="cartItems">
-                <p>Your cart is empty</p>
-            </div>
-            <div style="margin-top: 2rem;">
-                <button class="btn btn-primary">Checkout</button>
-            </div>
-        </div>
-    </div>
-
     <script>
-        let cart = [];
-        let cartCount = 0;
-
-        function addToCart(item) {
-            cart.push(item);
-            cartCount++;
-            updateCartCount();
-            showNotification(`Added ${item} to cart!`);
-        }
-
-        function updateCartCount() {
-            document.querySelector('.cart-count').textContent = cartCount;
-        }
-
-        function openCart() {
-            document.getElementById('cartModal').style.display = 'block';
-            updateCartDisplay();
-        }
-
-        function closeCart() {
-            document.getElementById('cartModal').style.display = 'none';
-        }
-
-        function updateCartDisplay() {
-            const cartItems = document.getElementById('cartItems');
-            if (cart.length === 0) {
-                cartItems.innerHTML = '<p>Your cart is empty</p>';
+        // Header scroll effect
+        window.addEventListener('scroll', () => {
+            const header = document.getElementById('header');
+            if (window.scrollY > 100) {
+                header.classList.add('scrolled');
             } else {
-                cartItems.innerHTML = cart.map(item => `<p>• ${item}</p>`).join('');
+                header.classList.remove('scrolled');
             }
-        }
+        });
 
-        function viewItem(item) {
-            alert(`Viewing details for ${item}. In a real app, this would open a detailed product page.`);
-        }
-
-        function filterCategory(category) {
-            showNotification(`Filtering by ${category}. In a real app, this would show filtered results.`);
-        }
-
-        function showNotification(message) {
-            // Create a simple notification
-            const notification = document.createElement('div');
-            notification.style.cssText = `
-                position: fixed;
-                top: 100px;
-                right: 20px;
-                background: #8B2635;
-                color: white;
-                padding: 1rem;
-                border-radius: 8px;
-                z-index: 1001;
-                animation: slideIn 0.3s ease-out;
-            `;
-            notification.textContent = message;
-            document.body.appendChild(notification);
-
-            setTimeout(() => {
-                notification.remove();
-            }, 3000);
-        }
-
-        // Close modal when clicking outside
-        window.onclick = function(event) {
-            const modal = document.getElementById('cartModal');
-            if (event.target === modal) {
-                modal.style.display = 'none';
-            }
-        }
-
-        // Add some interactive animations
-        document.addEventListener('DOMContentLoaded', function() {
-            // Smooth scrolling for navigation links
-            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                anchor.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    const target = document.querySelector(this.getAttribute('href'));
-                    if (target) {
-                        target.scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'start'
-                        });
-                    }
-                });
-            });
-
-            // Search functionality
-            document.querySelector('.search-input').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    showNotification(`Searching for "${this.value}"`);
-                }
-            });
-
-            // Newsletter subscription
-            document.querySelector('.newsletter-form button').addEventListener('click', function() {
-                const email = document.querySelector('.newsletter-input').value;
-                if (email) {
-                    showNotification('Thanks for subscribing!');
-                    document.querySelector('.newsletter-input').value = '';
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
                 }
             });
         });
 
-        // Add CSS for slideIn animation
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes slideIn {
-                from {
-                    transform: translateX(100%);
-                    opacity: 0;
+        // Listing card click handler
+        function viewListing(itemId) {
+            // In a real app, this would navigate to the item detail page
+            alert(`You need to log in to view listing details. Redirecting to login page...`);
+            window.location.href = 'login.html';
+        }
+
+        // Intersection Observer for fade-in animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('fade-in');
                 }
-                to {  
-                    transform: translateX(0);
-                    opacity: 1;
-                }
-            }
-        `;
-        document.head.appendChild(style);
+            });
+        }, observerOptions);
+
+        // Observe all listing cards
+        document.querySelectorAll('.listing-card').forEach(card => {
+            observer.observe(card);
+        });
+
+        // Mobile menu functionality (for future enhancement)
+        document.querySelector('.mobile-menu-btn').addEventListener('click', function() {
+            // This would toggle a mobile menu in a full implementation
+            alert('Mobile menu would appear here in the full implementation');
+        });
     </script>
 </body>
 </html>
