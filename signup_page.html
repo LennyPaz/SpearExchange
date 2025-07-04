@@ -230,14 +230,24 @@
             border: none;
             color: var(--text-light);
             cursor: pointer;
-            padding: 0.25rem;
-            border-radius: 4px;
+            padding: 0;
+            border-radius: 0;
             transition: var(--transition);
+            font-size: 1rem;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .password-toggle:hover {
             color: var(--primary-color);
-            background: rgba(139, 38, 53, 0.1);
+        }
+
+        .password-toggle:focus {
+            outline: none;
+            color: var(--primary-color);
         }
 
         .form-error {
@@ -599,7 +609,7 @@
 
                 <!-- CAPTCHA -->
                 <div class="captcha-container">
-                    <div class="cf-turnstile" data-sitekey="0x4AAAAAAAz8LCvOgn-FrCJp"></div>
+                    <div class="cf-turnstile" data-sitekey="0x4AAAAAAADnPIDROAb9aCA8"></div>
                 </div>
                 <div class="form-error" id="captchaError"></div>
 
@@ -1078,4 +1088,3 @@
     </script>
 </body>
 </html>
-            
