@@ -515,14 +515,14 @@
 
                 <!-- Email -->
                 <div class="form-group">
-                    <label for="email" class="form-label">FSU Email Address</label>
+                    <label for="email" class="form-label">Email Address</label>
                     <div class="input-icon">
                         <input 
                             type="email" 
                             id="email" 
                             name="email" 
                             class="form-input" 
-                            placeholder="your-email@fsu.edu"
+                            placeholder="your-email@fsu.edu or @gmail.com"
                             required
                         >
                         <i class="fas fa-envelope"></i>
@@ -719,17 +719,21 @@
             clearFieldStatus(emailInput, emailError, emailSuccess);
             
             if (!email) {
-                showFieldError(emailInput, emailError, 'FSU email address is required');
+                showFieldError(emailInput, emailError, 'Email address is required');
                 return false;
-            } else if (!email.endsWith('@fsu.edu')) {
-                showFieldError(emailInput, emailError, 'Must use your FSU email address (@fsu.edu)');
+            } else if (!email.endsWith('@fsu.edu') && !email.endsWith('@gmail.com')) {
+                showFieldError(emailInput, emailError, 'Must use FSU email (@fsu.edu) or Gmail for testing');
                 return false;
-            } else if (!/^[a-zA-Z0-9._%+-]+@fsu\.edu$/.test(email)) {
-                showFieldError(emailInput, emailError, 'Please enter a valid FSU email address');
+            } else if (!/^[a-zA-Z0-9._%+-]+@(fsu\.edu|gmail\.com)$/.test(email)) {
+                showFieldError(emailInput, emailError, 'Please enter a valid email address');
                 return false;
             }
             
-            showFieldSuccess(emailInput, emailSuccess, 'Valid FSU email address');
+            if (email.endsWith('@fsu.edu')) {
+                showFieldSuccess(emailInput, emailSuccess, 'Valid FSU email address');
+            } else {
+                showFieldSuccess(emailInput, emailSuccess, 'Gmail allowed for testing');
+            }
             return true;
         }
 
