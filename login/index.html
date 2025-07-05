@@ -500,7 +500,7 @@
 
                 <!-- Forgot Password -->
                 <div class="forgot-password">
-                    <a href="#" id="forgotPasswordLink">Forgot your password?</a>
+                    <a href="../forgot-password/" id="forgotPasswordLink">Forgot your password?</a>
                 </div>
 
                 <!-- Submit Button -->
@@ -552,10 +552,10 @@
             }
         }
 
-        // Forgot password link handler (placeholder for now)
+        // Forgot password link handler
         document.getElementById('forgotPasswordLink').addEventListener('click', function(e) {
             e.preventDefault();
-            showAlert('info', 'Forgot password functionality coming soon!');
+            window.location.href = '../forgot-password/';
         });
 
         // Real-time validation
