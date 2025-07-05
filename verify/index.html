@@ -1,1 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Verification - The Spear Exchange</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #8B2635;
+            --primary-dark: #6B1B2A;
+            --accent-color: #FFD700;
+            --text-dark: #2C3E50;
+            --text-light: #5A6C7D;
+            --background-light: #F8FAFC;
+            --white: #FFFFFF;
+            --success-color: #10B981;
+            --warning-color: #F59E0B;
+            --error-color: #EF4444;
+            --shadow-light: 0 2px 10px rgba(0,0,0,0.08);
+            --shadow-medium: 0 8px 30px rgba(0,0,0,0.12);
+            --border-radius: 12px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            line-height: 1.6;
+            color: var(--text-dark);
+            background: linear-gradient(135deg, var(--background-light) 0%, #E2E8F0 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .verification-container {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-medium);
+            overflow: hidden;
+            max-width: 600px;
+            width: 100%;
+            animation: slideInUp 0.6s ease-out;
+        }
+
+        .verification-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .verification-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.05"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.05"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            z-index: 1;
+        }
+
+        .logo-container {
+            position: relative;
+            z-index: 2;
+            margin-bottom: 1rem;
+        }
+
+        .logo-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .logo-text {
+            font-size: 2rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .verification-content {
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+
+        .status-icon {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 2rem;
+            font-size: 3rem;
+            animation: bounceIn 0.8s ease-out 0.3s both;
+        }
+
+        .status-icon.success {
+            background: linear-gradient(135deg, var(--success-color), #059669);
+            color: white;
+            box-shadow: 0 8px 30px rgba(16, 185, 129, 0.3);
+        }
+
+        .status-icon.error {
+            background: linear-gradient(135deg, var(--error-color), #DC2626);
+            color: white;
+            box-shadow: 0 8px 30px rgba(239, 68, 68, 0.3);
+        }
+
+        .status-icon.warning {
+            background: linear-gradient(135deg, var(--warning-color), #D97706);
+            color: white;
+            box-shadow: 0 8px 30px rgba(245, 158, 11, 0.3);
+        }
+
+        .verification-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+        }
+
+        .verification-message {
+            font-size: 1.1rem;
+            color: var(--text-light);
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: var(--transition);
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            box-shadow: var(--shadow-light);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .additional-info {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: var(--background-light);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            color: var(--text-light);
+        }
+
+        .divider {
+            margin: 2rem 0;
+            text-align: center;
+            position: relative;
+        }
+
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: #E2E8F0;
+        }
+
+        .divider span {
+            background: white;
+            padding: 0 1rem;
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        /* Animations */
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes bounceIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.3);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.05);
+            }
+            70% {
+                transform: scale(0.9);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            .verification-header {
+                padding: 2rem 1.5rem;
+            }
+
+            .verification-content {
+                padding: 2rem 1.5rem;
+            }
+
+            .verification-title {
+                font-size: 1.5rem;
+            }
+
+            .logo-icon {
+                width: 60px;
+                height: 60px;
+            }
+
+            .logo-text {
+                font-size: 1.5rem;
+            }
+
+            .status-icon {
+                width: 80px;
+                height: 80px;
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="verification-container">
+        <div class="verification-header">
+            <div class="logo-container">
+                <div class="logo-icon">
+                    <span class="logo-text">SE</span>
+                </div>
+                <h1>The Spear Exchange</h1>
+            </div>
+        </div>
+
+        <div class="verification-content" id="content">
+            <!-- Content will be populated by JavaScript based on verification status -->
+        </div>
+    </div>
+
+    <script>
+        // Get URL parameters to determine verification status
+        const urlParams = new URLSearchParams(window.location.search);
+        const status = urlParams.get('status') || 'error';
+        const message = urlParams.get('message') || '';
+        
+        const content = document.getElementById('content');
+        
+        // Define different states
+        const states = {
+            success: {
+                icon: 'fas fa-check-circle',
+                iconClass: 'success',
+                title: 'Email Verified Successfully!',
+                message: 'Welcome to The Spear Exchange! Your email has been verified and your account is now active.',
+                primaryButton: {
+                    text: 'Login Now',
+                    href: 'https://lennypaz.github.io/SpearExchange/login/',
+                    icon: 'fas fa-sign-in-alt'
+                },
+                additionalInfo: 'You can now log in and start buying and selling with fellow Seminoles. Go Noles! 🏈'
+            },
+            already_verified: {
+                icon: 'fas fa-check-circle',
+                iconClass: 'success',
+                title: 'Already Verified!',
+                message: 'Your email is already verified. You can log in to access your account.',
+                primaryButton: {
+                    text: 'Login Now',
+                    href: 'https://lennypaz.github.io/SpearExchange/login/',
+                    icon: 'fas fa-sign-in-alt'
+                },
+                additionalInfo: 'If you\'re having trouble logging in, try resetting your password.'
+            },
+            expired: {
+                icon: 'fas fa-clock',
+                iconClass: 'warning',
+                title: 'Verification Link Expired',
+                message: 'This verification link has expired. Please sign up again to receive a new verification email.',
+                primaryButton: {
+                    text: 'Sign Up Again',
+                    href: 'https://lennypaz.github.io/SpearExchange/signup/',
+                    icon: 'fas fa-user-plus'
+                },
+                secondaryButton: {
+                    text: 'Back to Home',
+                    href: 'https://lennypaz.github.io/SpearExchange/',
+                    icon: 'fas fa-home'
+                },
+                additionalInfo: 'Verification links expire after 24 hours for security purposes.'
+            },
+            invalid: {
+                icon: 'fas fa-exclamation-circle',
+                iconClass: 'error',
+                title: 'Invalid Verification Link',
+                message: 'This verification link is invalid or has already been used.',
+                primaryButton: {
+                    text: 'Sign Up',
+                    href: 'https://lennypaz.github.io/SpearExchange/signup/',
+                    icon: 'fas fa-user-plus'
+                },
+                secondaryButton: {
+                    text: 'Back to Home',
+                    href: 'https://lennypaz.github.io/SpearExchange/',
+                    icon: 'fas fa-home'
+                },
+                additionalInfo: 'If you already have an account, try logging in instead.'
+            },
+            error: {
+                icon: 'fas fa-exclamation-triangle',
+                iconClass: 'error',
+                title: 'Verification Error',
+                message: 'An error occurred during verification. Please try again.',
+                primaryButton: {
+                    text: 'Try Again',
+                    href: 'https://lennypaz.github.io/SpearExchange/signup/',
+                    icon: 'fas fa-redo'
+                },
+                secondaryButton: {
+                    text: 'Back to Home',
+                    href: 'https://lennypaz.github.io/SpearExchange/',
+                    icon: 'fas fa-home'
+                },
+                additionalInfo: 'If this problem persists, please contact support.'
+            }
+        };
+        
+        // Get the current state or default to error
+        const currentState = states[status] || states.error;
+        
+        // Override message if provided in URL
+        if (message) {
+            currentState.message = decodeURIComponent(message);
+        }
+        
+        // Build the HTML content
+        let html = `
+            <div class="status-icon ${currentState.iconClass}">
+                <i class="${currentState.icon}"></i>
+            </div>
+            
+            <h2 class="verification-title">${currentState.title}</h2>
+            <p class="verification-message">${currentState.message}</p>
+            
+            <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                <a href="${currentState.primaryButton.href}" class="btn btn-primary">
+                    <i class="${currentState.primaryButton.icon}"></i>
+                    ${currentState.primaryButton.text}
+                </a>
+        `;
+        
+        if (currentState.secondaryButton) {
+            html += `
+                <a href="${currentState.secondaryButton.href}" class="btn btn-outline">
+                    <i class="${currentState.secondaryButton.icon}"></i>
+                    ${currentState.secondaryButton.text}
+                </a>
+            `;
+        }
+        
+        html += `
+            </div>
+            
+            <div class="additional-info">
+                <i class="fas fa-info-circle" style="margin-right: 0.5rem;"></i>
+                ${currentState.additionalInfo}
+            </div>
+        `;
+        
+        content.innerHTML = html;
+        
+        // Update page title based on status
+        document.title = `${currentState.title} - The Spear Exchange`;
+    </script>
+</body>
+</html>
