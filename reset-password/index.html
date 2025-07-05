@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reset Password - The Spear Exchange</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+    <style>
+        :root {
+            --primary-color: #8B2635;
+            --primary-dark: #6B1B2A;
+            --accent-color: #FFD700;
+            --text-dark: #2C3E50;
+            --text-light: #5A6C7D;
+            --background-light: #F8FAFC;
+            --white: #FFFFFF;
+            --success-color: #10B981;
+            --warning-color: #F59E0B;
+            --error-color: #EF4444;
+            --shadow-light: 0 2px 10px rgba(0,0,0,0.08);
+            --shadow-medium: 0 8px 30px rgba(0,0,0,0.12);
+            --border-radius: 12px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            line-height: 1.6;
+            color: var(--text-dark);
+            background: var(--background-light);
+            min-height: 100vh;
+        }
+
+        /* Header Styles */
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(139, 38, 53, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow-light);
+        }
+
+        .nav {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--primary-color);
+        }
+
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.2rem;
+            box-shadow: var(--shadow-light);
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .back-button {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+        }
+
+        .back-button:hover {
+            color: var(--primary-color);
+            background: rgba(139, 38, 53, 0.1);
+        }
+
+        /* Main Content */
+        .main-container {
+            display: flex;
+            min-height: calc(100vh - 80px);
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .reset-container {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-medium);
+            overflow: hidden;
+            max-width: 500px;
+            width: 100%;
+            animation: slideInUp 0.6s ease-out;
+        }
+
+        .reset-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .reset-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.05"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.05"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+        }
+
+        .reset-header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .reset-header p {
+            opacity: 0.9;
+            font-size: 1rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .reset-form {
+            padding: 2.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            font-size: 0.95rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 2px solid #E2E8F0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: var(--transition);
+            background: white;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(139, 38, 53, 0.1);
+        }
+
+        .form-input.error {
+            border-color: var(--error-color);
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+        }
+
+        .form-input.success {
+            border-color: var(--success-color);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+
+        .input-icon {
+            position: relative;
+        }
+
+        .input-icon i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+            transition: var(--transition);
+        }
+
+        .input-icon .form-input {
+            padding-left: 2.75rem;
+        }
+
+        .input-icon .form-input:focus + i {
+            color: var(--primary-color);
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 1.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-light);
+            cursor: pointer;
+            padding: 0;
+            border-radius: 0;
+            transition: var(--transition);
+            font-size: 1rem;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .password-toggle:hover {
+            color: var(--primary-color);
+        }
+
+        .password-toggle:focus {
+            outline: none;
+            color: var(--primary-color);
+        }
+
+        .form-error {
+            color: var(--error-color);
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .form-success {
+            color: var(--success-color);
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .password-strength {
+            margin-top: 0.5rem;
+        }
+
+        .strength-meter {
+            height: 4px;
+            background: #E2E8F0;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .strength-fill {
+            height: 100%;
+            transition: var(--transition);
+            border-radius: 2px;
+        }
+
+        .strength-text {
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            font-weight: 500;
+        }
+
+        .captcha-container {
+            display: flex;
+            justify-content: center;
+            margin: 1.5rem 0;
+        }
+
+        .btn {
+            padding: 0.875rem 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            cursor: pointer;
+            border: none;
+            font-size: 1rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            width: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            box-shadow: var(--shadow-light);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading-spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid transparent;
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: var(--text-light);
+            padding-top: 1.5rem;
+            border-top: 1px solid #E2E8F0;
+        }
+
+        .login-link a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.95rem;
+        }
+
+        .alert-success {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            color: #065F46;
+        }
+
+        .alert-error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: #991B1B;
+        }
+
+        .alert-warning {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+            color: #92400E;
+        }
+
+        .error-state {
+            text-align: center;
+            padding: 3rem 2rem;
+        }
+
+        .error-state h2 {
+            color: var(--error-color);
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .error-state p {
+            color: var(--text-light);
+            margin-bottom: 2rem;
+        }
+
+        .error-state .btn {
+            max-width: 200px;
+            margin: 0 auto;
+        }
+
+        /* Animations */
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav {
+                padding: 1rem;
+            }
+
+            .logo-text {
+                font-size: 1.2rem;
+            }
+
+            .main-container {
+                padding: 1rem;
+            }
+
+            .reset-form {
+                padding: 2rem 1.5rem;
+            }
+
+            .reset-header {
+                padding: 1.5rem;
+            }
+
+            .reset-header h1 {
+                font-size: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .logo-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
+            }
+
+            .reset-form {
+                padding: 1.5rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav">
+            <a href="index.html" class="logo">
+                <div class="logo-icon">SE</div>
+                <span class="logo-text">The Spear Exchange</span>
+            </a>
+            
+            <a href="../login/" class="back-button">
+                <i class="fas fa-arrow-left"></i>
+                Back to Login
+            </a>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-container">
+        <div class="reset-container">
+            <div class="reset-header">
+                <h1>Reset Your Password</h1>
+                <p>Enter your new password below</p>
+            </div>
+
+            <!-- Error State (hidden by default) -->
+            <div class="error-state" id="errorState" style="display: none;">
+                <h2>Reset Link Invalid</h2>
+                <p id="errorMessage">This password reset link is invalid or has expired.</p>
+                <a href="../forgot-password/" class="btn btn-primary">Request New Reset Link</a>
+            </div>
+
+            <!-- Reset Form -->
+            <form class="reset-form" id="resetForm">
+                <!-- Alert container -->
+                <div id="alertContainer"></div>
+
+                <!-- Hidden fields for token -->
+                <input type="hidden" id="resetToken" name="resetToken">
+
+                <!-- Email Display -->
+                <div class="form-group">
+                    <label class="form-label">Resetting password for:</label>
+                    <div class="input-icon">
+                        <input 
+                            type="email" 
+                            id="emailDisplay" 
+                            class="form-input" 
+                            readonly
+                            style="background-color: #F8FAFC; cursor: not-allowed;"
+                        >
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                </div>
+
+                <!-- New Password -->
+                <div class="form-group">
+                    <label for="password" class="form-label">New Password</label>
+                    <div class="input-icon">
+                        <input 
+                            type="password" 
+                            id="password" 
+                            name="password" 
+                            class="form-input" 
+                            placeholder="Create a strong password"
+                            autocomplete="new-password"
+                            required
+                        >
+                        <i class="fas fa-lock"></i>
+                        <button type="button" class="password-toggle" id="passwordToggle">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <div class="password-strength" id="passwordStrength">
+                        <div class="strength-meter">
+                            <div class="strength-fill" id="strengthFill"></div>
+                        </div>
+                        <div class="strength-text" id="strengthText"></div>
+                    </div>
+                    <div class="form-error" id="passwordError"></div>
+                </div>
+
+                <!-- Confirm Password -->
+                <div class="form-group">
+                    <label for="confirmPassword" class="form-label">Confirm New Password</label>
+                    <div class="input-icon">
+                        <input 
+                            type="password" 
+                            id="confirmPassword" 
+                            name="confirmPassword" 
+                            class="form-input" 
+                            placeholder="Confirm your new password"
+                            autocomplete="new-password"
+                            required
+                        >
+                        <i class="fas fa-lock"></i>
+                        <button type="button" class="password-toggle" id="confirmPasswordToggle">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <div class="form-error" id="confirmPasswordError"></div>
+                    <div class="form-success" id="confirmPasswordSuccess"></div>
+                </div>
+
+                <!-- CAPTCHA -->
+                <div class="captcha-container">
+                    <div class="cf-turnstile" data-sitekey="0x4AAAAAABjmLKwd9CX2Laip"></div>
+                </div>
+                <div class="form-error" id="captchaError"></div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="btn btn-primary" id="submitBtn">
+                    <span id="submitText">Reset Password</span>
+                    <div class="loading-spinner" id="loadingSpinner" style="display: none;"></div>
+                </button>
+
+                <!-- Login Link -->
+                <div class="login-link">
+                    Remember your password? <a href="../login/">Sign in instead</a>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <script>
+        // API Configuration
+        const API_BASE_URL = 'https://spear-exchange.lenny-paz123.workers.dev';
+
+        // Form elements
+        const form = document.getElementById('resetForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const submitText = document.getElementById('submitText');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const alertContainer = document.getElementById('alertContainer');
+        const errorState = document.getElementById('errorState');
+
+        // Input elements
+        const emailDisplay = document.getElementById('emailDisplay');
+        const passwordInput = document.getElementById('password');
+        const confirmPasswordInput = document.getElementById('confirmPassword');
+        const resetTokenInput = document.getElementById('resetToken');
+
+        // Password toggle functionality
+        document.getElementById('passwordToggle').addEventListener('click', function() {
+            togglePasswordVisibility('password', this);
+        });
+
+        document.getElementById('confirmPasswordToggle').addEventListener('click', function() {
+            togglePasswordVisibility('confirmPassword', this);
+        });
+
+        function togglePasswordVisibility(inputId, button) {
+            const input = document.getElementById(inputId);
+            const icon = button.querySelector('i');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
+        // Real-time validation
+        passwordInput.addEventListener('input', validatePassword);
+        confirmPasswordInput.addEventListener('input', validateConfirmPassword);
+
+        function validatePassword() {
+            const password = passwordInput.value;
+            const passwordError = document.getElementById('passwordError');
+            const strengthFill = document.getElementById('strengthFill');
+            const strengthText = document.getElementById('strengthText');
+            
+            clearFieldStatus(passwordInput, passwordError);
+            
+            if (!password) {
+                showFieldError(passwordInput, passwordError, 'Password is required');
+                updatePasswordStrength(0, '');
+                return false;
+            }
+            
+            const strength = calculatePasswordStrength(password);
+            updatePasswordStrength(strength.score, strength.text);
+            
+            if (password.length < 8) {
+                showFieldError(passwordInput, passwordError, 'Password must be at least 8 characters long');
+                return false;
+            } else if (strength.score < 3) {
+                showFieldError(passwordInput, passwordError, 'Please choose a stronger password');
+                return false;
+            }
+            
+            showFieldSuccess(passwordInput);
+            
+            // Revalidate confirm password if it has a value
+            if (confirmPasswordInput.value) {
+                validateConfirmPassword();
+            }
+            
+            return true;
+        }
+
+        function validateConfirmPassword() {
+            const password = passwordInput.value;
+            const confirmPassword = confirmPasswordInput.value;
+            const confirmPasswordError = document.getElementById('confirmPasswordError');
+            const confirmPasswordSuccess = document.getElementById('confirmPasswordSuccess');
+            
+            clearFieldStatus(confirmPasswordInput, confirmPasswordError, confirmPasswordSuccess);
+            
+            if (!confirmPassword) {
+                showFieldError(confirmPasswordInput, confirmPasswordError, 'Please confirm your password');
+                return false;
+            } else if (password !== confirmPassword) {
+                showFieldError(confirmPasswordInput, confirmPasswordError, 'Passwords do not match');
+                return false;
+            }
+            
+            showFieldSuccess(confirmPasswordInput, confirmPasswordSuccess, 'Passwords match');
+            return true;
+        }
+
+        function calculatePasswordStrength(password) {
+            let score = 0;
+            let text = '';
+            
+            // Length check
+            if (password.length >= 8) score++;
+            if (password.length >= 12) score++;
+            
+            // Character variety checks
+            if (/[a-z]/.test(password)) score++;
+            if (/[A-Z]/.test(password)) score++;
+            if (/[0-9]/.test(password)) score++;
+            if (/[^A-Za-z0-9]/.test(password)) score++;
+            
+            // Set text and final score
+            if (score <= 2) {
+                text = 'Weak';
+            } else if (score <= 4) {
+                text = 'Fair';
+            } else if (score <= 5) {
+                text = 'Good';
+            } else {
+                text = 'Strong';
+            }
+            
+            return { score: Math.min(score, 4), text };
+        }
+
+        function updatePasswordStrength(score, text) {
+            const strengthFill = document.getElementById('strengthFill');
+            const strengthText = document.getElementById('strengthText');
+            
+            const colors = ['#EF4444', '#F59E0B', '#F59E0B', '#10B981', '#10B981'];
+            const width = (score / 4) * 100;
+            
+            strengthFill.style.width = width + '%';
+            strengthFill.style.backgroundColor = colors[score] || '#E2E8F0';
+            strengthText.textContent = text;
+            strengthText.style.color = colors[score] || '#6B7280';
+        }
+
+        // Helper functions for validation feedback
+        function showFieldError(input, errorElement, message) {
+            input.classList.add('error');
+            input.classList.remove('success');
+            showError(errorElement, message);
+        }
+
+        function showFieldSuccess(input, successElement = null, message = '') {
+            input.classList.add('success');
+            input.classList.remove('error');
+            if (successElement && message) {
+                showSuccess(successElement, message);
+            }
+        }
+
+        function clearFieldStatus(input, errorElement, successElement = null) {
+            input.classList.remove('error', 'success');
+            hideError(errorElement);
+            if (successElement) {
+                hideSuccess(successElement);
+            }
+        }
+
+        function showError(element, message) {
+            element.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${message}`;
+            element.style.display = 'flex';
+        }
+
+        function hideError(element) {
+            element.style.display = 'none';
+        }
+
+        function showSuccess(element, message) {
+            element.innerHTML = `<i class="fas fa-check-circle"></i> ${message}`;
+            element.style.display = 'flex';
+        }
+
+        function hideSuccess(element) {
+            element.style.display = 'none';
+        }
+
+        function showAlert(type, message) {
+            const alertClass = `alert-${type}`;
+            const iconClass = type === 'success' ? 'fas fa-check-circle' : 
+                            type === 'error' ? 'fas fa-exclamation-circle' : 
+                            'fas fa-exclamation-triangle';
+            
+            alertContainer.innerHTML = `
+                <div class="alert ${alertClass}">
+                    <i class="${iconClass}"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+        }
+
+        function clearAlert() {
+            alertContainer.innerHTML = '';
+        }
+
+        function showErrorState(message) {
+            form.style.display = 'none';
+            errorState.style.display = 'block';
+            document.getElementById('errorMessage').textContent = message;
+        }
+
+        // Form submission
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            clearAlert();
+            
+            // Validate all fields
+            const isPasswordValid = validatePassword();
+            const isConfirmPasswordValid = validateConfirmPassword();
+            
+            if (!isPasswordValid || !isConfirmPasswordValid) {
+                showAlert('error', 'Please fix the errors above before submitting.');
+                return;
+            }
+            
+            // Get CAPTCHA token
+            const captchaResponse = turnstile.getResponse();
+            if (!captchaResponse) {
+                showAlert('error', 'Please complete the CAPTCHA verification.');
+                document.getElementById('captchaError').innerHTML = '<i class="fas fa-exclamation-circle"></i> CAPTCHA verification is required';
+                document.getElementById('captchaError').style.display = 'flex';
+                return;
+            }
+
+            // Show loading state
+            setLoadingState(true);
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/reset-password`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        token: resetTokenInput.value,
+                        password: passwordInput.value,
+                        captchaToken: captchaResponse
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showAlert('success', data.message || 'Password reset successfully! Redirecting to login...');
+                    
+                    // Clear form
+                    form.reset();
+                    clearAllValidationStates();
+                    
+                    // Reset CAPTCHA
+                    turnstile.reset();
+                    
+                    // Redirect to login page after a delay
+                    setTimeout(() => {
+                        window.location.href = '../login/?message=reset-success';
+                    }, 3000);
+                    
+                } else {
+                    if (data.error.includes('expired') || data.error.includes('invalid')) {
+                        showErrorState(data.error);
+                    } else if (data.error.includes('CAPTCHA')) {
+                        showAlert('error', data.error);
+                        turnstile.reset();
+                    } else {
+                        showAlert('error', data.error || 'Failed to reset password. Please try again.');
+                    }
+                }
+                
+            } catch (error) {
+                console.error('Reset password error:', error);
+                showAlert('error', 'Network error. Please check your connection and try again.');
+                turnstile.reset();
+            } finally {
+                setLoadingState(false);
+            }
+        });
+        
+        function setLoadingState(isLoading) {
+            submitBtn.disabled = isLoading;
+            
+            if (isLoading) {
+                submitText.style.display = 'none';
+                loadingSpinner.style.display = 'block';
+            } else {
+                submitText.style.display = 'block';
+                loadingSpinner.style.display = 'none';
+            }
+        }
+        
+        function clearAllValidationStates() {
+            // Clear all input states
+            const inputs = [passwordInput, confirmPasswordInput];
+            inputs.forEach(input => {
+                input.classList.remove('error', 'success');
+            });
+            
+            // Clear all error and success messages
+            const errorElements = document.querySelectorAll('.form-error, .form-success');
+            errorElements.forEach(element => {
+                element.style.display = 'none';
+            });
+            
+            // Reset password strength indicator
+            updatePasswordStrength(0, '');
+        }
+
+        // Handle page load with query parameters
+        window.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const token = urlParams.get('token');
+            const email = urlParams.get('email');
+            const status = urlParams.get('status');
+            const message = urlParams.get('message');
+            
+            if (status === 'invalid' || status === 'expired' || status === 'error') {
+                showErrorState(message || 'This reset link is invalid or has expired.');
+                return;
+            }
+            
+            if (!token || !email) {
+                showErrorState('Missing reset token or email. Please request a new reset link.');
+                return;
+            }
+            
+            // Set the token and email
+            resetTokenInput.value = token;
+            emailDisplay.value = email;
+            
+            // Focus first input
+            passwordInput.focus();
+        });
+        
+        // CAPTCHA error handling
+        window.addEventListener('cf-turnstile-error', function() {
+            showAlert('error', 'CAPTCHA verification failed. Please try again.');
+        });
+        
+        // Add hover effects
+        const formInputs = document.querySelectorAll('.form-input:not([readonly])');
+        formInputs.forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentElement.style.transform = 'translateY(-1px)';
+                this.parentElement.style.transition = 'transform 0.2s ease';
+            });
+            
+            input.addEventListener('blur', function() {
+                this.parentElement.style.transform = 'translateY(0)';
+            });
+        });
+    </script>
+</body>
+</html>
