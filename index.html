@@ -40,8 +40,11 @@
             border-bottom: 1px solid rgba(139, 38, 53, 0.1);
             position: sticky;
             top: 0;
-            z-index: 1000;
+            z-index: 100;
             transition: var(--transition);
+            height: 80px;
+            display: flex;
+            align-items: center;
         }
 
         .header.scrolled {
@@ -54,7 +57,9 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 1rem 2rem;
+            padding: 0 2rem;
+            width: 100%;
+            height: 100%;
         }
 
         .logo {
@@ -100,6 +105,8 @@
             font-weight: 500;
             position: relative;
             transition: var(--transition);
+            font-size: 1rem;
+            white-space: nowrap;
         }
 
         .nav-links a::after {
@@ -233,7 +240,10 @@
             font-size: 0.95rem;
             display: inline-flex;
             align-items: center;
+            justify-content: center;
             gap: 0.5rem;
+            white-space: nowrap;
+            min-width: fit-content;
         }
 
         .btn-outline {
@@ -531,6 +541,7 @@
             border: none;
             cursor: pointer;
             padding: 0.5rem;
+            z-index: 202;
         }
 
         .mobile-menu-btn span {
@@ -539,6 +550,237 @@
             background: var(--text-dark);
             border-radius: 2px;
             transition: var(--transition);
+        }
+
+        /* Mobile Menu Overlay and Container */
+        .mobile-menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 200;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .mobile-menu-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            right: 0;
+            height: 100vh;
+            width: 320px;
+            max-width: 90vw;
+            background: white;
+            border-left: 1px solid rgba(139, 38, 53, 0.1);
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            z-index: 201;
+            overflow-y: auto;
+            padding: 0;
+        }
+
+        .mobile-menu.active {
+            transform: translateX(0);
+        }
+
+        .mobile-menu-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid rgba(139, 38, 53, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .mobile-menu-title {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .mobile-close-btn {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            padding: 0.25rem;
+            border-radius: 4px;
+            transition: var(--transition);
+        }
+
+        .mobile-close-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .mobile-close-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* Mobile Menu Sections */
+        .mobile-nav-section {
+            border-bottom: 1px solid #E2E8F0;
+        }
+
+        .mobile-nav-section:last-child {
+            border-bottom: none;
+        }
+
+        .mobile-section-header {
+            padding: 1rem 1.5rem;
+            background: var(--background-light);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+            border: none;
+            width: 100%;
+            text-align: left;
+        }
+
+        .mobile-section-header:hover {
+            background: rgba(139, 38, 53, 0.05);
+        }
+
+        .mobile-nav-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .mobile-nav-title svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .mobile-section-arrow {
+            width: 16px;
+            height: 16px;
+            transition: transform 0.3s ease;
+            color: var(--text-light);
+        }
+
+        .mobile-nav-section.active .mobile-section-arrow {
+            transform: rotate(180deg);
+        }
+
+        .mobile-section-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .mobile-section-content.open {
+            max-height: 500px;
+        }
+
+        .mobile-nav-link,
+        .mobile-auth-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.875rem 1.5rem;
+            color: var(--text-dark);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            background: none;
+            border: none;
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+
+        .mobile-nav-link:hover,
+        .mobile-auth-btn:hover {
+            background: var(--background-light);
+            color: var(--primary-color);
+            border-left-color: var(--primary-color);
+        }
+
+        .mobile-nav-link.active {
+            background: rgba(139, 38, 53, 0.1);
+            color: var(--primary-color);
+            border-left-color: var(--primary-color);
+        }
+
+        .mobile-nav-link svg,
+        .mobile-auth-btn svg {
+            width: 16px;
+            height: 16px;
+            flex-shrink: 0;
+        }
+
+        /* Mobile Auth Section Styles */
+        .mobile-auth-section {
+            padding: 1rem 1.5rem;
+        }
+
+        .mobile-auth-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .mobile-auth-buttons .btn {
+            width: 100%;
+            justify-content: center;
+            padding: 0.875rem 1rem;
+            white-space: nowrap;
+            min-height: 44px;
+        }
+
+        /* Mobile User Section */
+        .mobile-user-header {
+            padding: 1rem 1.5rem;
+            background: rgba(139, 38, 53, 0.05);
+            border-bottom: 1px solid #E2E8F0;
+        }
+
+        .mobile-user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .mobile-user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .mobile-user-details h4 {
+            margin: 0;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .mobile-user-details p {
+            margin: 0;
+            font-size: 0.875rem;
+            color: var(--text-light);
         }
 
         /* Loading State */
@@ -584,8 +826,88 @@
             animation: fadeInUp 0.6s ease-out;
         }
 
-        /* Responsive Design */
+        /* Progressive Responsive Scaling */
+        @media (max-width: 1200px) {
+            .nav-links {
+                gap: 2rem;
+            }
+            
+            .nav-links a {
+                font-size: 0.95rem;
+            }
+            
+            .logo-text {
+                font-size: 1.4rem;
+            }
+            
+            .btn {
+                padding: 0.7rem 1.3rem;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .nav-links {
+                gap: 1.75rem;
+            }
+            
+            .nav-links a {
+                font-size: 0.9rem;
+            }
+            
+            .logo-text {
+                font-size: 1.3rem;
+            }
+            
+            .btn {
+                padding: 0.65rem 1.2rem;
+                font-size: 0.875rem;
+            }
+            
+            .nav-actions {
+                gap: 0.75rem;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .nav-links {
+                gap: 1.5rem;
+            }
+            
+            .nav-links a {
+                font-size: 0.85rem;
+            }
+            
+            .logo-text {
+                font-size: 1.25rem;
+            }
+            
+            .logo-icon {
+                width: 44px;
+                height: 44px;
+                font-size: 1.1rem;
+            }
+            
+            .btn {
+                padding: 0.6rem 1rem;
+                font-size: 0.85rem;
+            }
+            
+            .nav-actions {
+                gap: 0.6rem;
+            }
+        }
+
+        /* Mobile Responsive Design */
         @media (max-width: 768px) {
+            .header {
+                height: 70px;
+            }
+            
+            .nav {
+                padding: 0 1rem;
+            }
+            
             .nav-links {
                 display: none;
             }
@@ -595,12 +917,24 @@
             }
 
             .nav-actions {
-                gap: 0.5rem;
+                gap: 0.75rem;
+                align-items: center;
             }
 
-            .btn {
-                padding: 0.6rem 1rem;
-                font-size: 0.9rem;
+            /* Hide desktop auth elements on mobile */
+            .auth-buttons,
+            .user-menu {
+                display: none !important;
+            }
+
+            .logo-text {
+                font-size: 1.2rem;
+            }
+            
+            .logo-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
             }
 
             .hero {
@@ -610,6 +944,7 @@
             .hero-cta {
                 flex-direction: column;
                 align-items: center;
+                gap: 1rem;
             }
 
             .btn-hero {
@@ -634,26 +969,30 @@
                 grid-template-columns: 1fr;
                 gap: 2rem;
             }
-
-            .user-menu-dropdown {
-                right: 0;
-                left: auto;
-                min-width: 180px;
-            }
         }
 
         @media (max-width: 480px) {
+            .header {
+                height: 65px;
+            }
+            
             .nav {
-                padding: 0.75rem 1rem;
+                padding: 0 0.75rem;
             }
 
             .logo-text {
-                font-size: 1.2rem;
+                font-size: 1.1rem;
             }
 
             .logo-icon {
-                width: 40px;
-                height: 40px;
+                width: 36px;
+                height: 36px;
+                font-size: 0.9rem;
+            }
+
+            .mobile-menu {
+                width: 100vw;
+                max-width: 100vw;
             }
         }
     </style>
@@ -720,13 +1059,142 @@
                 </div>
             </div>
 
-            <button class="mobile-menu-btn">
+            <button class="mobile-menu-btn" onclick="toggleMobileMenu()">
                 <span></span>
                 <span></span>
                 <span></span>
             </button>
         </nav>
     </header>
+
+    <!-- Mobile Menu Overlay -->
+    <div class="mobile-menu-overlay" id="mobileMenuOverlay" onclick="closeMobileMenu()"></div>
+    
+    <!-- Mobile Menu -->
+    <nav class="mobile-menu" id="mobileMenu">
+        <div class="mobile-menu-header">
+            <span class="mobile-menu-title">The Spear Exchange</span>
+            <button class="mobile-close-btn" onclick="closeMobileMenu()">
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Authentication Section (shown when logged out) -->
+        <div class="mobile-nav-section" id="mobileAuthSection">
+            <div class="mobile-auth-section">
+                <h4 style="margin: 0 0 1rem 0; font-size: 0.875rem; font-weight: 600; color: var(--text-light);">Get Started</h4>
+                <div class="mobile-auth-buttons">
+                    <a href="login/" class="btn btn-outline">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Login
+                    </a>
+                    <a href="signup/" class="btn btn-primary">
+                        <i class="fas fa-user-plus"></i>
+                        Sign Up
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Section (shown when logged in) -->
+        <div class="mobile-nav-section" id="mobileUserSection" style="display: none;">
+            <div class="mobile-user-header">
+                <div class="mobile-user-info">
+                    <div class="mobile-user-avatar" id="mobileUserAvatar">U</div>
+                    <div class="mobile-user-details">
+                        <h4 id="mobileUserName">User</h4>
+                        <p>FSU Student</p>
+                    </div>
+                </div>
+            </div>
+            <div class="mobile-section-content open">
+                <a href="listings/" class="mobile-nav-link">
+                    <i class="fas fa-list"></i>
+                    Browse Listings
+                </a>
+                <a href="my-listings/" class="mobile-nav-link">
+                    <i class="fas fa-box"></i>
+                    My Listings
+                </a>
+                <a href="messages/" class="mobile-nav-link">
+                    <i class="fas fa-envelope"></i>
+                    Messages
+                </a>
+                <a href="profile/" class="mobile-nav-link">
+                    <i class="fas fa-user"></i>
+                    Profile
+                </a>
+                <button class="mobile-auth-btn" onclick="handleLogout(); closeMobileMenu();">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Logout
+                </button>
+            </div>
+        </div>
+
+        <!-- Navigation Section -->
+        <div class="mobile-nav-section">
+            <button class="mobile-section-header" onclick="toggleMobileSection('nav-section')">
+                <div class="mobile-nav-title">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+                    </svg>
+                    Navigation
+                </div>
+                <svg class="mobile-section-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                </svg>
+            </button>
+            <div class="mobile-section-content open" id="nav-section">
+                <a href="#home" class="mobile-nav-link active" onclick="closeMobileMenu()">
+                    <i class="fas fa-home"></i>
+                    Home
+                </a>
+                <a href="#featured" class="mobile-nav-link" onclick="closeMobileMenu()">
+                    <i class="fas fa-star"></i>
+                    Featured
+                </a>
+                <a href="#about" class="mobile-nav-link" onclick="closeMobileMenu()">
+                    <i class="fas fa-info-circle"></i>
+                    About
+                </a>
+                <a href="#contact" class="mobile-nav-link" onclick="closeMobileMenu()">
+                    <i class="fas fa-envelope"></i>
+                    Contact
+                </a>
+            </div>
+        </div>
+
+        <!-- Quick Actions Section -->
+        <div class="mobile-nav-section">
+            <button class="mobile-section-header" onclick="toggleMobileSection('actions-section')">
+                <div class="mobile-nav-title">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                    </svg>
+                    Quick Actions
+                </div>
+                <svg class="mobile-section-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                </svg>
+            </button>
+            <div class="mobile-section-content" id="actions-section">
+                <button class="mobile-nav-link" onclick="handleStartShopping(); closeMobileMenu();">
+                    <i class="fas fa-search"></i>
+                    Start Shopping
+                </button>
+                <button class="mobile-nav-link" onclick="handleCreateListing(); closeMobileMenu();">
+                    <i class="fas fa-plus"></i>
+                    List Your Items
+                </button>
+                <button class="mobile-nav-link" onclick="handleViewMoreListings(); closeMobileMenu();">
+                    <i class="fas fa-th-large"></i>
+                    Browse All Listings
+                </button>
+            </div>
+        </div>
+    </nav>
 
     <!-- Hero Section -->
     <section class="hero" id="home">
@@ -826,6 +1294,7 @@
                         <p class="listing-seller">
                             <i class="fas fa-user-circle"></i>
                             by Alex K.
+
                         </p>
                         <div class="listing-price">$35</div>
                         <div class="listing-actions">
@@ -1020,13 +1489,25 @@
             currentUser = user;
             isLoggedIn = true;
             
-            // Update user display
+            // Update desktop user display
             userName.textContent = user.name || user.email.split('@')[0];
             userAvatar.textContent = (user.name || user.email).charAt(0).toUpperCase();
             
-            // Show/hide appropriate elements
+            // Update mobile user display
+            const mobileUserName = document.getElementById('mobileUserName');
+            const mobileUserAvatar = document.getElementById('mobileUserAvatar');
+            if (mobileUserName) mobileUserName.textContent = user.name || user.email.split('@')[0];
+            if (mobileUserAvatar) mobileUserAvatar.textContent = (user.name || user.email).charAt(0).toUpperCase();
+            
+            // Show/hide appropriate elements - Desktop
             authButtons.style.display = 'none';
             userMenu.style.display = 'block';
+            
+            // Show/hide appropriate elements - Mobile
+            const mobileAuthSection = document.getElementById('mobileAuthSection');
+            const mobileUserSection = document.getElementById('mobileUserSection');
+            if (mobileAuthSection) mobileAuthSection.style.display = 'none';
+            if (mobileUserSection) mobileUserSection.style.display = 'block';
             
             console.log('User logged in:', user);
         }
@@ -1036,9 +1517,15 @@
             currentUser = null;
             isLoggedIn = false;
             
-            // Show/hide appropriate elements
+            // Show/hide appropriate elements - Desktop
             authButtons.style.display = 'flex';
             userMenu.style.display = 'none';
+            
+            // Show/hide appropriate elements - Mobile
+            const mobileAuthSection = document.getElementById('mobileAuthSection');
+            const mobileUserSection = document.getElementById('mobileUserSection');
+            if (mobileAuthSection) mobileAuthSection.style.display = 'block';
+            if (mobileUserSection) mobileUserSection.style.display = 'none';
             
             // Close user menu if open
             userMenu.classList.remove('active');
@@ -1149,7 +1636,11 @@
 
         // Handle start shopping button
         function handleStartShopping() {
-            window.location.href = 'listings/';
+            if (isLoggedIn) {
+                window.location.href = 'listings/';
+            } else {
+                window.location.href = 'login/?redirect=listings';
+            }
         }
 
         // Handle create listing button
@@ -1163,7 +1654,11 @@
 
         // Handle view more listings button
         function handleViewMoreListings() {
-            window.location.href = 'listings/';
+            if (isLoggedIn) {
+                window.location.href = 'listings/';
+            } else {
+                window.location.href = 'login/?redirect=listings';
+            }
         }
 
         // Handle view details button
@@ -1213,6 +1708,60 @@
             if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
                 userMenu.classList.toggle('active');
+            }
+        });
+
+        // Mobile Menu Functions
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            const overlay = document.getElementById('mobileMenuOverlay');
+            
+            mobileMenu.classList.toggle('active');
+            overlay.classList.toggle('active');
+            
+            // Prevent body scroll when menu is open
+            if (mobileMenu.classList.contains('active')) {
+                document.body.style.overflow = 'hidden';
+            } else {
+                document.body.style.overflow = '';
+            }
+        }
+
+        function closeMobileMenu() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            const overlay = document.getElementById('mobileMenuOverlay');
+            
+            mobileMenu.classList.remove('active');
+            overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function toggleMobileSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            const parentSection = section.closest('.mobile-nav-section');
+            
+            if (section && parentSection) {
+                section.classList.toggle('open');
+                parentSection.classList.toggle('active');
+            }
+        }
+
+        // Close mobile menu on escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeMobileMenu();
+                
+                if (userMenu.classList.contains('active')) {
+                    userMenu.classList.remove('active');
+                    userMenuTrigger.focus();
+                }
+            }
+        });
+
+        // Close mobile menu on window resize if it gets too wide
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                closeMobileMenu();
             }
         });
 
