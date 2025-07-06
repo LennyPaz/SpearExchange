@@ -121,6 +121,101 @@
             color: var(--primary-color);
         }
 
+        .nav-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        /* User Menu Styles */
+        .user-menu {
+            position: relative;
+            display: none; /* Hidden by default, shown when logged in */
+        }
+
+        .user-menu-trigger {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            color: var(--text-dark);
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .user-menu-trigger:hover {
+            background: rgba(139, 38, 53, 0.1);
+            color: var(--primary-color);
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .user-menu-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border-radius: 8px;
+            box-shadow: var(--shadow-medium);
+            border: 1px solid rgba(139, 38, 53, 0.1);
+            min-width: 200px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: var(--transition);
+            z-index: 1000;
+        }
+
+        .user-menu.active .user-menu-dropdown {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .user-menu-dropdown a,
+        .user-menu-dropdown button {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            width: 100%;
+            padding: 0.75rem 1rem;
+            text-decoration: none;
+            color: var(--text-dark);
+            background: none;
+            border: none;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .user-menu-dropdown a:hover,
+        .user-menu-dropdown button:hover {
+            background: var(--background-light);
+            color: var(--primary-color);
+        }
+
+        .user-menu-dropdown .divider {
+            height: 1px;
+            background: #E2E8F0;
+            margin: 0.5rem 0;
+        }
+
+        /* Auth Buttons (shown when logged out) */
         .auth-buttons {
             display: flex;
             gap: 1rem;
@@ -415,6 +510,18 @@
             color: #94a3b8;
         }
 
+        .footer-bottom a {
+            color: #cbd5e1;
+            text-decoration: none;
+            transition: var(--transition);
+            font-weight: 500;
+        }
+
+        .footer-bottom a:hover {
+            color: white;
+            text-decoration: underline;
+        }
+
         /* Mobile Navigation */
         .mobile-menu-btn {
             display: none;
@@ -434,6 +541,27 @@
             transition: var(--transition);
         }
 
+        /* Loading State */
+        .loading {
+            display: none;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-light);
+        }
+
+        .loading.show {
+            display: flex;
+        }
+
+        .spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid transparent;
+            border-top: 2px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
         /* Animations */
         @keyframes fadeInUp {
             from {
@@ -443,6 +571,12 @@
             to {
                 opacity: 1;
                 transform: translateY(0);
+            }
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
             }
         }
 
@@ -460,7 +594,7 @@
                 display: flex;
             }
 
-            .auth-buttons {
+            .nav-actions {
                 gap: 0.5rem;
             }
 
@@ -500,6 +634,12 @@
                 grid-template-columns: 1fr;
                 gap: 2rem;
             }
+
+            .user-menu-dropdown {
+                right: 0;
+                left: auto;
+                min-width: 180px;
+            }
         }
 
         @media (max-width: 480px) {
@@ -534,9 +674,50 @@
                 <a href="#contact">Contact</a>
             </div>
 
-            <div class="auth-buttons">
-                <a href="login/" class="btn btn-outline">Login</a>
-                <a href="signup/" class="btn btn-primary">Sign Up</a>
+            <div class="nav-actions">
+                <!-- Loading indicator -->
+                <div class="loading" id="authLoading">
+                    <div class="spinner"></div>
+                    <span>Loading...</span>
+                </div>
+
+                <!-- Auth buttons (shown when logged out) -->
+                <div class="auth-buttons" id="authButtons">
+                    <a href="login/" class="btn btn-outline">Login</a>
+                    <a href="signup/" class="btn btn-primary">Sign Up</a>
+                </div>
+
+                <!-- User menu (shown when logged in) -->
+                <div class="user-menu" id="userMenu">
+                    <button class="user-menu-trigger" id="userMenuTrigger">
+                        <div class="user-avatar" id="userAvatar">U</div>
+                        <span id="userName">User</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="user-menu-dropdown">
+                        <a href="listings/">
+                            <i class="fas fa-list"></i>
+                            Browse Listings
+                        </a>
+                        <a href="my-listings/">
+                            <i class="fas fa-box"></i>
+                            My Listings
+                        </a>
+                        <a href="messages/">
+                            <i class="fas fa-envelope"></i>
+                            Messages
+                        </a>
+                        <div class="divider"></div>
+                        <a href="profile/">
+                            <i class="fas fa-user"></i>
+                            Profile
+                        </a>
+                        <button onclick="handleLogout()">
+                            <i class="fas fa-sign-out-alt"></i>
+                            Logout
+                        </button>
+                    </div>
+                </div>
             </div>
 
             <button class="mobile-menu-btn">
@@ -553,14 +734,14 @@
             <h1>Welcome to The Spear Exchange</h1>
             <p class="hero-subtitle">The trusted marketplace for FSU students to buy, sell, and trade safely within the Seminole community</p>
             <div class="hero-cta">
-                <a href="#featured" class="btn btn-primary btn-hero">
+                <button class="btn btn-primary btn-hero" onclick="handleStartShopping()">
                     <i class="fas fa-search"></i>
                     Start Shopping
-                </a>
-                <a href="listing/" class="btn btn-secondary btn-hero">
+                </button>
+                <button class="btn btn-secondary btn-hero" onclick="handleCreateListing()">
                     <i class="fas fa-plus"></i>
                     List Your Items
-                </a>
+                </button>
             </div>
         </div>
     </section>
@@ -588,8 +769,8 @@
                         </p>
                         <div class="listing-price">$899</div>
                         <div class="listing-actions">
-                            <a href="login/" class="btn btn-primary btn-small">View Details</a>
-                            <a href="login/" class="btn btn-outline btn-small">Message</a>
+                            <button class="btn btn-primary btn-small" onclick="handleViewDetails('macbook')">View Details</button>
+                            <button class="btn btn-outline btn-small" onclick="handleMessage('macbook')">Message</button>
                         </div>
                     </div>
                 </div>
@@ -608,8 +789,8 @@
                         </p>
                         <div class="listing-price">$45</div>
                         <div class="listing-actions">
-                            <a href="login/" class="btn btn-primary btn-small">View Details</a>
-                            <a href="login/" class="btn btn-outline btn-small">Message</a>
+                            <button class="btn btn-primary btn-small" onclick="handleViewDetails('textbook')">View Details</button>
+                            <button class="btn btn-outline btn-small" onclick="handleMessage('textbook')">Message</button>
                         </div>
                     </div>
                 </div>
@@ -628,8 +809,8 @@
                         </p>
                         <div class="listing-price">$120</div>
                         <div class="listing-actions">
-                            <a href="login/" class="btn btn-primary btn-small">View Details</a>
-                            <a href="login/" class="btn btn-outline btn-small">Message</a>
+                            <button class="btn btn-primary btn-small" onclick="handleViewDetails('fridge')">View Details</button>
+                            <button class="btn btn-outline btn-small" onclick="handleMessage('fridge')">Message</button>
                         </div>
                     </div>
                 </div>
@@ -648,8 +829,8 @@
                         </p>
                         <div class="listing-price">$35</div>
                         <div class="listing-actions">
-                            <a href="login/" class="btn btn-primary btn-small">View Details</a>
-                            <a href="login/" class="btn btn-outline btn-small">Message</a>
+                            <button class="btn btn-primary btn-small" onclick="handleViewDetails('jersey')">View Details</button>
+                            <button class="btn btn-outline btn-small" onclick="handleMessage('jersey')">Message</button>
                         </div>
                     </div>
                 </div>
@@ -668,8 +849,8 @@
                         </p>
                         <div class="listing-price">$180</div>
                         <div class="listing-actions">
-                            <a href="login/" class="btn btn-primary btn-small">View Details</a>
-                            <a href="login/" class="btn btn-outline btn-small">Message</a>
+                            <button class="btn btn-primary btn-small" onclick="handleViewDetails('chair')">View Details</button>
+                            <button class="btn btn-outline btn-small" onclick="handleMessage('chair')">Message</button>
                         </div>
                     </div>
                 </div>
@@ -688,8 +869,8 @@
                         </p>
                         <div class="listing-price">$750</div>
                         <div class="listing-actions">
-                            <a href="login/" class="btn btn-primary btn-small">View Details</a>
-                            <a href="login/" class="btn btn-outline btn-small">Message</a>
+                            <button class="btn btn-primary btn-small" onclick="handleViewDetails('iphone')">View Details</button>
+                            <button class="btn btn-outline btn-small" onclick="handleMessage('iphone')">Message</button>
                         </div>
                     </div>
                 </div>
@@ -708,8 +889,8 @@
                         </p>
                         <div class="listing-price">$95</div>
                         <div class="listing-actions">
-                            <a href="login/" class="btn btn-primary btn-small">View Details</a>
-                            <a href="login/" class="btn btn-outline btn-small">Message</a>
+                            <button class="btn btn-primary btn-small" onclick="handleViewDetails('bike')">View Details</button>
+                            <button class="btn btn-outline btn-small" onclick="handleMessage('bike')">Message</button>
                         </div>
                     </div>
                 </div>
@@ -728,18 +909,18 @@
                         </p>
                         <div class="listing-price">$85</div>
                         <div class="listing-actions">
-                            <a href="login/" class="btn btn-primary btn-small">View Details</a>
-                            <a href="login/" class="btn btn-outline btn-small">Message</a>
+                            <button class="btn btn-primary btn-small" onclick="handleViewDetails('keyboard')">View Details</button>
+                            <button class="btn btn-outline btn-small" onclick="handleMessage('keyboard')">Message</button>
                         </div>
                     </div>
                 </div>
             </div>
 
             <div class="view-more">
-                <a href="login/" class="btn btn-primary btn-large">
+                <button class="btn btn-primary btn-large" onclick="handleViewMoreListings()">
                     <i class="fas fa-arrow-right"></i>
                     View More Listings
-                </a>
+                </button>
             </div>
         </div>
     </section>
@@ -780,66 +961,267 @@
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2025 The Spear Exchange. Made for FSU students, by FSU students. | <a href="#">Terms of Service</a> | <a href="#">Privacy Policy</a></p>
+                <p>The Spear Exchange. Built for FSU students, by FSU students. | <a href="#">Terms of Service</a> | <a href="#">Privacy Policy</a></p>
             </div>
         </div>
     </footer>
 
     <script>
-        // Header scroll effect
-        window.addEventListener('scroll', () => {
-            const header = document.getElementById('header');
-            if (window.scrollY > 100) {
-                header.classList.add('scrolled');
+        // API Configuration
+        const API_BASE_URL = 'https://spear-exchange.lenny-paz123.workers.dev';
+
+        // Global state
+        let currentUser = null;
+        let isLoggedIn = false;
+
+        // DOM Elements
+        const authLoading = document.getElementById('authLoading');
+        const authButtons = document.getElementById('authButtons');
+        const userMenu = document.getElementById('userMenu');
+        const userMenuTrigger = document.getElementById('userMenuTrigger');
+        const userAvatar = document.getElementById('userAvatar');
+        const userName = document.getElementById('userName');
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuthStatus();
+            initializeEventListeners();
+        });
+
+        // Check authentication status
+        async function checkAuthStatus() {
+            showLoading(true);
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/me`, {
+                    method: 'GET',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    updateUIForLoggedInUser(data.user);
+                } else {
+                    updateUIForLoggedOutUser();
+                }
+            } catch (error) {
+                console.error('Auth check error:', error);
+                updateUIForLoggedOutUser();
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Update UI for logged in user
+        function updateUIForLoggedInUser(user) {
+            currentUser = user;
+            isLoggedIn = true;
+            
+            // Update user display
+            userName.textContent = user.name || user.email.split('@')[0];
+            userAvatar.textContent = (user.name || user.email).charAt(0).toUpperCase();
+            
+            // Show/hide appropriate elements
+            authButtons.style.display = 'none';
+            userMenu.style.display = 'block';
+            
+            console.log('User logged in:', user);
+        }
+
+        // Update UI for logged out user
+        function updateUIForLoggedOutUser() {
+            currentUser = null;
+            isLoggedIn = false;
+            
+            // Show/hide appropriate elements
+            authButtons.style.display = 'flex';
+            userMenu.style.display = 'none';
+            
+            // Close user menu if open
+            userMenu.classList.remove('active');
+            
+            console.log('User logged out');
+        }
+
+        // Show/hide loading state
+        function showLoading(show) {
+            if (show) {
+                authLoading.classList.add('show');
+                authButtons.style.display = 'none';
+                userMenu.style.display = 'none';
             } else {
-                header.classList.remove('scrolled');
+                authLoading.classList.remove('show');
+            }
+        }
+
+        // Initialize event listeners
+        function initializeEventListeners() {
+            // Header scroll effect
+            window.addEventListener('scroll', () => {
+                const header = document.getElementById('header');
+                if (window.scrollY > 100) {
+                    header.classList.add('scrolled');
+                } else {
+                    header.classList.remove('scrolled');
+                }
+            });
+
+            // User menu toggle
+            userMenuTrigger.addEventListener('click', function(e) {
+                e.stopPropagation();
+                userMenu.classList.toggle('active');
+            });
+
+            // Close user menu when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!userMenu.contains(e.target)) {
+                    userMenu.classList.remove('active');
+                }
+            });
+
+            // Smooth scrolling for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+
+            // Mobile menu functionality
+            document.querySelector('.mobile-menu-btn').addEventListener('click', function() {
+                alert('Mobile menu would appear here in the full implementation');
+            });
+
+            // Intersection Observer for fade-in animations
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('fade-in');
+                    }
+                });
+            }, observerOptions);
+
+            // Observe all listing cards
+            document.querySelectorAll('.listing-card').forEach(card => {
+                observer.observe(card);
+            });
+        }
+
+        // Handle logout
+        async function handleLogout() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/logout`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                // Update UI regardless of response (in case of network issues)
+                updateUIForLoggedOutUser();
+                
+                if (response.ok) {
+                    console.log('Logout successful');
+                } else {
+                    console.warn('Logout request failed, but UI updated');
+                }
+            } catch (error) {
+                console.error('Logout error:', error);
+                // Still update UI even if logout request fails
+                updateUIForLoggedOutUser();
+            }
+        }
+
+        // Handle start shopping button
+        function handleStartShopping() {
+            window.location.href = 'listings/';
+        }
+
+        // Handle create listing button
+        function handleCreateListing() {
+            if (isLoggedIn) {
+                window.location.href = 'create-listing/';
+            } else {
+                window.location.href = 'login/?redirect=create-listing';
+            }
+        }
+
+        // Handle view more listings button
+        function handleViewMoreListings() {
+            window.location.href = 'listings/';
+        }
+
+        // Handle view details button
+        function handleViewDetails(itemId) {
+            if (isLoggedIn) {
+                window.location.href = `listings/${itemId}/`;
+            } else {
+                window.location.href = `login/?redirect=listings/${itemId}`;
+            }
+        }
+
+        // Handle message button
+        function handleMessage(itemId) {
+            if (isLoggedIn) {
+                window.location.href = `messages/?listing=${itemId}`;
+            } else {
+                window.location.href = `login/?redirect=messages&listing=${itemId}`;
+            }
+        }
+
+        // Handle listing card click
+        function viewListing(itemId) {
+            handleViewDetails(itemId);
+        }
+
+        // Utility function to get user initials
+        function getUserInitials(name) {
+            if (!name) return 'U';
+            return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+        }
+
+        // Add some nice hover effects and animations for form inputs
+        const formInputs = document.querySelectorAll('.form-input');
+        formInputs.forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentElement.style.transform = 'translateY(-1px)';
+                this.parentElement.style.transition = 'transform 0.2s ease';
+            });
+            
+            input.addEventListener('blur', function() {
+                this.parentElement.style.transform = 'translateY(0)';
+            });
+        });
+
+        // Handle keyboard navigation for user menu
+        userMenuTrigger.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                userMenu.classList.toggle('active');
             }
         });
 
-        // Smooth scrolling for anchor links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
-            });
-        });
-
-        // Listing card click handler
-        function viewListing(itemId) {
-            // In a real app, this would navigate to the item detail page
-            alert(`You need to log in to view listing details. Redirecting to login page...`);
-            window.location.href = 'login/';
-        }
-
-        // Intersection Observer for fade-in animations
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('fade-in');
-                }
-            });
-        }, observerOptions);
-
-        // Observe all listing cards
-        document.querySelectorAll('.listing-card').forEach(card => {
-            observer.observe(card);
-        });
-
-        // Mobile menu functionality (for future enhancement)
-        document.querySelector('.mobile-menu-btn').addEventListener('click', function() {
-            // This would toggle a mobile menu in a full implementation
-            alert('Mobile menu would appear here in the full implementation');
+        // Handle escape key to close user menu
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && userMenu.classList.contains('active')) {
+                userMenu.classList.remove('active');
+                userMenuTrigger.focus();
+            }
         });
     </script>
 </body>
