@@ -1255,27 +1255,23 @@
 				});
 				console.log('Response status:', response.status);
 				console.log('Response headers:', response.headers);
-
-				const data = await response.json();
-				console.log('Response data:', data);
-
-                if (response.ok) {
-                    const data = await response.json();
-                    listings = data.listings || [];
-                    filteredListings = [...listings];
-                    displayListings();
-                    updateResultsCount();
-                } else {
-                    throw new Error('Failed to load listings');
-                }
-            } catch (error) {
-                console.error('Error loading listings:', error);
-                showEmptyState();
-            } finally {
-                showLoading(false);
-            }
-        }
-
+				if (response.ok) {
+					const data = await response.json(); // ← Only call .json() ONCE
+					console.log('Response data:', data);
+					listings = data.listings || [];
+					filteredListings = [...listings];
+					displayListings();
+					updateResultsCount();
+				} else {
+					throw new Error('Failed to load listings');
+				}
+			} catch (error) {
+				console.error('Error loading listings:', error);
+				showEmptyState();
+			} finally {
+				showLoading(false);
+			}
+		}
         // Display listings in current view
         function displayListings() {
             const gridContainer = document.getElementById('listings-grid');
