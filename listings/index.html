@@ -1260,11 +1260,22 @@
 				const data = await response.json();
 				console.log('Response data:', data);
 
-				// ... rest of function
-			} catch (error) {
-				console.error('Fetch error:', error);
-			}
-		}
+                if (response.ok) {
+                    const data = await response.json();
+                    listings = data.listings || [];
+                    filteredListings = [...listings];
+                    displayListings();
+                    updateResultsCount();
+                } else {
+                    throw new Error('Failed to load listings');
+                }
+            } catch (error) {
+                console.error('Error loading listings:', error);
+                showEmptyState();
+            } finally {
+                showLoading(false);
+            }
+        }
 
         // Display listings in current view
         function displayListings() {
