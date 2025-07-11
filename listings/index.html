@@ -1246,29 +1246,25 @@
 
         // Load listings from API
         async function loadListings() {
-            try {
-                showLoading(true);
-                
-                const response = await fetch('/api/listings', {
-                    credentials: 'include'
-                });
+			try {
+				showLoading(true);
+				console.log('Attempting to fetch from /api/listings');
 
-                if (response.ok) {
-                    const data = await response.json();
-                    listings = data.listings || [];
-                    filteredListings = [...listings];
-                    displayListings();
-                    updateResultsCount();
-                } else {
-                    throw new Error('Failed to load listings');
-                }
-            } catch (error) {
-                console.error('Error loading listings:', error);
-                showEmptyState();
-            } finally {
-                showLoading(false);
-            }
-        }
+				const response = await fetch('/api/listings', {
+					credentials: 'include'
+				});
+
+				console.log('Response status:', response.status);
+				console.log('Response headers:', response.headers);
+
+				const data = await response.json();
+				console.log('Response data:', data);
+
+				// ... rest of function
+			} catch (error) {
+				console.error('Fetch error:', error);
+			}
+		}
 
         // Display listings in current view
         function displayListings() {
