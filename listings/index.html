@@ -1248,12 +1248,11 @@
         async function loadListings() {
 			try {
 				showLoading(true);
-				console.log('Attempting to fetch from /api/listings');
-
-				const response = await fetch('/api/listings', {
+				const apiUrl = 'https://spear-exchange.lenny-paz123.workers.dev/api/listings';
+				console.log('Attempting to fetch from', apiUrl);
+				const response = await fetch(apiUrl, {
 					credentials: 'include'
 				});
-
 				console.log('Response status:', response.status);
 				console.log('Response headers:', response.headers);
 
