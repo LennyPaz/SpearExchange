@@ -149,6 +149,51 @@
             font-size: 0.9rem;
         }
 
+        .user-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            box-shadow: var(--shadow-medium);
+            min-width: 200px;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .user-dropdown.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-item {
+            display: block;
+            padding: 0.75rem 1rem;
+            color: var(--text-dark);
+            text-decoration: none;
+            transition: var(--transition);
+            border-bottom: 1px solid #F3F4F6;
+        }
+
+        .dropdown-item:hover {
+            background: rgba(139, 38, 53, 0.05);
+            color: var(--primary-color);
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-item i {
+            width: 16px;
+            margin-right: 0.5rem;
+        }
+
         /* Main Content */
         .main-content {
             max-width: 1400px;
@@ -420,6 +465,7 @@
             padding: 0.25rem 0.75rem;
             border-radius: 20px;
             font-weight: 500;
+            text-transform: capitalize;
         }
 
         .listing-date {
@@ -1047,6 +1093,25 @@
                     <span id="user-name">User</span>
                     <i class="fas fa-chevron-down"></i>
                 </div>
+                
+                <div class="user-dropdown" id="user-dropdown">
+                    <a href="/my-listings" class="dropdown-item">
+                        <i class="fas fa-list"></i>
+                        My Listings
+                    </a>
+                    <a href="/messages" class="dropdown-item">
+                        <i class="fas fa-comments"></i>
+                        Messages
+                    </a>
+                    <a href="/profile" class="dropdown-item">
+                        <i class="fas fa-user"></i>
+                        Profile Settings
+                    </a>
+                    <a href="#" class="dropdown-item" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Logout
+                    </a>
+                </div>
             </div>
 
             <!-- Mobile menu button in nav bar (right side) -->
@@ -1400,15 +1465,17 @@
             const listContainer = document.getElementById('listings-list');
 
             if (view === 'grid') {
+                // Grid view active
                 gridBtn.classList.add('active');
                 listBtn.classList.remove('active');
                 gridContainer.style.display = 'grid';
-                listContainer.classList.remove('active');
+                listContainer.style.display = 'none';
             } else {
+                // List view active
                 listBtn.classList.add('active');
                 gridBtn.classList.remove('active');
                 gridContainer.style.display = 'none';
-                listContainer.classList.add('active');
+                listContainer.style.display = 'flex';
             }
         }
 
@@ -1621,8 +1688,32 @@
 
         // Toggle user menu
         function toggleUserMenu() {
-            // Implement user menu dropdown
-            console.log('User menu clicked');
+            const dropdown = document.getElementById('user-dropdown');
+            dropdown.classList.toggle('show');
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function closeDropdown(e) {
+                if (!e.target.closest('.user-menu')) {
+                    dropdown.classList.remove('show');
+                    document.removeEventListener('click', closeDropdown);
+                }
+            });
+        }
+
+        function logout() {
+            // Close dropdown first
+            document.getElementById('user-dropdown').classList.remove('show');
+            
+            // Implement logout functionality
+            fetch('https://spear-exchange.lenny-paz123.workers.dev/api/logout', {
+                method: 'POST',
+                credentials: 'include'
+            }).then(() => {
+                window.location.href = '/login';
+            }).catch(error => {
+                console.error('Logout error:', error);
+                window.location.href = '/login';
+            });
         }
 
         // Mobile menu functions
@@ -1693,19 +1784,33 @@
         }
 
         function formatDate(dateString) {
-            const date = new Date(dateString);
+            const date = new Date(dateString + 'Z'); // Add Z to treat as UTC
             const now = new Date();
-            const diffTime = Math.abs(now - date);
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-            if (diffDays === 1) {
+            
+            // Calculate difference in milliseconds, then convert to days
+            const diffTime = now.getTime() - date.getTime();
+            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+            
+            if (diffDays < 0) {
+                // Future date (shouldn't happen, but just in case)
                 return 'Today';
-            } else if (diffDays === 2) {
+            } else if (diffDays === 0) {
+                return 'Today';
+            } else if (diffDays === 1) {
                 return 'Yesterday';
             } else if (diffDays <= 7) {
-                return `${diffDays - 1} days ago`;
+                return `${diffDays} days ago`;
+            } else if (diffDays <= 30) {
+                const diffWeeks = Math.floor(diffDays / 7);
+                return diffWeeks === 1 ? '1 week ago' : `${diffWeeks} weeks ago`;
             } else {
-                return date.toLocaleDateString();
+                // For older listings, show the actual date
+                return date.toLocaleDateString('en-US', { 
+                    month: 'short', 
+                    day: 'numeric',
+                    year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined,
+                    timeZone: 'America/New_York' // Adjust to your timezone
+                });
             }
         }
 
