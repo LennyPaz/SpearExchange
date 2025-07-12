@@ -358,45 +358,45 @@
             display: none;
         }
 
-        /* FIXED LISTING CARD - CONSISTENT HEIGHT WITH BOTTOM-POSITIONED TIME */
-        .listing-card {
-            background: white;
-            border-radius: var(--border-radius);
-            overflow: hidden;
-            box-shadow: var(--shadow-light);
-            transition: var(--transition);
-            cursor: pointer;
-            border: 1px solid transparent;
-            height: 420px; /* Fixed height for consistency */
-            display: flex;
-            flex-direction: column;
-            position: relative; /* For absolute positioning of time */
-        }
+        /* FIXED LISTING CARD - CONSISTENT HEIGHT WITH STRUCTURED LAYOUT */
+		.listing-card {
+			background: white;
+			border-radius: var(--border-radius);
+			overflow: hidden;
+			box-shadow: var(--shadow-light);
+			transition: var(--transition);
+			cursor: pointer;
+			border: 1px solid transparent;
+			height: 440px; /* Fixed height for consistency */
+			display: flex;
+			flex-direction: column;
+			position: relative; /* For absolute positioning of overlays */
+		}
 
         .listing-card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-medium);
-            border-color: var(--primary-color);
-        }
+			transform: translateY(-4px);
+			box-shadow: var(--shadow-medium);
+			border-color: var(--primary-color);
+		}
 
         .listing-image {
-            width: 100%;
-            height: 200px;
-            background: linear-gradient(135deg, #F3F4F6, #E5E7EB);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-light);
-            font-size: 3rem;
-            position: relative;
-            flex-shrink: 0; /* Prevent shrinking */
-        }
+			width: 100%;
+			height: 200px;
+			background: linear-gradient(135deg, #F3F4F6, #E5E7EB);
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			color: var(--text-light);
+			font-size: 3rem;
+			position: relative;
+			flex-shrink: 0; /* Prevent shrinking */
+		}
 
         .listing-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
+		}
 
         .favorite-btn {
             position: absolute;
@@ -426,91 +426,110 @@
             background: white;
         }
 
-        /* Content area takes remaining space but leaves room for time */
-        .listing-content {
-            padding: 1.25rem;
-            display: flex;
-            flex-direction: column;
-            flex-grow: 1;
-            padding-bottom: 2.5rem; /* Extra space for absolute positioned time */
-        }
+        /* Content area with fixed structure - no flex-grow */
+		.listing-content {
+			padding: 1.25rem;
+			display: flex;
+			flex-direction: column;
+			height: 240px; 
+			padding-bottom: 3rem; /* Space for bottom overlays */
+		}
 
-        /* Time positioned at bottom right corner of entire card */
-        .listing-date {
-            position: absolute;
-            bottom: 0.75rem;
-            right: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
-            font-size: 0.85rem;
-            color: var(--text-light);
-            background: rgba(255, 255, 255, 0.9);
-            padding: 0.25rem 0.5rem;
-            border-radius: 4px;
-            backdrop-filter: blur(5px);
-        }
+        /* Overlays positioned absolutely (outside content flow) */
+		.listing-date {
+			position: absolute;
+			bottom: 0.75rem;
+			right: 1rem;
+			display: flex;
+			align-items: center;
+			gap: 0.25rem;
+			font-size: 0.85rem;
+			color: var(--text-light);
+			background: rgba(255, 255, 255, 0.9);
+			padding: 0.25rem 0.5rem;
+			border-radius: 4px;
+			backdrop-filter: blur(5px);
+			z-index: 10;
+		}
 
         /* Seller positioned at bottom left corner of entire card */
         .listing-seller {
-            position: absolute;
-            bottom: 0.75rem;
-            left: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
-            font-size: 0.85rem;
-            color: var(--text-light);
-            background: rgba(255, 255, 255, 0.9);
-            padding: 0.25rem 0.5rem;
-            border-radius: 4px;
-            backdrop-filter: blur(5px);
-        }
+			position: absolute;
+			bottom: 0.75rem;
+			left: 1rem;
+			display: flex;
+			align-items: center;
+			gap: 0.25rem;
+			font-size: 0.85rem;
+			color: var(--text-light);
+			background: rgba(255, 255, 255, 0.9);
+			padding: 0.25rem 0.5rem;
+			border-radius: 4px;
+			backdrop-filter: blur(5px);
+			z-index: 10;
+		}
 
-        .listing-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: var(--text-dark);
-            margin-bottom: 0.5rem;
-            line-height: 1.3;
-        }
+        /* Fixed height for title area */
+		.listing-title {
+			font-size: 1.1rem;
+			font-weight: 600;
+			color: var(--text-dark);
+			margin-bottom: 0.25rem;
+			line-height: 1.3;
+			height: 1.5rem; 
+			overflow: hidden;
+			display: -webkit-box;
+			-webkit-line-clamp: 2;
+			-webkit-box-orient: vertical;
+		}
 
-        .listing-description {
-            color: var(--text-light);
-            font-size: 0.9rem;
-            margin-bottom: 1rem;
-            line-height: 1.4;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            flex-grow: 1; /* Take available space */
-        }
+        /* Fixed height for description area */
+		.listing-description {
+			color: var(--text-light);
+			font-size: 0.9rem;
+			margin-bottom: 0.75rem;
+			line-height: 1.4;
+			height: 3.2rem; 
+			overflow: hidden;
+			display: -webkit-box;
+			-webkit-line-clamp: 2;
+			-webkit-box-orient: vertical;
+		}
 
-        .listing-price {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--primary-color);
-            margin-bottom: 1rem;
-        }
+        /* Price positioned consistently */
+		.listing-price {
+			font-size: 1.5rem;
+			font-weight: 700;
+			color: var(--primary-color);
+			margin-bottom: 0.75rem;
+			height: 2rem; /* Fixed height */
+			display: flex;
+			align-items: center;
+		}
 
-        .listing-meta {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.85rem;
-            color: var(--text-light);
-            margin-top: auto; /* Push to bottom of content area */
-        }
+        /* Category positioned consistently at the bottom of content */
+		.listing-meta {
+			margin-top: auto; /* Pushes to bottom of content area */
+			display: flex;
+			justify-content: flex-start;
+			align-items: center;
+			padding-bottom: 0.5rem; /* Add padding to prevent bottom clipping */
+		}
 
         .listing-category {
-            background: rgba(139, 38, 53, 0.1);
-            color: var(--primary-color);
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
-            font-weight: 500;
-            text-transform: capitalize;
-        }
+			background: rgba(139, 38, 53, 0.1);
+			color: var(--primary-color);
+			padding: 0.25rem 0.75rem;
+			border-radius: 20px;
+			font-weight: 500;
+			text-transform: capitalize;
+			font-size: 0.85rem;
+			white-space: nowrap; /* Prevent wrapping */
+			overflow: hidden;
+			text-overflow: ellipsis;
+			max-width: 180px; /* Prevent category from being too wide */
+			line-height: 1.2; /* Ensure consistent line height */
+	}
 
         /* List View Styles */
         .listing-list-item {
@@ -1122,7 +1141,7 @@
                 <li><a href="/listings" class="active">Browse</a></li>
                 <li><a href="/messages">Messages</a></li>
                 <li><a href="/my-listings">My Listings</a></li>
-                <li><a href="/create-listing" class="create-listing-btn">+ Create Listing</a></li>
+                <li><a href="/	create-listing" class="create-listing-btn">+ Create Listing</a></li>
             </ul>
 
             <div class="user-menu">
@@ -1418,48 +1437,51 @@
             updatePagination();
         }
 
-        // Create listing card for grid view
-        function createListingCard(listing) {
-            const card = document.createElement('div');
-            card.className = 'listing-card';
-            card.onclick = () => viewListing(listing.id);
+    // Create listing card for grid view with fixed, consistent layout
+	function createListingCard(listing) {
+		const card = document.createElement('div');
+		card.className = 'listing-card';
+		card.onclick = () => viewListing(listing.id);
 
-            // Parse image URLs if they exist
-            let imageUrls = [];
-            try {
-                imageUrls = listing.image_urls ? JSON.parse(listing.image_urls) : [];
-            } catch (e) {
-                console.error('Error parsing image URLs:', e);
-            }
+		// Parse image URLs if they exist
+		let imageUrls = [];
+		try {
+			imageUrls = listing.image_urls ? JSON.parse(listing.image_urls) : [];
+		} catch (e) {
+			console.error('Error parsing image URLs:', e);
+		}
 
-            const imageContent = imageUrls.length > 0 
-                ? `<img src="${imageUrls[0]}" alt="${listing.title}" onerror="this.style.display='none'">`
-                : `<i class="fas fa-image"></i>`;
+		const imageContent = imageUrls.length > 0 
+			? `<img src="${imageUrls[0]}" alt="${listing.title}" onerror="this.style.display='none'">`
+			: `<i class="fas fa-image"></i>`;
 
-            card.innerHTML = `
-                <div class="listing-image">
-                    ${imageContent}
-                    <button class="favorite-btn" onclick="event.stopPropagation(); toggleFavorite(${listing.id})">
-                        <i class="far fa-heart"></i>
-                    </button>
-                </div>
-                <div class="listing-content">
-                    <h3 class="listing-title">${escapeHtml(listing.title)}</h3>
-                    <p class="listing-description">${escapeHtml(listing.description)}</p>
-                    <div class="listing-price">\$${listing.price.toFixed(2)}</div>
-                    <div class="listing-meta">
-                        <span class="listing-category">${escapeHtml(listing.category)}</span>
-                    </div>
-                </div>
-                <div class="listing-date">
-                    <i class="far fa-clock"></i>
-                    ${formatDate(listing.created_at)}
-                </div>
-            `;
+		card.innerHTML = `
+			<div class="listing-image">
+				${imageContent}
+				<button class="favorite-btn" onclick="event.stopPropagation(); toggleFavorite(${listing.id})">
+					<i class="far fa-heart"></i>
+				</button>
+			</div>
+			<div class="listing-content">
+				<h3 class="listing-title">${escapeHtml(listing.title)}</h3>
+				<p class="listing-description">${escapeHtml(listing.description)}</p>
+				<div class="listing-price">\$${listing.price.toFixed(2)}</div>
+				<div class="listing-meta">
+					<span class="listing-category">${escapeHtml(listing.category)}</span>
+				</div>
+			</div>
+			<div class="listing-seller">
+				<i class="fas fa-user"></i>
+				${escapeHtml(listing.seller_name)}
+			</div>
+			<div class="listing-date">
+				<i class="far fa-clock"></i>
+				${formatDate(listing.created_at)}
+			</div>
+		`;
 
-            return card;
-        }
-
+		return card;
+		}
         // Create listing item for list view
         function createListingListItem(listing) {
             const item = document.createElement('div');
