@@ -358,7 +358,7 @@
             display: none;
         }
 
-        /* Listing Card */
+        /* FIXED LISTING CARD - CONSISTENT HEIGHT WITH BOTTOM-POSITIONED TIME */
         .listing-card {
             background: white;
             border-radius: var(--border-radius);
@@ -367,6 +367,10 @@
             transition: var(--transition);
             cursor: pointer;
             border: 1px solid transparent;
+            height: 420px; /* Fixed height for consistency */
+            display: flex;
+            flex-direction: column;
+            position: relative; /* For absolute positioning of time */
         }
 
         .listing-card:hover {
@@ -385,6 +389,7 @@
             color: var(--text-light);
             font-size: 3rem;
             position: relative;
+            flex-shrink: 0; /* Prevent shrinking */
         }
 
         .listing-image img {
@@ -421,8 +426,45 @@
             background: white;
         }
 
+        /* Content area takes remaining space but leaves room for time */
         .listing-content {
             padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            padding-bottom: 2.5rem; /* Extra space for absolute positioned time */
+        }
+
+        /* Time positioned at bottom right corner of entire card */
+        .listing-date {
+            position: absolute;
+            bottom: 0.75rem;
+            right: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.85rem;
+            color: var(--text-light);
+            background: rgba(255, 255, 255, 0.9);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            backdrop-filter: blur(5px);
+        }
+
+        /* Seller positioned at bottom left corner of entire card */
+        .listing-seller {
+            position: absolute;
+            bottom: 0.75rem;
+            left: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.85rem;
+            color: var(--text-light);
+            background: rgba(255, 255, 255, 0.9);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            backdrop-filter: blur(5px);
         }
 
         .listing-title {
@@ -442,6 +484,7 @@
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
+            flex-grow: 1; /* Take available space */
         }
 
         .listing-price {
@@ -454,10 +497,10 @@
         .listing-meta {
             display: flex;
             justify-content: space-between;
-
             align-items: center;
             font-size: 0.85rem;
             color: var(--text-light);
+            margin-top: auto; /* Push to bottom of content area */
         }
 
         .listing-category {
@@ -467,12 +510,6 @@
             border-radius: 20px;
             font-weight: 500;
             text-transform: capitalize;
-        }
-
-        .listing-date {
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
         }
 
         /* List View Styles */
@@ -1409,14 +1446,14 @@
                 <div class="listing-content">
                     <h3 class="listing-title">${escapeHtml(listing.title)}</h3>
                     <p class="listing-description">${escapeHtml(listing.description)}</p>
-                    <div class="listing-price">$${listing.price.toFixed(2)}</div>
+                    <div class="listing-price">\$${listing.price.toFixed(2)}</div>
                     <div class="listing-meta">
                         <span class="listing-category">${escapeHtml(listing.category)}</span>
-                        <span class="listing-date">
-                            <i class="far fa-clock"></i>
-                            ${formatDate(listing.created_at)}
-                        </span>
                     </div>
+                </div>
+                <div class="listing-date">
+                    <i class="far fa-clock"></i>
+                    ${formatDate(listing.created_at)}
                 </div>
             `;
 
@@ -1451,7 +1488,7 @@
                             <h3 class="listing-title">${escapeHtml(listing.title)}</h3>
                             <span class="listing-category">${escapeHtml(listing.category)}</span>
                         </div>
-                        <div class="list-item-price">$${listing.price.toFixed(2)}</div>
+                        <div class="list-item-price">${listing.price.toFixed(2)}</div>
                     </div>
                     <p class="listing-description">${escapeHtml(listing.description)}</p>
                     <div class="listing-meta">
@@ -1747,12 +1784,6 @@
             sidebar.classList.remove('open');
             overlay.classList.remove('active');
             document.body.style.overflow = '';
-        }
-
-        function logout() {
-            // Implement logout functionality
-            console.log('Logout clicked');
-            closeMobileMenu();
         }
 
         // Show/hide loading state
