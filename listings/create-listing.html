@@ -52,7 +52,8 @@
       justify-content: space-between;
     }
 
-    nav .logo {
+    .logo {
+      flex-shrink: 0;
       display: flex;
       align-items: center;
       text-decoration: none;
@@ -75,11 +76,13 @@
     }
 
     .nav-links {
-      list-style: none;
+      flex: 1;
       display: flex;
+      justify-content: center;
       gap: 2rem;
-      align-items: center;
+      list-style: none;
       margin: 0;
+      padding: 0;
     }
 
     .nav-links a {
@@ -93,12 +96,17 @@
       color: var(--primary-color);
     }
 
-    .nav-links .btn-primary {
+    .btn-primary {
       background: var(--primary-color);
       color: white;
       padding: 0.5rem 1rem;
       border-radius: 8px;
       text-decoration: none;
+      transition: var(--transition);
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
     }
 
     .container {
@@ -171,16 +179,6 @@
       transform: translateY(-2px);
     }
 
-    .btn-primary {
-      background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-      color: white;
-    }
-
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-light);
-    }
-
     small {
       display: block;
       color: var(--text-light);
@@ -208,30 +206,26 @@
 
   <!-- ✅ Header Navigation -->
   <header>
-  <nav style="max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between;">
-  
-  <!-- Logo (Left) -->
-  <a href="index.html" class="logo" style="display: flex; align-items: center; text-decoration: none; gap: 0.75rem;">
-    <div class="logo-icon">SE</div>
-    <span class="logo-text">The Spear Exchange</span>
-  </a>
+    <nav>
+      <!-- Logo (Left) -->
+      <a href="index.html" class="logo">
+        <div class="logo-icon">SE</div>
+        <span class="logo-text">The Spear Exchange</span>
+      </a>
 
-  <!-- Centered Navigation Links -->
-  <ul style="list-style: none; display: flex; gap: 2rem; align-items: center; margin: 0; flex: 1; justify-content: center;">
-    <li><a href="index.html" style="text-decoration: none; color: var(--text-dark); font-weight: 500;">Home</a></li>
-    <li><a href="listings/" style="text-decoration: none; color: var(--text-dark); font-weight: 500;">Browse</a></li>
-    <li><a href="messages/" style="text-decoration: none; color: var(--text-dark); font-weight: 500;">Messages</a></li>
-    <li><a href="my-listings/" style="text-decoration: none; color: var(--text-dark); font-weight: 500;">My Listings</a></li>
-  </ul>
+      <!-- Centered Navigation Links -->
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="listings/">Browse</a></li>
+        <li><a href="messages/">Messages</a></li>
+        <li><a href="my-listings/">My Listings</a></li>
+      </ul>
 
-  <!-- Create Listing Button (Right) -->
-  <div style="flex-shrink: 0;">
-    <a href="create-listing.html" class="btn-primary" style="background: var(--primary-color); color: white; padding: 0.5rem 1rem; border-radius: 8px; text-decoration: none;">
-      + Create Listing
-    </a>
-  </div>
-
-</nav>
+      <!-- Create Listing Button (Right) -->
+      <div>
+        <a href="create-listing.html" class="btn-primary">+ Create Listing</a>
+      </div>
+    </nav>
   </header>
 
   <!-- ✅ Main Form Section -->
@@ -252,19 +246,11 @@
       </select>
 
       <label>Condition *</label>
-      <div class="radio-group" style="margin-bottom: 1rem;">
-        <label style="font-size: 1rem;">
-          <input type="radio" name="condition" value="Excellent" style="transform: scale(1.4); margin-right: 0.5rem;"> Excellent
-        </label>
-        <label style="font-size: 1rem;">
-          <input type="radio" name="condition" value="Like New" style="transform: scale(1.4); margin-right: 0.5rem;"> Like New
-        </label>
-        <label style="font-size: 1rem;">
-          <input type="radio" name="condition" value="Good" style="transform: scale(1.4); margin-right: 0.5rem;"> Good
-        </label>
-        <label style="font-size: 1rem;">
-          <input type="radio" name="condition" value="Fair" style="transform: scale(1.4); margin-right: 0.5rem;"> Fair
-        </label>
+      <div class="radio-group">
+        <label><input type="radio" name="condition" value="Excellent" style="transform: scale(1.4); margin-right: 0.5rem;"> Excellent</label>
+        <label><input type="radio" name="condition" value="Like New" style="transform: scale(1.4); margin-right: 0.5rem;"> Like New</label>
+        <label><input type="radio" name="condition" value="Good" style="transform: scale(1.4); margin-right: 0.5rem;"> Good</label>
+        <label><input type="radio" name="condition" value="Fair" style="transform: scale(1.4); margin-right: 0.5rem;"> Fair</label>
       </div>
 
       <label for="price">Price *</label>
@@ -285,15 +271,9 @@
 
       <label>Contact Method</label>
       <div class="radio-group" style="display: flex; gap: 1rem; margin-bottom: 1rem;">
-        <label style="font-size: 1rem;">
-          <input type="radio" name="contact" value="email" required style="transform: scale(1.4); margin-right: 0.4rem;"> FSU Email
-        </label>
-        <label style="font-size: 1rem;">
-          <input type="radio" name="contact" value="phone" style="transform: scale(1.4); margin-right: 0.4rem;"> Phone Number
-        </label>
-        <label style="font-size: 1rem;">
-          <input type="radio" name="contact" value="both" style="transform: scale(1.4); margin-right: 0.4rem;"> Both
-        </label>
+        <label><input type="radio" name="contact" value="email" required style="transform: scale(1.4); margin-right: 0.4rem;"> FSU Email</label>
+        <label><input type="radio" name="contact" value="phone" style="transform: scale(1.4); margin-right: 0.4rem;"> Phone Number</label>
+        <label><input type="radio" name="contact" value="both" style="transform: scale(1.4); margin-right: 0.4rem;"> Both</label>
       </div>
 
       <label for="email">FSU Email</label>
