@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -32,12 +31,79 @@
       background: var(--background-light);
       color: var(--text-dark);
       line-height: 1.6;
-      padding: 3rem 1rem;
+      padding-bottom: 3rem;
+    }
+
+    header {
+      background: #fff;
+      border-bottom: 1px solid #eee;
+      padding: 1rem 2rem;
+      box-shadow: var(--shadow-light);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    nav {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    nav .logo {
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+      gap: 0.75rem;
+    }
+
+    .logo-icon {
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+      color: white;
+      font-weight: bold;
+      font-size: 1.25rem;
+      padding: 0.5rem 0.75rem;
+      border-radius: 8px;
+    }
+
+    .logo-text {
+      font-size: 1.4rem;
+      font-weight: bold;
+      color: var(--primary-color);
+    }
+
+    .nav-links {
+      list-style: none;
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+      margin: 0;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--text-dark);
+      font-weight: 500;
+      transition: var(--transition);
+    }
+
+    .nav-links a:hover {
+      color: var(--primary-color);
+    }
+
+    .nav-links .btn-primary {
+      background: var(--primary-color);
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      text-decoration: none;
     }
 
     .container {
       max-width: 800px;
-      margin: auto;
+      margin: 3rem auto;
       background: var(--white);
       padding: 2rem;
       border-radius: var(--border-radius);
@@ -139,6 +205,25 @@
   </style>
 </head>
 <body>
+
+  <!-- ✅ Header Navigation -->
+  <header>
+    <nav>
+      <a href="index.html" class="logo">
+        <div class="logo-icon">SE</div>
+        <span class="logo-text">The Spear Exchange</span>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="listings/">Browse</a></li>
+        <li><a href="messages/">Messages</a></li>
+        <li><a href="my-listings/">My Listings</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- ✅ Main Form Section -->
   <div class="container">
     <h1>Create a New Listing</h1>
     <form>
@@ -152,14 +237,23 @@
         <option>Electronics</option>
         <option>Furniture</option>
         <option>Clothing</option>
+        <option>Other</option>
       </select>
 
       <label>Condition *</label>
-      <div class="radio-group">
-        <label><input type="radio" name="condition" value="Excellent" required> Excellent</label>
-        <label><input type="radio" name="condition" value="Like New"> Like New</label>
-        <label><input type="radio" name="condition" value="Good"> Good</label>
-        <label><input type="radio" name="condition" value="Fair"> Fair</label>
+      <div class="radio-group" style="margin-bottom: 1rem;">
+        <label style="font-size: 1rem;">
+          <input type="radio" name="condition" value="Excellent" style="transform: scale(1.4); margin-right: 0.5rem;"> Excellent
+        </label>
+        <label style="font-size: 1rem;">
+          <input type="radio" name="condition" value="Like New" style="transform: scale(1.4); margin-right: 0.5rem;"> Like New
+        </label>
+        <label style="font-size: 1rem;">
+          <input type="radio" name="condition" value="Good" style="transform: scale(1.4); margin-right: 0.5rem;"> Good
+        </label>
+        <label style="font-size: 1rem;">
+          <input type="radio" name="condition" value="Fair" style="transform: scale(1.4); margin-right: 0.5rem;"> Fair
+        </label>
       </div>
 
       <label for="price">Price *</label>
@@ -179,14 +273,23 @@
       </select>
 
       <label>Contact Method</label>
-      <div class="radio-group">
-        <label><input type="radio" name="contact" value="email" required> FSU Email</label>
-        <label><input type="radio" name="contact" value="phone"> Phone Number</label>
-        <label><input type="radio" name="contact" value="both"> Both</label>
+      <div class="radio-group" style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+        <label style="font-size: 1rem;">
+          <input type="radio" name="contact" value="email" required style="transform: scale(1.4); margin-right: 0.4rem;"> FSU Email
+        </label>
+        <label style="font-size: 1rem;">
+          <input type="radio" name="contact" value="phone" style="transform: scale(1.4); margin-right: 0.4rem;"> Phone Number
+        </label>
+        <label style="font-size: 1rem;">
+          <input type="radio" name="contact" value="both" style="transform: scale(1.4); margin-right: 0.4rem;"> Both
+        </label>
       </div>
 
       <label for="email">FSU Email</label>
       <input type="email" id="email" placeholder="yourname@fsu.edu" required>
+
+      <label for="phone">Phone Number</label>
+      <input type="tel" id="phone" placeholder="(000) 000-0000" required>
 
       <div class="checkbox">
         <label><input type="checkbox" required> I agree to the <a href="#">Terms of Service</a> and <a href="#">Community Guidelines</a>.</label>
@@ -198,5 +301,6 @@
       </div>
     </form>
   </div>
+
 </body>
 </html>
