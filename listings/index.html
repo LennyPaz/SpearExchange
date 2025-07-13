@@ -270,15 +270,18 @@
         }
 
         .filter-select {
-            padding: 0.75rem 1rem;
+            padding: 0.75rem 2.5rem 0.75rem 1rem;
             border: 2px solid #E5E7EB;
             border-radius: 8px;
-            background: white;
+            background: white url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e") no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 1rem;
             font-size: 0.9rem;
             color: var(--text-dark);
             cursor: pointer;
             transition: var(--transition);
-            min-width: 120px;
+            min-width: 140px;
+            appearance: none;
         }
 
         .filter-select:focus {
@@ -359,44 +362,44 @@
         }
 
         /* FIXED LISTING CARD - CONSISTENT HEIGHT WITH STRUCTURED LAYOUT */
-		.listing-card {
-			background: white;
-			border-radius: var(--border-radius);
-			overflow: hidden;
-			box-shadow: var(--shadow-light);
-			transition: var(--transition);
-			cursor: pointer;
-			border: 1px solid transparent;
-			height: 440px; /* Fixed height for consistency */
-			display: flex;
-			flex-direction: column;
-			position: relative; /* For absolute positioning of overlays */
-		}
+        .listing-card {
+            background: white;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-light);
+            transition: var(--transition);
+            cursor: pointer;
+            border: 1px solid transparent;
+            height: 440px; /* Fixed height for consistency */
+            display: flex;
+            flex-direction: column;
+            position: relative; /* For absolute positioning of overlays */
+        }
 
         .listing-card:hover {
-			transform: translateY(-4px);
-			box-shadow: var(--shadow-medium);
-			border-color: var(--primary-color);
-		}
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-medium);
+            border-color: var(--primary-color);
+        }
 
         .listing-image {
-			width: 100%;
-			height: 200px;
-			background: linear-gradient(135deg, #F3F4F6, #E5E7EB);
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			color: var(--text-light);
-			font-size: 3rem;
-			position: relative;
-			flex-shrink: 0; /* Prevent shrinking */
-		}
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #F3F4F6, #E5E7EB);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-light);
+            font-size: 3rem;
+            position: relative;
+            flex-shrink: 0; /* Prevent shrinking */
+        }
 
         .listing-image img {
-			width: 100%;
-			height: 100%;
-			object-fit: cover;
-		}
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
 
         .favorite-btn {
             position: absolute;
@@ -427,111 +430,111 @@
         }
 
         /* Content area with fixed structure - no flex-grow */
-		.listing-content {
-			padding: 1.25rem;
-			display: flex;
-			flex-direction: column;
-			height: 240px; 
-			padding-bottom: 3rem; /* Space for bottom overlays */
-		}
+        .listing-content {
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            height: 240px; 
+            padding-bottom: 3rem; /* Space for bottom overlays */
+        }
 
         /* Overlays positioned absolutely (outside content flow) */
-		.listing-date {
-			position: absolute;
-			bottom: 0.75rem;
-			right: 1rem;
-			display: flex;
-			align-items: center;
-			gap: 0.25rem;
-			font-size: 0.85rem;
-			color: var(--text-light);
-			background: rgba(255, 255, 255, 0.9);
-			padding: 0.25rem 0.5rem;
-			border-radius: 4px;
-			backdrop-filter: blur(5px);
-			z-index: 10;
-		}
+        .listing-date {
+            position: absolute;
+            bottom: 0.75rem;
+            right: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.85rem;
+            color: var(--text-light);
+            background: rgba(255, 255, 255, 0.9);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            backdrop-filter: blur(5px);
+            z-index: 10;
+        }
 
         /* Seller positioned at bottom left corner of entire card */
         .listing-seller {
-			position: absolute;
-			bottom: 0.75rem;
-			left: 1rem;
-			display: flex;
-			align-items: center;
-			gap: 0.25rem;
-			font-size: 0.85rem;
-			color: var(--text-light);
-			background: rgba(255, 255, 255, 0.9);
-			padding: 0.25rem 0.5rem;
-			border-radius: 4px;
-			backdrop-filter: blur(5px);
-			z-index: 10;
-		}
+            position: absolute;
+            bottom: 0.75rem;
+            left: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.85rem;
+            color: var(--text-light);
+            background: rgba(255, 255, 255, 0.9);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            backdrop-filter: blur(5px);
+            z-index: 10;
+        }
 
         /* Fixed height for title area */
-		.listing-title {
-			font-size: 1.1rem;
-			font-weight: 600;
-			color: var(--text-dark);
-			margin-bottom: 0.25rem;
-			line-height: 1.3;
-			height: 1.5rem; 
-			overflow: hidden;
-			display: -webkit-box;
-			-webkit-line-clamp: 2;
-			-webkit-box-orient: vertical;
-		}
+        .listing-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 0.25rem;
+            line-height: 1.3;
+            height: 1.5rem; 
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
 
         /* Fixed height for description area */
-		.listing-description {
-			color: var(--text-light);
-			font-size: 0.9rem;
-			margin-bottom: 0.75rem;
-			line-height: 1.4;
-			height: 3.2rem; 
-			overflow: hidden;
-			display: -webkit-box;
-			-webkit-line-clamp: 2;
-			-webkit-box-orient: vertical;
-		}
+        .listing-description {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-bottom: 0.75rem;
+            line-height: 1.4;
+            height: 3.2rem; 
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
 
         /* Price positioned consistently */
-		.listing-price {
-			font-size: 1.5rem;
-			font-weight: 700;
-			color: var(--primary-color);
-			margin-bottom: 0.75rem;
-			height: 2rem; /* Fixed height */
-			display: flex;
-			align-items: center;
-		}
+        .listing-price {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.75rem;
+            height: 2rem; /* Fixed height */
+            display: flex;
+            align-items: center;
+        }
 
         /* Category positioned consistently at the bottom of content */
-		.listing-meta {
-			margin-top: auto; /* Pushes to bottom of content area */
-			display: flex;
-			justify-content: flex-start;
-			align-items: center;
-			padding-bottom: 0.5rem; /* Add padding to prevent bottom clipping */
-		}
+        .listing-meta {
+            margin-top: auto; /* Pushes to bottom of content area */
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            padding-bottom: 0.5rem; /* Add padding to prevent bottom clipping */
+        }
 
         .listing-category {
-			background: rgba(139, 38, 53, 0.1);
-			color: var(--primary-color);
-			padding: 0.25rem 0.75rem;
-			border-radius: 20px;
-			font-weight: 500;
-			text-transform: capitalize;
-			font-size: 0.85rem;
-			white-space: nowrap; /* Prevent wrapping */
-			overflow: hidden;
-			text-overflow: ellipsis;
-			max-width: 180px; /* Prevent category from being too wide */
-			line-height: 1.2; /* Ensure consistent line height */
-	}
+            background: rgba(139, 38, 53, 0.1);
+            color: var(--primary-color);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-weight: 500;
+            text-transform: capitalize;
+            font-size: 0.85rem;
+            white-space: nowrap; /* Prevent wrapping */
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 180px; /* Prevent category from being too wide */
+            line-height: 1.2; /* Ensure consistent line height */
+        }
 
-        /* List View Styles */
+        /* Enhanced List View - Professional Layout with Fixed Heights */
         .listing-list-item {
             background: white;
             border-radius: var(--border-radius);
@@ -542,16 +545,22 @@
             border: 1px solid transparent;
             display: flex;
             gap: 1.5rem;
+            min-height: 180px; /* Increased height for better proportions */
+            max-height: 180px;
+            position: relative; /* For absolute positioning if needed */
+            align-items: center; /* Center image vertically */
         }
 
         .listing-list-item:hover {
+            transform: translateY(-2px);
             box-shadow: var(--shadow-medium);
             border-color: var(--primary-color);
         }
 
+        /* Enhanced image container with favorite button */
         .list-item-image {
-            width: 120px;
-            height: 120px;
+            width: 140px; /* Slightly larger to match the increased height */
+            height: 140px;
             background: linear-gradient(135deg, #F3F4F6, #E5E7EB);
             border-radius: 8px;
             flex-shrink: 0;
@@ -559,27 +568,503 @@
             align-items: center;
             justify-content: center;
             color: var(--text-light);
-            font-size: 2rem;
+            font-size: 2.5rem;
+            position: relative; /* For favorite button positioning */
+            overflow: hidden;
         }
 
+        .list-item-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Favorite button for list view */
+        .list-favorite-btn {
+            position: absolute;
+            top: 0.6rem;
+            right: 0.6rem;
+            width: 34px;
+            height: 34px;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            color: var(--text-light);
+            font-size: 1rem;
+        }
+
+        .list-favorite-btn:hover {
+            background: white;
+            color: var(--error-color);
+            transform: scale(1.1);
+        }
+
+        .list-favorite-btn.favorited {
+            color: var(--error-color);
+            background: white;
+        }
+
+        /* Content area - SIMPLIFIED LAYOUT */
         .list-item-content {
             flex: 1;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
+            min-height: 140px;
+            max-height: 140px;
+            overflow: hidden;
         }
 
+        /* Header section */
         .list-item-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
+            gap: 1rem;
             margin-bottom: 0.5rem;
         }
 
+        .list-item-title-section {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .list-item-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin: 0 0 0.5rem 0;
+            line-height: 1.3;
+            height: 2rem;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+        }
+
+        .list-item-category-row {
+            display: flex;
+            align-items: center;
+        }
+
+        /* Price styling for list view */
         .list-item-price {
             font-size: 1.5rem;
             font-weight: 700;
             color: var(--primary-color);
+            white-space: nowrap;
+            align-self: flex-start;
+        }
+
+        /* Description */
+        .list-item-description {
+            color: var(--text-light);
+            font-size: 0.95rem;
+            line-height: 1.4;
+            height: 3.5rem;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            margin-bottom: 1rem;
+        }
+
+        /* Footer - COMPLETELY REDESIGNED */
+        .list-item-footer {
+            display: flex;
+            align-items: center;
+            font-size: 0.85rem;
+            color: var(--text-light);
+            padding-top: 0.5rem;
+            border-top: 1px solid rgba(139, 38, 53, 0.06);
+            flex-wrap: nowrap;
+        }
+
+        .list-item-seller {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            margin-right: 2rem; /* Fixed spacing */
+        }
+
+        .list-item-date {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .list-item-seller i,
+        .list-item-date i {
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+
+        /* Mobile responsiveness for list view - SEQUENTIAL FIX */
+        @media (max-width: 1024px) {
+            .listing-list-item {
+                padding: 1.25rem;
+                gap: 1.25rem;
+            }
+        }
+
+        /* STEP 1: Fix 900px breakpoint - Increase content height, ensure description visibility */
+        @media (max-width: 900px) {
+            .listing-list-item {
+                min-height: 170px; /* Increased from 160px */
+                max-height: 170px;
+                padding: 1rem;
+                gap: 1rem;
+            }
+
+            .list-item-image {
+                width: 120px;
+                height: 120px;
+            }
+
+            .list-item-content {
+                min-height: 140px; /* Increased from 120px */
+                max-height: 140px;
+            }
+
+            .list-item-description {
+                height: 2.8rem; /* Reduced from 3.5rem but still visible */
+                line-height: 1.4;
+                -webkit-line-clamp: 2;
+                margin-bottom: 0.75rem;
+            }
+
+            .list-item-title {
+                font-size: 1.1rem;
+                height: 1.5rem; /* More controlled height */
+            }
+
+            .list-item-price {
+                font-size: 1.3rem;
+            }
+
+            .list-item-footer {
+                padding-top: 0.25rem; /* Reduced padding to save space */
+            }
+        }
+
+        /* STEP 2: Add new 850px breakpoint - Intermediate responsive step */
+        @media (max-width: 850px) {
+            .listing-list-item {
+                min-height: 160px;
+                max-height: 160px;
+                padding: 0.875rem; /* Between 1rem and 0.75rem */
+                gap: 0.875rem;
+            }
+
+            .list-item-image {
+                width: 110px; /* Gradual size reduction */
+                height: 110px;
+            }
+
+            .list-item-content {
+                min-height: 130px;
+                max-height: 130px;
+            }
+
+            .list-item-description {
+                height: 2.4rem; /* Further reduced */
+                font-size: 0.9rem;
+            }
+
+            .list-item-title {
+                font-size: 1.05rem; /* Gradual font size reduction */
+            }
+
+            .list-item-price {
+                font-size: 1.25rem;
+            }
+        }
+
+        /* STEP 3: Fixed 800px breakpoint - Keep working height behavior, add only alignment fixes */
+        @media (max-width: 800px) {
+            .listing-list-item {
+                min-height: auto;
+                max-height: none;
+                padding: 0.75rem;
+                gap: 0.75rem;
+                display: flex;
+                flex-direction: row;
+                align-items: stretch; /* ONLY alignment fix from 768px */
+            }
+
+            .list-item-image {
+                width: 100px;
+                height: 100px;
+                flex-shrink: 0;
+            }
+
+            .list-item-content {
+                min-height: auto;
+                max-height: 160px;
+				overflow: visible; /* Keep this - it was working */
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-start;
+                gap: 0.5rem;
+                align-items: flex-start; /* ONLY alignment fix from 768px */
+            }
+
+            .list-item-header {
+                width: 100%; /* ONLY alignment fix from 768px */
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+                gap: 0.75rem;
+            }
+
+            .list-item-title {
+                font-size: 1rem;
+                line-height: 1.2;
+                margin: 0;
+                overflow: hidden;
+                display: -webkit-box;
+                -webkit-line-clamp: 1;
+                -webkit-box-orient: vertical;
+                text-align: left; /* ONLY alignment fix from 768px */
+            }
+
+            .list-item-price {
+                font-size: 1.3rem;
+                font-weight: 700;
+                color: var(--primary-color);
+                text-align: right;
+                white-space: nowrap;
+                margin: 0;
+                padding: 0;
+                align-self: flex-start;
+            }
+
+            .list-item-description {
+                font-size: 0.8rem;
+                line-height: 1.2;
+                margin: 0;
+                overflow: hidden;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                text-align: left; /* ONLY alignment fix from 768px */
+            }
+
+            .listing-category {
+                font-size: 0.8rem;
+                padding: 0.25rem 0.6rem;
+                margin: 0.25rem 0 0 0;
+                display: inline-block;
+                text-align: left;
+            }
+
+            .list-item-footer {
+                font-size: 0.75rem;
+                padding-top: 0.25rem;
+                border-top: 1px solid rgba(139, 38, 53, 0.06);
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                margin: 0;
+                justify-content: flex-start; /* ONLY alignment fix from 768px */
+            }
+
+            .list-item-seller,
+            .list-item-date {
+                margin: 0; /* ONLY alignment fix from 768px */
+            }
+        }
+
+        /* STEP 4: Revert 768px to working version - keep the height behavior that worked */
+        @media (max-width: 768px) {
+            .listing-list-item {
+                flex-direction: column;
+                min-height: auto;
+                max-height: none;
+                padding: 1rem;
+                gap: 0.75rem;
+                align-items: stretch; /* Keep this alignment fix */
+            }
+
+            .list-item-image {
+                width: 100%;
+                height: 180px;
+            }
+
+            .list-item-content {
+                min-height: auto;
+                max-height: 160px;
+                display: flex;
+                flex-direction: column;
+                gap: 0.75rem;
+                padding: 0;
+                margin: 0;
+                align-items: flex-start; /* Keep this alignment fix */
+            }
+			
+
+            .list-item-header {
+                width: 100%; /* Keep this alignment fix */
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .list-item-title {
+                font-size: 1.1rem;
+                line-height: 1.3;
+                margin: 0;
+                padding: 0;
+                text-align: left;
+                height: auto; /* Keep auto height - this was working */
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+            }
+
+            .list-item-price {
+                font-size: 1.3rem;
+                font-weight: 700;
+                color: var(--primary-color);
+                text-align: right;
+                white-space: nowrap;
+                margin: 0;
+                padding: 0;
+                align-self: flex-start;
+            }
+
+            .listing-category {
+                font-size: 0.8rem;
+                padding: 0.25rem 0.6rem;
+                margin: 0.25rem 0 0 0;
+                display: inline-block;
+                text-align: left;
+            }
+
+            .list-item-description {
+                font-size: 0.9rem;
+                line-height: 1.4;
+                margin: 0;
+                padding: 0;
+                text-align: left;
+                height: auto; /* Keep auto height - this was working */
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+
+
+                overflow: hidden;
+            }
+
+            .list-item-footer {
+                display: flex;
+                align-items: center;
+                justify-content: flex-start;
+                gap: 1.5rem;
+                font-size: 0.8rem;
+                margin: 0;
+                padding: 0.5rem 0 0 0;
+                border-top: 1px solid rgba(139, 38, 53, 0.06);
+                text-align: left;
+            }
+
+            .list-item-seller,
+            .list-item-date {
+                margin: 0;
+                padding: 0;
+                text-align: left;
+            }
+
+            .listings-list {
+                margin: 0;
+                padding: 0;
+            }
+        }
+
+        /* STEP 5: Add intermediate mobile breakpoints - Progressive optimization */
+        @media (max-width: 600px) {
+            .listing-list-item {
+                padding: 0.875rem; /* Slightly more padding for readability */
+                gap: 0.625rem;
+            }
+
+            .list-item-image {
+                height: 160px; /* Smaller but proportional */
+            }
+
+            .list-item-title {
+                font-size: 1.05rem;
+            }
+
+            .list-item-price {
+                font-size: 1.25rem;
+            }
+
+            .list-item-description {
+                font-size: 0.85rem;
+                line-height: 1.3;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .listing-list-item {
+                padding: 0.75rem; /* Optimized for small screens */
+                gap: 0.5rem;
+            }
+
+            .list-item-image {
+                height: 140px; /* More compact */
+            }
+
+            .list-item-title {
+                font-size: 1rem;
+            }
+
+            .list-item-price {
+                font-size: 1.2rem;
+            }
+
+            .list-item-description {
+                font-size: 0.8rem;
+                line-height: 1.25;
+            }
+
+            .list-item-footer {
+                font-size: 0.75rem;
+            }
+        }
+
+        /* STEP 5B: Ultra-small screens optimization */
+        @media (max-width: 360px) {
+            .listing-list-item {
+                padding: 0.625rem;
+                gap: 0.375rem;
+            }
+
+            .list-item-image {
+                height: 120px;
+            }
+
+            .list-item-title {
+                font-size: 0.95rem;
+            }
+
+            .list-item-price {
+                font-size: 1.1rem;
+            }
+
+            .list-item-description {
+                font-size: 0.75rem;
+                line-height: 1.2;
+            }
         }
 
         /* Loading States */
@@ -631,7 +1116,7 @@
 
         .create-listing-btn {
             background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-            color: white;
+            color: white !important;
             padding: 0.75rem 1.5rem;
             border: none;
             border-radius: 8px;
@@ -639,11 +1124,13 @@
             text-decoration: none;
             display: inline-block;
             transition: var(--transition);
+            box-shadow: 0 2px 8px rgba(139, 38, 53, 0.2);
         }
 
         .create-listing-btn:hover {
             transform: translateY(-2px);
-            box-shadow: var(--shadow-medium);
+            box-shadow: 0 4px 12px rgba(139, 38, 53, 0.3);
+            color: white !important;
         }
 
         /* Pagination */
@@ -680,48 +1167,6 @@
         .page-btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
-        }
-
-        /* Create Listing Button Improved */
-        .create-listing-btn {
-            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-            color: white !important;
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            text-decoration: none;
-            display: inline-block;
-            transition: var(--transition);
-            box-shadow: 0 2px 8px rgba(139, 38, 53, 0.2);
-        }
-
-        .create-listing-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(139, 38, 53, 0.3);
-            color: white !important;
-        }
-
-        /* Improved filter styling */
-        .filter-select {
-            padding: 0.75rem 2.5rem 0.75rem 1rem;
-            border: 2px solid #E5E7EB;
-            border-radius: 8px;
-            background: white url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e") no-repeat;
-            background-position: right 0.75rem center;
-            background-size: 1rem;
-            font-size: 0.9rem;
-            color: var(--text-dark);
-            cursor: pointer;
-            transition: var(--transition);
-            min-width: 140px;
-            appearance: none;
-        }
-
-        .filter-select:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(139, 38, 53, 0.1);
         }
 
         /* Mobile Menu Styles - RIGHT SIDE LIKE LANDING PAGE */
@@ -953,6 +1398,7 @@
                 font-size: 0.75rem;
                 padding: 0.3rem 0.5rem;
             }
+
             
             .nav-links {
                 gap: 0.5rem;
@@ -1141,8 +1587,7 @@
                 <li><a href="/listings" class="active">Browse</a></li>
                 <li><a href="/messages">Messages</a></li>
                 <li><a href="/my-listings">My Listings</a></li>
-                <li><a href="create-listing.html" class="create-listing-btn">+ Create Listing</a></li>
-
+                <li><a href="/create-listing" class="create-listing-btn">+ Create Listing</a></li>
             </ul>
 
             <div class="user-menu">
@@ -1341,6 +1786,8 @@
             // Set temporary user info for testing
             document.getElementById('user-name').textContent = 'Test User';
             document.getElementById('user-avatar').textContent = 'T';
+            document.getElementById('mobile-user-name').textContent = 'Test User';
+            document.getElementById('mobile-user-avatar').textContent = 'T';
         });
 
         // Check if user is authenticated - TEMPORARILY DISABLED
@@ -1438,51 +1885,52 @@
             updatePagination();
         }
 
-    // Create listing card for grid view with fixed, consistent layout
-	function createListingCard(listing) {
-		const card = document.createElement('div');
-		card.className = 'listing-card';
-		card.onclick = () => viewListing(listing.id);
+        // Create listing card for grid view with fixed, consistent layout
+        function createListingCard(listing) {
+            const card = document.createElement('div');
+            card.className = 'listing-card';
+            card.onclick = () => viewListing(listing.id);
 
-		// Parse image URLs if they exist
-		let imageUrls = [];
-		try {
-			imageUrls = listing.image_urls ? JSON.parse(listing.image_urls) : [];
-		} catch (e) {
-			console.error('Error parsing image URLs:', e);
-		}
+            // Parse image URLs if they exist
+            let imageUrls = [];
+            try {
+                imageUrls = listing.image_urls ? JSON.parse(listing.image_urls) : [];
+            } catch (e) {
+                console.error('Error parsing image URLs:', e);
+            }
 
-		const imageContent = imageUrls.length > 0 
-			? `<img src="${imageUrls[0]}" alt="${listing.title}" onerror="this.style.display='none'">`
-			: `<i class="fas fa-image"></i>`;
+            const imageContent = imageUrls.length > 0 
+                ? `<img src="${imageUrls[0]}" alt="${listing.title}" onerror="this.style.display='none'">`
+                : `<i class="fas fa-image"></i>`;
 
-		card.innerHTML = `
-			<div class="listing-image">
-				${imageContent}
-				<button class="favorite-btn" onclick="event.stopPropagation(); toggleFavorite(${listing.id})">
-					<i class="far fa-heart"></i>
-				</button>
-			</div>
-			<div class="listing-content">
-				<h3 class="listing-title">${escapeHtml(listing.title)}</h3>
-				<p class="listing-description">${escapeHtml(listing.description)}</p>
-				<div class="listing-price">\$${listing.price.toFixed(2)}</div>
-				<div class="listing-meta">
-					<span class="listing-category">${escapeHtml(listing.category)}</span>
-				</div>
-			</div>
-			<div class="listing-seller">
-				<i class="fas fa-user"></i>
-				${escapeHtml(listing.seller_name)}
-			</div>
-			<div class="listing-date">
-				<i class="far fa-clock"></i>
-				${formatDate(listing.created_at)}
-			</div>
-		`;
+            card.innerHTML = `
+                <div class="listing-image">
+                    ${imageContent}
+                    <button class="favorite-btn" onclick="event.stopPropagation(); toggleFavorite(${listing.id})">
+                        <i class="far fa-heart"></i>
+                    </button>
+                </div>
+                <div class="listing-content">
+                    <h3 class="listing-title">${escapeHtml(listing.title)}</h3>
+                    <p class="listing-description">${escapeHtml(listing.description)}</p>
+                    <div class="listing-price">\$${listing.price.toFixed(2)}</div>
+                    <div class="listing-meta">
+                        <span class="listing-category">${escapeHtml(listing.category)}</span>
+                    </div>
+                </div>
+                <div class="listing-seller">
+                    <i class="fas fa-user"></i>
+                    ${escapeHtml(listing.seller_name)}
+                </div>
+                <div class="listing-date">
+                    <i class="far fa-clock"></i>
+                    ${formatDate(listing.created_at)}
+                </div>
+            `;
 
-		return card;
-		}
+            return card;
+        }
+
         // Create listing item for list view
         function createListingListItem(listing) {
             const item = document.createElement('div');
