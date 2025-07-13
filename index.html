@@ -1639,19 +1639,13 @@
         }
 
         // Handle create listing button
-      const isLoggedIn = false; // Replace this with your actual login logic
-
-  function handleStartShopping() {
-    window.location.href = 'listings/';
-  }
-
-  function handleCreateListing() {
-    if (isLoggedIn) {
-      window.location.href = 'listings/create-listing.html';
-    } else {
-      window.location.href = 'login/?redirect=create-listing';
-    }
-  }
+        function handleCreateListing() {
+            if (isLoggedIn) {
+                window.location.href = 'create-listing/';
+            } else {
+                window.location.href = 'login/?redirect=create-listing';
+            }
+        }
 
         // Handle view more listings button
         function handleViewMoreListings() {
