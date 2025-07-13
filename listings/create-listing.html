@@ -208,19 +208,30 @@
 
   <!-- ✅ Header Navigation -->
   <header>
-    <nav>
-      <a href="index.html" class="logo">
-        <div class="logo-icon">SE</div>
-        <span class="logo-text">The Spear Exchange</span>
-      </a>
+  <nav style="max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between;">
+  
+  <!-- Logo (Left) -->
+  <a href="index.html" class="logo" style="display: flex; align-items: center; text-decoration: none; gap: 0.75rem;">
+    <div class="logo-icon">SE</div>
+    <span class="logo-text">The Spear Exchange</span>
+  </a>
 
-      <ul class="nav-links">
-        <li><a href="index.html">Home</a></li>
-        <li><a href="listings/">Browse</a></li>
-        <li><a href="messages/">Messages</a></li>
-        <li><a href="my-listings/">My Listings</a></li>
-      </ul>
-    </nav>
+  <!-- Centered Navigation Links -->
+  <ul style="list-style: none; display: flex; gap: 2rem; align-items: center; margin: 0; flex: 1; justify-content: center;">
+    <li><a href="index.html" style="text-decoration: none; color: var(--text-dark); font-weight: 500;">Home</a></li>
+    <li><a href="listings/" style="text-decoration: none; color: var(--text-dark); font-weight: 500;">Browse</a></li>
+    <li><a href="messages/" style="text-decoration: none; color: var(--text-dark); font-weight: 500;">Messages</a></li>
+    <li><a href="my-listings/" style="text-decoration: none; color: var(--text-dark); font-weight: 500;">My Listings</a></li>
+  </ul>
+
+  <!-- Create Listing Button (Right) -->
+  <div style="flex-shrink: 0;">
+    <a href="create-listing.html" class="btn-primary" style="background: var(--primary-color); color: white; padding: 0.5rem 1rem; border-radius: 8px; text-decoration: none;">
+      + Create Listing
+    </a>
+  </div>
+
+</nav>
   </header>
 
   <!-- ✅ Main Form Section -->
