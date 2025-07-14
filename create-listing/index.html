@@ -905,9 +905,9 @@
             <!-- Navigation Links -->
             <ul class="nav-links">
                 <li><a href="../">Home</a></li>
-                <li><a href="/listings">Browse</a></li>
-                <li><a href="/messages">Messages</a></li>
-                <li><a href="/my-listings">My Listings</a></li>
+                <li><a href="../listings">Browse</a></li>
+                <li><a href="../messages">Messages</a></li>
+                <li><a href="../my-listings">My Listings</a></li>
             </ul>
 
             <!-- User Dropdown -->
@@ -918,15 +918,15 @@
                     <i class="fas fa-chevron-down"></i>
                 </div>
                 <div class="user-dropdown-menu" id="user-dropdown-menu">
-                    <a href="/my-listings" class="dropdown-item">
+                    <a href="../my-listings" class="dropdown-item">
                         <i class="fas fa-list"></i>
                         My Listings
                     </a>
-                    <a href="/messages" class="dropdown-item">
+                    <a href="../messages" class="dropdown-item">
                         <i class="fas fa-comments"></i>
                         Messages
                     </a>
-                    <a href="/profile" class="dropdown-item">
+                    <a href="../profile" class="dropdown-item">
                         <i class="fas fa-user"></i>
                         Profile Settings
                     </a>
@@ -963,15 +963,15 @@
                 <i class="fas fa-home"></i>
                 Home
             </a>
-            <a href="/listings" class="mobile-nav-item">
+            <a href="../listings" class="mobile-nav-item">
                 <i class="fas fa-search"></i>
                 Browse Listings
             </a>
-            <a href="/messages" class="mobile-nav-item">
+            <a href="../messages" class="mobile-nav-item">
                 <i class="fas fa-comments"></i>
                 Messages
             </a>
-            <a href="/my-listings" class="mobile-nav-item">
+            <a href="../my-listings" class="mobile-nav-item">
                 <i class="fas fa-list"></i>
                 My Listings
             </a>
@@ -1122,8 +1122,8 @@
                 <div class="checkbox-single">
                     <input type="checkbox" id="terms" required>
                     <label for="terms">
-                        I agree to the <a href="/terms" target="_blank">Terms of Service</a> and 
-                        <a href="/community-guidelines" target="_blank">Community Guidelines</a>. 
+                        I agree to the <a href="../terms" target="_blank">Terms of Service</a> and 
+                        <a href="../community-guidelines" target="_blank">Community Guidelines</a>. 
                         I confirm that this listing is accurate and that I'm authorized to sell this item.
                     </label>
                 </div>
@@ -1194,11 +1194,11 @@
                     document.getElementById('mobile-user-name').textContent = data.user.name || 'User';
                     document.getElementById('mobile-user-avatar').textContent = (data.user.name || 'U').charAt(0).toUpperCase();
                 } else {
-                    window.location.href = '/login';
+                    window.location.href = '../login';
                 }
             } catch (error) {
                 console.error('Auth check failed:', error);
-                window.location.href = '/login';
+                window.location.href = '../login';
             }
             */
         }
@@ -1515,7 +1515,7 @@
                 
                 if (!authResponse.ok) {
                     alert('You must be logged in to create a listing. Redirecting to login page...');
-                    window.location.href = '/login';
+                    window.location.href = '../login';
                     return;
                 }
                 
@@ -1636,9 +1636,9 @@
 
         function viewListing() {
             if (createdListingId) {
-                window.location.href = `/listings/${createdListingId}`;
+                window.location.href = `../listings/${createdListingId}`;
             } else {
-                window.location.href = '/listings';
+                window.location.href = '../listings';
             }
         }
 
@@ -1689,10 +1689,10 @@
                 method: 'POST',
                 credentials: 'include'
             }).then(() => {
-                window.location.href = '/login';
+                window.location.href = '../login';
             }).catch(error => {
                 console.error('Logout error:', error);
-                window.location.href = '/login';
+                window.location.href = '../login';
             });
         }
 
