@@ -553,40 +553,66 @@
 
         .image-preview {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-            gap: 1rem;
-            margin-top: 1.5rem;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
         }
 
-        .preview-item {
+        .image-preview-item {
             position: relative;
-            aspect-ratio: 1;
             border-radius: 8px;
             overflow: hidden;
-            border: 2px solid #e1e8ed;
+            border: 2px solid #ddd;
+            aspect-ratio: 1;
         }
 
-        .preview-image {
+        .image-preview-item img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
 
-        .remove-image {
+        .image-overlay {
             position: absolute;
-            top: 0.5rem;
-            right: 0.5rem;
-            background: var(--error-color);
-            color: var(--white);
+            top: 5px;
+            right: 5px;
+        }
+
+        .remove-image-btn {
+            background: rgba(0,0,0,0.7);
+            color: white;
             border: none;
             border-radius: 50%;
             width: 24px;
             height: 24px;
+            cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            cursor: pointer;
-            font-size: 0.8rem;
+            font-size: 12px;
+        }
+
+        .image-loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+        }
+
+        .loading-spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         .form-row {
@@ -1016,13 +1042,13 @@
                         <label for="category">Category <span class="required">*</span></label>
                         <select id="category" class="form-input form-select" required>
                             <option value="">Select a category</option>
-                            <option value="Electronics">Electronics</option>
-                            <option value="Textbooks">Textbooks</option>
-                            <option value="Furniture">Furniture</option>
-                            <option value="Clothing">Clothing</option>
-                            <option value="Sports">Sports & Recreation</option>
-                            <option value="Services">Services</option>
-                            <option value="Other">Other</option>
+                            <option value="electronics">Electronics</option>
+                            <option value="textbooks">Textbooks</option>
+                            <option value="furniture">Furniture</option>
+                            <option value="clothing">Clothing</option>
+                            <option value="sports">Sports & Recreation</option>
+                            <option value="services">Services</option>
+                            <option value="other">Other</option>
                         </select>
                         <div class="error-message" id="category-error">Please select a category</div>
                     </div>
@@ -1064,17 +1090,31 @@
 
                 <!-- Images -->
                 <div class="form-group">
-                    <label>Images</label>
-                    <div class="image-upload" onclick="document.getElementById('photos').click()">
-                        <input type="file" id="photos" multiple accept="image/*" style="display: none;">
+                    <label>Images <span style="color: var(--text-light); font-weight: 400;">(Optional)</span></label>
+                    <p style="color: var(--text-light); font-size: 0.9rem; margin-bottom: 1rem;">Add up to 5 photos to showcase your item</p>
+                    
+                    <!-- Upload Area -->
+                    <div class="image-upload" id="image-upload-area">
+                        <input type="file" id="image-input" accept="image/*" multiple style="display: none;">
                         <div class="upload-icon">
                             <i class="fas fa-cloud-upload-alt"></i>
                         </div>
-                        <div class="upload-text">Click to upload images</div>
-                        <div class="upload-subtext">or drag and drop up to 5 images</div>
-                        <div class="upload-formats">JPG, PNG, WebP up to 5MB each</div>
+                        <div class="upload-text">Drop images here or click to upload</div>
+                        <div class="upload-subtext">JPEG, PNG, WebP up to 5MB each</div>
+                        <div class="upload-formats">
+                            <button type="button" class="btn" id="upload-btn" style="margin-top: 1rem; background: var(--primary-color); color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 6px; cursor: pointer;">
+                                <i class="fas fa-plus"></i> Choose Images
+                            </button>
+                        </div>
                     </div>
-                    <div class="image-preview" id="image-preview"></div>
+                    
+                    <!-- Image Count -->
+                    <div style="font-size: 0.9rem; color: var(--text-light); margin-top: 0.75rem;" id="image-count">0/5 images</div>
+                    
+                    <!-- Image Preview Container -->
+                    <div class="image-preview" id="image-preview-container" style="margin-top: 1rem;">
+                        <!-- Uploaded image previews will appear here -->
+                    </div>
                 </div>
 
                 <!-- Location -->
@@ -1162,25 +1202,206 @@
 
     <script>
         // Global variables
-        let selectedImages = [];
+        let uploadedImages = [];
         let createdListingId = null;
+        const maxImages = 5;
 
         // Initialize the page
         document.addEventListener('DOMContentLoaded', async () => {
-            // TEMPORARILY DISABLED - await checkAuthentication();
+            await checkAuthentication();
             setupEventListeners();
-            
-            // Set temporary user info for testing
-            document.getElementById('user-name').textContent = 'Test User';
-            document.getElementById('user-avatar').textContent = 'T';
-            document.getElementById('mobile-user-name').textContent = 'Test User';
-            document.getElementById('mobile-user-avatar').textContent = 'T';
-            document.getElementById('email').value = 'testuser@fsu.edu';
+            initializeImageUpload();
         });
 
-        // Check authentication - TEMPORARILY DISABLED
+        // Initialize image upload functionality
+        function initializeImageUpload() {
+            const uploadArea = document.getElementById('image-upload-area');
+            const fileInput = document.getElementById('image-input');
+            const uploadBtn = document.getElementById('upload-btn');
+            
+            // Click to upload
+            uploadBtn.addEventListener('click', () => {
+                fileInput.click();
+            });
+            
+            uploadArea.addEventListener('click', (e) => {
+                if (e.target !== uploadBtn && !uploadBtn.contains(e.target)) {
+                    fileInput.click();
+                }
+            });
+            
+            // Drag and drop functionality
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+            
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.classList.remove('dragover');
+            });
+            
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+                const files = Array.from(e.dataTransfer.files);
+                handleImageFiles(files);
+            });
+            
+            // File input change
+            fileInput.addEventListener('change', (e) => {
+                const files = Array.from(e.target.files);
+                handleImageFiles(files);
+            });
+        }
+
+        // Handle selected image files
+        async function handleImageFiles(files) {
+            const imageFiles = files.filter(file => file.type.startsWith('image/'));
+            
+            if (imageFiles.length === 0) {
+                alert('Please select valid image files (JPEG, PNG, WebP)');
+                return;
+            }
+            
+            if (uploadedImages.length + imageFiles.length > maxImages) {
+                alert(`Maximum ${maxImages} images allowed`);
+                return;
+            }
+            
+            for (const file of imageFiles) {
+                await uploadSingleImage(file);
+            }
+        }
+
+        // Upload single image to R2
+        async function uploadSingleImage(file) {
+            // Validate file size (5MB max)
+            const maxSize = 5 * 1024 * 1024;
+            if (file.size > maxSize) {
+                alert(`Image ${file.name} is too large. Maximum size is 5MB.`);
+                return;
+            }
+            
+            // Show loading state
+            const loadingId = showImageLoading(file.name);
+            
+            try {
+                const formData = new FormData();
+                formData.append('image', file);
+                
+                const response = await fetch('https://spear-exchange.lenny-paz123.workers.dev/api/upload-image', {
+                    method: 'POST',
+                    credentials: 'include',
+                    body: formData
+                });
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Upload failed');
+                }
+                
+                const result = await response.json();
+                
+                // Add to uploaded images array
+                uploadedImages.push({
+                    url: result.imageUrl,
+                    name: file.name,
+                    size: file.size
+                });
+                
+                // Remove loading state and show preview
+                removeImageLoading(loadingId);
+                addImagePreview(result.imageUrl, file.name);
+                updateImageUploadUI();
+                
+                console.log('Image uploaded successfully:', result.imageUrl);
+                
+            } catch (error) {
+                console.error('Upload error:', error);
+                removeImageLoading(loadingId);
+                alert(`Failed to upload ${file.name}: ${error.message}`);
+            }
+        }
+
+        // Show loading state for uploading image
+        function showImageLoading(fileName) {
+            const loadingId = `loading-${Date.now()}`;
+            const previewContainer = document.getElementById('image-preview-container');
+            
+            const loadingDiv = document.createElement('div');
+            loadingDiv.id = loadingId;
+            loadingDiv.className = 'image-loading';
+            loadingDiv.innerHTML = `
+                <div class="loading-spinner"></div>
+                <p style="margin-top: 10px; font-size: 14px; color: var(--text-light);">Uploading ${fileName}...</p>
+            `;
+            
+            previewContainer.appendChild(loadingDiv);
+            return loadingId;
+        }
+
+        // Remove loading state
+        function removeImageLoading(loadingId) {
+            const loadingDiv = document.getElementById(loadingId);
+            if (loadingDiv) {
+                loadingDiv.remove();
+            }
+        }
+
+        // Add image preview after successful upload
+        function addImagePreview(imageUrl, fileName) {
+            const previewContainer = document.getElementById('image-preview-container');
+            
+            const previewDiv = document.createElement('div');
+            previewDiv.className = 'image-preview-item';
+            previewDiv.innerHTML = `
+                <img src="${imageUrl}" alt="${fileName}" loading="lazy">
+                <div class="image-overlay">
+                    <button type="button" class="remove-image-btn" onclick="removeImage('${imageUrl}')">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `;
+            
+            previewContainer.appendChild(previewDiv);
+        }
+
+        // Remove uploaded image
+        function removeImage(imageUrl) {
+            uploadedImages = uploadedImages.filter(img => img.url !== imageUrl);
+            
+            // Remove preview
+            const previewContainer = document.getElementById('image-preview-container');
+            const previews = previewContainer.querySelectorAll('.image-preview-item');
+            
+            previews.forEach(preview => {
+                const img = preview.querySelector('img');
+                if (img && img.src === imageUrl) {
+                    preview.remove();
+                }
+            });
+            
+            updateImageUploadUI();
+        }
+
+        // Update UI based on uploaded images
+        function updateImageUploadUI() {
+            const uploadArea = document.getElementById('image-upload-area');
+            const imageCount = document.getElementById('image-count');
+            
+            imageCount.textContent = `${uploadedImages.length}/${maxImages} images`;
+            
+            if (uploadedImages.length >= maxImages) {
+                uploadArea.style.opacity = '0.5';
+                uploadArea.style.pointerEvents = 'none';
+            } else {
+                uploadArea.style.opacity = '1';
+                uploadArea.style.pointerEvents = 'auto';
+            }
+        }
+
+        // Check authentication
         async function checkAuthentication() {
-            /* COMMENTED OUT FOR TESTING
             try {
                 const response = await fetch('https://spear-exchange.lenny-paz123.workers.dev/api/me', {
                     credentials: 'include'
@@ -1194,13 +1415,13 @@
                     document.getElementById('mobile-user-name').textContent = data.user.name || 'User';
                     document.getElementById('mobile-user-avatar').textContent = (data.user.name || 'U').charAt(0).toUpperCase();
                 } else {
+                    console.log('Not authenticated, redirecting to login...');
                     window.location.href = '../login';
                 }
             } catch (error) {
                 console.error('Auth check failed:', error);
                 window.location.href = '../login';
             }
-            */
         }
 
         // Setup event listeners
@@ -1237,17 +1458,6 @@
                 input.addEventListener('blur', validateField);
                 input.addEventListener('input', clearErrors);
             });
-
-            // Image upload
-            const photoInput = document.getElementById('photos');
-            const uploadArea = document.querySelector('.image-upload');
-
-            photoInput.addEventListener('change', handleImageSelect);
-            
-            // Drag and drop
-            uploadArea.addEventListener('dragover', handleDragOver);
-            uploadArea.addEventListener('dragleave', handleDragLeave);
-            uploadArea.addEventListener('drop', handleDrop);
 
             // Form submission
             document.getElementById('listing-form').addEventListener('submit', handleSubmit);
@@ -1384,84 +1594,6 @@
             }
         }
 
-        // Image handling
-        function handleImageSelect(event) {
-            const files = Array.from(event.target.files);
-            processImages(files);
-        }
-
-        function handleDragOver(event) {
-            event.preventDefault();
-            event.currentTarget.classList.add('dragover');
-        }
-
-        function handleDragLeave(event) {
-            event.currentTarget.classList.remove('dragover');
-        }
-
-        function handleDrop(event) {
-            event.preventDefault();
-            event.currentTarget.classList.remove('dragover');
-            
-            const files = Array.from(event.dataTransfer.files);
-            const imageFiles = files.filter(file => file.type.startsWith('image/'));
-            processImages(imageFiles);
-        }
-
-        function processImages(files) {
-            // Limit to 5 images total
-            const availableSlots = 5 - selectedImages.length;
-            const filesToProcess = files.slice(0, availableSlots);
-            
-            filesToProcess.forEach(file => {
-                // Validate file size (5MB limit)
-                if (file.size > 5 * 1024 * 1024) {
-                    alert(`${file.name} is too large. Maximum file size is 5MB.`);
-                    return;
-                }
-                
-                // Create preview
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const imageData = {
-                        file: file,
-                        url: e.target.result,
-                        id: Date.now() + Math.random()
-                    };
-                    
-                    selectedImages.push(imageData);
-                    renderImagePreview();
-                };
-                reader.readAsDataURL(file);
-            });
-            
-            if (files.length > availableSlots) {
-                alert(`You can only upload ${availableSlots} more image(s). Maximum is 5 images total.`);
-            }
-        }
-
-        function renderImagePreview() {
-            const previewContainer = document.getElementById('image-preview');
-            previewContainer.innerHTML = '';
-            
-            selectedImages.forEach(image => {
-                const previewItem = document.createElement('div');
-                previewItem.className = 'preview-item';
-                previewItem.innerHTML = `
-                    <img src="${image.url}" alt="Preview" class="preview-image">
-                    <button type="button" class="remove-image" onclick="removeImage('${image.id}')">
-                        <i class="fas fa-times"></i>
-                    </button>
-                `;
-                previewContainer.appendChild(previewItem);
-            });
-        }
-
-        function removeImage(imageId) {
-            selectedImages = selectedImages.filter(img => img.id != imageId);
-            renderImagePreview();
-        }
-
         // Form validation
         function validateForm() {
             let isValid = true;
@@ -1508,17 +1640,6 @@
             setButtonLoading(submitBtn, true);
             
             try {
-                // Check if user is authenticated first
-                const authResponse = await fetch('https://spear-exchange.lenny-paz123.workers.dev/api/me', {
-                    credentials: 'include'
-                });
-                
-                if (!authResponse.ok) {
-                    alert('You must be logged in to create a listing. Redirecting to login page...');
-                    window.location.href = '../login';
-                    return;
-                }
-                
                 // Prepare form data
                 const formData = {
                     title: document.getElementById('title').value.trim(),
@@ -1530,7 +1651,7 @@
                     negotiable: document.getElementById('negotiable').checked,
                     contact_method: document.querySelector('input[name="contact"]:checked').value,
                     phone_number: document.getElementById('phone').value.trim(),
-                    image_urls: JSON.stringify(['https://via.placeholder.com/400x300/8B2635/FFFFFF?text=Sample+Item']) // Placeholder image for testing
+                    image_urls: JSON.stringify(uploadedImages.map(img => img.url)) // Use real uploaded URLs
                 };
                 
                 console.log('Submitting listing:', formData);
@@ -1617,8 +1738,9 @@
         function createAnother() {
             document.getElementById('success-modal').classList.remove('show');
             document.getElementById('listing-form').reset();
-            selectedImages = [];
-            renderImagePreview();
+            uploadedImages = [];
+            document.getElementById('image-preview-container').innerHTML = '';
+            updateImageUploadUI();
             
             // Clear character counts
             document.getElementById('title-count').textContent = '0';
