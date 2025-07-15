@@ -1046,7 +1046,7 @@
                             <option value="textbooks">Textbooks</option>
                             <option value="furniture">Furniture</option>
                             <option value="clothing">Clothing</option>
-                            <option value="sports">Sports & Recreation</option>
+                            <option value="sports">Sports &amp; Recreation</option>
                             <option value="services">Services</option>
                             <option value="other">Other</option>
                         </select>
@@ -1308,6 +1308,9 @@
                     name: file.name,
                     size: file.size
                 });
+				
+				console.log('📸 uploadedImages array before submit:', uploadedImages);
+				console.log('📸 Number of uploaded images:', uploadedImages.length);
                 
                 // Remove loading state and show preview
                 removeImageLoading(loadingId);
@@ -1651,7 +1654,7 @@
                     negotiable: document.getElementById('negotiable').checked,
                     contact_method: document.querySelector('input[name="contact"]:checked').value,
                     phone_number: document.getElementById('phone').value.trim(),
-                    image_urls: JSON.stringify(uploadedImages.map(img => img.url)) // Use real uploaded URLs
+                    imageUrls: uploadedImages.map(img => img.url)
                 };
                 
                 console.log('Submitting listing:', formData);
