@@ -1867,6 +1867,71 @@
     </main>
 
     <script>
+        // Mobile Authentication Fix
+        // Helper function to detect mobile
+        function isMobile() {
+            return /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        }
+
+        // Enhanced fetch function that handles both cookies and tokens
+        async function authenticatedFetch(url, options = {}) {
+            const sessionToken = localStorage.getItem('sessionToken');
+            
+            // Default options
+            const defaultOptions = {
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...options.headers
+                }
+            };
+            
+            // Add Authorization header for mobile
+            if (isMobile() && sessionToken) {
+                defaultOptions.headers['Authorization'] = `Bearer ${sessionToken}`;
+            }
+            
+            return fetch(url, { ...defaultOptions, ...options });
+        }
+
+        // Enhanced auth check function
+        async function enhancedCheckAuth() {
+            try {
+                const response = await authenticatedFetch('https://spear-exchange.lenny-paz123.workers.dev/api/me');
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    return { success: true, user: data.user };
+                } else {
+                    // Clear stored credentials on auth failure
+                    localStorage.removeItem('user');
+                    localStorage.removeItem('sessionToken');
+                    return { success: false };
+                }
+            } catch (error) {
+                console.error('Auth check failed:', error);
+                localStorage.removeItem('user');
+                localStorage.removeItem('sessionToken');
+                return { success: false };
+            }
+        }
+
+        // Enhanced logout function
+        async function enhancedLogout() {
+            try {
+                await authenticatedFetch('https://spear-exchange.lenny-paz123.workers.dev/api/logout', {
+                    method: 'POST'
+                });
+            } catch (error) {
+                console.error('Logout error:', error);
+            } finally {
+                // Always clear local storage
+                localStorage.removeItem('user');
+                localStorage.removeItem('sessionToken');
+                window.location.href = '../login';
+            }
+        }
+
         // Global state
         let listings = [];
         let filteredListings = [];
@@ -1882,40 +1947,31 @@
             setupEventListeners();
         });
 
-        // Check if user is authenticated
+        // Check if user is authenticated with enhanced method
         async function checkAuthentication() {
-            try {
-                const response = await fetch('https://spear-exchange.lenny-paz123.workers.dev/api/me', {
-                    credentials: 'include'
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    currentUser = data.user;
-                    document.getElementById('user-name').textContent = data.user.name || 'User';
-                    document.getElementById('user-avatar').textContent = (data.user.name || 'U').charAt(0).toUpperCase();
-                    document.getElementById('mobile-user-name').textContent = data.user.name || 'User';
-                    document.getElementById('mobile-user-avatar').textContent = (data.user.name || 'U').charAt(0).toUpperCase();
-                } else {
-                    console.log('Not authenticated, redirecting to login...');
-                    window.location.href = '../login';
-                }
-            } catch (error) {
-                console.error('Auth check failed:', error);
+            const authResult = await enhancedCheckAuth();
+            
+            if (authResult.success) {
+                currentUser = authResult.user;
+                document.getElementById('user-name').textContent = authResult.user.name || 'User';
+                document.getElementById('user-avatar').textContent = (authResult.user.name || 'U').charAt(0).toUpperCase();
+                document.getElementById('mobile-user-name').textContent = authResult.user.name || 'User';
+                document.getElementById('mobile-user-avatar').textContent = (authResult.user.name || 'U').charAt(0).toUpperCase();
+                console.log('✅ Mobile auth check successful');
+            } else {
+                console.log('❌ Not authenticated, redirecting to login...');
                 window.location.href = '../login';
             }
         }
 
-        // Load listings from API
+        // Load listings from API with enhanced authentication
         async function loadListings() {
             try {
                 showLoading(true);
                 const apiUrl = 'https://spear-exchange.lenny-paz123.workers.dev/api/listings';
                 console.log('🔍 Attempting to fetch from:', apiUrl);
                 
-                const response = await fetch(apiUrl, {
-                    credentials: 'include'
-                });
+                const response = await authenticatedFetch(apiUrl);
                 
                 console.log('📊 Response status:', response.status);
                 console.log('✅ Response ok:', response.ok);
@@ -2275,12 +2331,11 @@
             window.location.href = `../listings/${listingId}`;
         }
 
-        // Toggle favorite
+        // Toggle favorite with enhanced authentication
         async function toggleFavorite(listingId) {
             try {
-                const response = await fetch(`https://spear-exchange.lenny-paz123.workers.dev/api/favorites/${listingId}`, {
-                    method: 'POST',
-                    credentials: 'include'
+                const response = await authenticatedFetch(`https://spear-exchange.lenny-paz123.workers.dev/api/favorites/${listingId}`, {
+                    method: 'POST'
                 });
 
                 if (response.ok) {
@@ -2323,16 +2378,8 @@
             // Close dropdown first
             document.getElementById('user-dropdown').classList.remove('show');
             
-            // Implement logout functionality
-            fetch('https://spear-exchange.lenny-paz123.workers.dev/api/logout', {
-                method: 'POST',
-                credentials: 'include'
-            }).then(() => {
-                window.location.href = '../login';
-            }).catch(error => {
-                console.error('Logout error:', error);
-                window.location.href = '../login';
-            });
+            // Use enhanced logout function
+            enhancedLogout();
         }
 
         // Mobile menu functions
