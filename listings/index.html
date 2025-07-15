@@ -436,6 +436,8 @@
             flex-direction: column;
             height: 240px; 
             padding-bottom: 3rem; /* Space for bottom overlays */
+			overflow: hidden; 
+  			position: relative;
         }
 
         /* Overlays positioned absolutely (outside content flow) */
@@ -497,6 +499,8 @@
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
+			height: auto;
+			max-height: calc(1.4em * 2);
         }
 
         /* Price positioned consistently */
@@ -616,7 +620,7 @@
             flex-direction: column;
             justify-content: space-between;
             min-height: 140px;
-            max-height: 140px;
+            max-height: 160px;
             overflow: hidden;
         }
 
@@ -666,11 +670,12 @@
             color: var(--text-light);
             font-size: 0.95rem;
             line-height: 1.4;
-            height: 3.5rem;
+            height: auto;
             overflow: hidden;
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
+			max-height: calc(1.4em * 2);
             margin-bottom: 1rem;
         }
 
@@ -728,19 +733,26 @@
 
             .list-item-content {
                 min-height: 140px; /* Increased from 120px */
-                max-height: 140px;
+                max-height: 160px;
             }
 
             .list-item-description {
                 height: 2.8rem; /* Reduced from 3.5rem but still visible */
                 line-height: 1.4;
+				display: -webkit-box;
                 -webkit-line-clamp: 2;
+				-webkit-box-orient: vertical;
+				overflow: hidden;
                 margin-bottom: 0.75rem;
             }
 
             .list-item-title {
                 font-size: 1.1rem;
-                height: 1.5rem; /* More controlled height */
+                height: 1.5rem; 
+				display: -webkit-box;
+				-webkit-line-clamp: 1;
+				-webkit-box-orient: vertical;
+				overflow: hidden;
             }
 
             .list-item-price {
@@ -769,16 +781,31 @@
             .list-item-content {
                 min-height: 130px;
                 max-height: 130px;
+				display: flex;
+				justify-content: space-between;
+				flex-direction: column;
+				min-width: 0;
             }
 
             .list-item-description {
-                height: 2.4rem; /* Further reduced */
                 font-size: 0.9rem;
-            }
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				display: block;
+				min-width: 0;
+				max-width: 100%;
+			}
 
             .list-item-title {
                 font-size: 1.05rem; /* Gradual font size reduction */
-            }
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				display: block;
+				min-width: 0;
+				max-width: 100%;
+			}
 
             .list-item-price {
                 font-size: 1.25rem;
@@ -805,7 +832,7 @@
 
             .list-item-content {
                 min-height: auto;
-                max-height: 160px;
+                max-height: 170px;
 				overflow: visible; /* Keep this - it was working */
                 flex: 1;
                 display: flex;
@@ -846,8 +873,9 @@
             }
 
             .list-item-description {
-                font-size: 0.8rem;
-                line-height: 1.2;
+                font-size: 0.85rem;
+                line-height: 1.3;
+				height: 3.2rem;
                 margin: 0;
                 overflow: hidden;
                 display: -webkit-box;
@@ -924,10 +952,12 @@
                 padding: 0;
                 text-align: left;
                 height: auto; /* Keep auto height - this was working */
-                display: -webkit-box;
-                -webkit-line-clamp: 2;
-                -webkit-box-orient: vertical;
-                overflow: hidden;
+                white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				display: block;
+				min-width: 0;
+				max-width: 100%;
             }
 
             .list-item-price {
@@ -956,12 +986,12 @@
                 padding: 0;
                 text-align: left;
                 height: auto; /* Keep auto height - this was working */
-                display: -webkit-box;
-                -webkit-line-clamp: 2;
-                -webkit-box-orient: vertical;
-
-
-                overflow: hidden;
+                white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				display: block;
+				min-width: 0;
+				max-width: 100%;
             }
 
             .list-item-footer {
@@ -1002,6 +1032,12 @@
 
             .list-item-title {
                 font-size: 1.05rem;
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				display: block;
+				min-width: 0;
+				max-width: 100%;
             }
 
             .list-item-price {
@@ -1011,8 +1047,14 @@
             .list-item-description {
                 font-size: 0.85rem;
                 line-height: 1.3;
-            }
-        }
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				display: block;
+				min-width: 0;
+				max-width: 100%;
+        	}
+		}
 
         @media (max-width: 480px) {
             .listing-list-item {
@@ -1026,6 +1068,12 @@
 
             .list-item-title {
                 font-size: 1rem;
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				display: block;
+				min-width: 0;
+				max-width: 100%;
             }
 
             .list-item-price {
@@ -1035,6 +1083,12 @@
             .list-item-description {
                 font-size: 0.8rem;
                 line-height: 1.25;
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				display: block;
+				min-width: 0;
+				max-width: 100%;
             }
 
             .list-item-footer {
@@ -1055,6 +1109,10 @@
 
             .list-item-title {
                 font-size: 0.95rem;
+				display: -webkit-box;
+				-webkit-line-clamp: 1;
+				-webkit-box-orient: vertical;
+				overflow: hidden;
             }
 
             .list-item-price {
@@ -1064,6 +1122,10 @@
             .list-item-description {
                 font-size: 0.75rem;
                 line-height: 1.2;
+				display: -webkit-box;
+				-webkit-line-clamp: 1;
+				-webkit-box-orient: vertical;
+				overflow: hidden;
             }
         }
 
