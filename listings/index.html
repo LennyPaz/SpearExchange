@@ -1979,49 +1979,56 @@
 
         // Create listing card for grid view with fixed, consistent layout
         function createListingCard(listing) {
-            const card = document.createElement('div');
-            card.className = 'listing-card';
-            card.onclick = () => viewListing(listing.id);
+			const card = document.createElement('div');
+			card.className = 'listing-card';
+			card.onclick = () => viewListing(listing.id);
 
-            // Parse image URLs if they exist
-            let imageUrls = [];
-            try {
-                imageUrls = listing.image_urls ? JSON.parse(listing.image_urls) : [];
-            } catch (e) {
-                console.error('Error parsing image URLs:', e);
-            }
+			// Parse image URLs if they exist
+			let imageUrls = [];
+			try {
+				imageUrls = listing.image_urls ? JSON.parse(listing.image_urls) : [];
+			} catch (e) {
+				console.error('Error parsing image URLs:', e);
+			}
 
-            const imageContent = imageUrls.length > 0 
-                ? `<img src="${imageUrls[0]}" alt="${listing.title}" onerror="this.style.display='none'">`
-                : `<i class="fas fa-image"></i>`;
+			// ADD THIS DEBUGGING CODE:
+			console.log('🖼️ Listing ID:', listing.id);
+			console.log('🖼️ Raw image_urls from DB:', listing.image_urls);
+			console.log('🖼️ Parsed imageUrls:', imageUrls);
+			console.log('🖼️ First image URL:', imageUrls[0]);
 
-            card.innerHTML = `
-                <div class="listing-image">
-                    ${imageContent}
-                    <button class="favorite-btn" onclick="event.stopPropagation(); toggleFavorite(${listing.id})">
-                        <i class="far fa-heart"></i>
-                    </button>
-                </div>
-                <div class="listing-content">
-                    <h3 class="listing-title">${escapeHtml(listing.title)}</h3>
-                    <p class="listing-description">${escapeHtml(listing.description)}</p>
-                    <div class="listing-price">\$${listing.price.toFixed(2)}</div>
-                    <div class="listing-meta">
-                        <span class="listing-category">${escapeHtml(listing.category)}</span>
-                    </div>
-                </div>
-                <div class="listing-seller">
-                    <i class="fas fa-user"></i>
-                    ${escapeHtml(listing.seller_name)}
-                </div>
-                <div class="listing-date">
-                    <i class="far fa-clock"></i>
-                    ${formatDate(listing.created_at)}
-                </div>
-            `;
+			// KEEP ONLY ONE imageContent DECLARATION:
+			const imageContent = imageUrls.length > 0 
+				? `<img src="${imageUrls[0]}" alt="${listing.title}" onerror="this.style.display='none'">`
+				: `<i class="fas fa-image"></i>`;
 
-            return card;
-        }
+			card.innerHTML = `
+				<div class="listing-image">
+					${imageContent}
+					<button class="favorite-btn" onclick="event.stopPropagation(); toggleFavorite(${listing.id})">
+						<i class="far fa-heart"></i>
+					</button>
+				</div>
+				<div class="listing-content">
+					<h3 class="listing-title">${escapeHtml(listing.title)}</h3>
+					<p class="listing-description">${escapeHtml(listing.description)}</p>
+					<div class="listing-price">\$${listing.price.toFixed(2)}</div>
+					<div class="listing-meta">
+						<span class="listing-category">${escapeHtml(listing.category)}</span>
+					</div>
+				</div>
+				<div class="listing-seller">
+					<i class="fas fa-user"></i>
+					${escapeHtml(listing.seller_name)}
+				</div>
+				<div class="listing-date">
+					<i class="far fa-clock"></i>
+					${formatDate(listing.created_at)}
+				</div>
+			`;
+
+			return card;
+		}
 
         // Create listing item for list view
         function createListingListItem(listing) {
