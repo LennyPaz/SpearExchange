@@ -1877,22 +1877,15 @@
 
         // Initialize the page
         document.addEventListener('DOMContentLoaded', async () => {
-            // TEMPORARILY DISABLED - await checkAuthentication();
+            await checkAuthentication();
             await loadListings();
             setupEventListeners();
-            
-            // Set temporary user info for testing
-            document.getElementById('user-name').textContent = 'Test User';
-            document.getElementById('user-avatar').textContent = 'T';
-            document.getElementById('mobile-user-name').textContent = 'Test User';
-            document.getElementById('mobile-user-avatar').textContent = 'T';
         });
 
-        // Check if user is authenticated - TEMPORARILY DISABLED
+        // Check if user is authenticated
         async function checkAuthentication() {
-            /* COMMENTED OUT FOR TESTING
             try {
-                const response = await fetch('/api/me', {
+                const response = await fetch('https://spear-exchange.lenny-paz123.workers.dev/api/me', {
                     credentials: 'include'
                 });
 
@@ -1901,15 +1894,16 @@
                     currentUser = data.user;
                     document.getElementById('user-name').textContent = data.user.name || 'User';
                     document.getElementById('user-avatar').textContent = (data.user.name || 'U').charAt(0).toUpperCase();
+                    document.getElementById('mobile-user-name').textContent = data.user.name || 'User';
+                    document.getElementById('mobile-user-avatar').textContent = (data.user.name || 'U').charAt(0).toUpperCase();
                 } else {
-                    // Redirect to login if not authenticated
-                    window.location.href = '/login';
+                    console.log('Not authenticated, redirecting to login...');
+                    window.location.href = '../login';
                 }
             } catch (error) {
                 console.error('Auth check failed:', error);
-                window.location.href = '/login';
+                window.location.href = '../login';
             }
-            */
         }
 
         // Load listings from API
@@ -2271,7 +2265,7 @@
 
         // View individual listing
         function viewListing(listingId) {
-            window.location.href = `/listings/${listingId}`;
+            window.location.href = `../listings/${listingId}`;
         }
 
         // Toggle favorite
