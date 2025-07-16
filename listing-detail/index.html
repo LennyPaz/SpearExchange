@@ -825,10 +825,10 @@
         let images = [];
         let listingId = null;
 
-        // Extract listing ID from URL
+        // Extract listing ID from URL query parameter
         function getListingIdFromUrl() {
-            const pathParts = window.location.pathname.split('/');
-            return pathParts[pathParts.length - 1] || pathParts[pathParts.length - 2];
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('id');
         }
 
         // API Configuration
