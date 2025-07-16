@@ -867,8 +867,12 @@
                     throw new Error(`HTTP ${response.status}: ${errorText}`);
                 }
 
-                const listing = await response.json();
-                console.log('📦 Received listing data:', listing);
+                const data = await response.json();
+                console.log('📦 Received response data:', data);
+                
+                // Handle nested structure - the actual listing data is under data.listing
+                const listing = data.listing || data;
+                console.log('🎯 Extracted listing:', listing);
                 
                 if (!listing || Object.keys(listing).length === 0) {
                     throw new Error('Empty listing data received');
@@ -885,6 +889,8 @@
 
         // Display listing data
         function displayListing(listing) {
+            console.log('🎨 Displaying listing:', listing);
+            
             // Hide loading, show content
             document.getElementById('loading-state').classList.add('hidden');
             document.getElementById('listing-content').classList.remove('hidden');
@@ -897,10 +903,10 @@
 
             // Update breadcrumb
             document.getElementById('breadcrumb-category').textContent = listing.category || 'General';
-            document.getElementById('breadcrumb-title').textContent = listing.title;
+            document.getElementById('breadcrumb-title').textContent = listing.title || 'Listing';
 
             // Main listing info
-            document.getElementById('listing-title').textContent = listing.title;
+            document.getElementById('listing-title').textContent = listing.title || 'No title';
             document.getElementById('listing-category').textContent = listing.category || 'General';
             document.getElementById('listing-location').textContent = listing.location || 'Location not specified';
             document.getElementById('listing-date').textContent = formatDate(listing.created_at);
@@ -912,30 +918,50 @@
                 document.getElementById('price-negotiable-text').classList.remove('hidden');
             }
 
-            // Details
+            // Details - handle missing fields gracefully
             document.getElementById('listing-condition').textContent = listing.condition || 'Not specified';
             document.getElementById('listing-negotiable').textContent = listing.negotiable ? 'Yes' : 'No';
             document.getElementById('listing-contact-method').textContent = formatContactMethod(listing.contact_method);
             document.getElementById('listing-status').textContent = listing.status || 'Active';
 
-            // Images
-            setupImageGallery(listing.image_urls);
+            // Images - handle both array and JSON string formats
+            let imageUrls = [];
+            if (listing.image_urls) {
+                if (Array.isArray(listing.image_urls)) {
+                    imageUrls = listing.image_urls;
+                } else if (typeof listing.image_urls === 'string') {
+                    try {
+                        imageUrls = JSON.parse(listing.image_urls);
+                    } catch (e) {
+                        console.warn('Failed to parse image_urls:', e);
+                        imageUrls = [];
+                    }
+                }
+            }
+            setupImageGallery(imageUrls);
 
-            // Seller info (placeholder for now)
-            document.getElementById('seller-name').textContent = listing.seller?.profile_name || 'Anonymous';
-            document.getElementById('seller-bio').textContent = listing.seller?.bio || 'No bio available';
+            // Seller info - handle both nested and flat structures
+            const sellerName = listing.seller?.profile_name || listing.seller_name || 'Anonymous';
+            const sellerBio = listing.seller?.bio || 'No bio available';
+            const isVerified = listing.seller?.is_verified || false;
+            const memberSince = listing.seller?.member_since || listing.created_at;
             
-            if (listing.seller?.is_verified) {
+            document.getElementById('seller-name').textContent = sellerName;
+            document.getElementById('seller-bio').textContent = sellerBio;
+            
+            if (isVerified) {
                 document.getElementById('seller-verified').classList.remove('hidden');
             }
             
-            if (listing.seller?.member_since) {
+            if (memberSince) {
                 document.getElementById('seller-member-since').textContent = 
-                    `Member since ${formatDate(listing.seller.member_since)}`;
+                    `Member since ${formatDate(memberSince)}`;
             }
 
-            // Setup contact methods
-            setupContactMethods(listing.contact_method, listing.phone_number);
+            // Setup contact methods - handle missing contact_method
+            const contactMethod = listing.contact_method || 'message'; // default to message
+            const phoneNumber = listing.seller_phone || listing.phone_number;
+            setupContactMethods(contactMethod, phoneNumber);
         }
 
         // Setup image gallery
