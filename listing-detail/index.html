@@ -850,20 +850,35 @@
         // Load listing details
         async function loadListingDetails() {
             try {
-                const response = await fetch(`${API_BASE_URL}/api/listings/${listingId}`, {
+                console.log('🔍 Loading listing with ID:', listingId);
+                const apiUrl = `${API_BASE_URL}/api/listings/${listingId}`;
+                console.log('🌐 Fetching from:', apiUrl);
+                
+                const response = await fetch(apiUrl, {
                     credentials: 'include'
                 });
 
+                console.log('📊 Response status:', response.status);
+                console.log('✅ Response ok:', response.ok);
+
                 if (!response.ok) {
-                    throw new Error('Listing not found');
+                    const errorText = await response.text();
+                    console.log('❌ Error response:', errorText);
+                    throw new Error(`HTTP ${response.status}: ${errorText}`);
                 }
 
                 const listing = await response.json();
+                console.log('📦 Received listing data:', listing);
+                
+                if (!listing || Object.keys(listing).length === 0) {
+                    throw new Error('Empty listing data received');
+                }
+                
                 currentListing = listing;
                 displayListing(listing);
                 
             } catch (error) {
-                console.error('Error loading listing:', error);
+                console.error('💥 Error loading listing:', error);
                 showError();
             }
         }
@@ -875,9 +890,10 @@
             document.getElementById('listing-content').classList.remove('hidden');
 
             // Update page title and meta
-            document.title = `${listing.title} - Spear Exchange`;
+            document.title = `${listing.title || 'Listing'} - Spear Exchange`;
+            const description = listing.description || 'No description available';
             document.querySelector('meta[name="description"]').content = 
-                listing.description.substring(0, 150) + '...';
+                description.length > 150 ? description.substring(0, 150) + '...' : description;
 
             // Update breadcrumb
             document.getElementById('breadcrumb-category').textContent = listing.category || 'General';
