@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>About Us - The Spear Exchange</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    :root {
+      --primary-color: #8B2635;
+      --primary-dark: #6B1B2A;
+      --accent-color: #FFD700;
+      --text-dark: #2C3E50;
+      --text-light: #5A6C7D;
+      --background-light: #F8FAFC;
+      --white: #FFFFFF;
+      --shadow-light: 0 2px 10px rgba(0,0,0,0.08);
+      --shadow-medium: 0 8px 30px rgba(0,0,0,0.12);
+      --border-radius: 12px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--background-light);
+      color: var(--text-dark);
+    }
+
+    header {
+      background: var(--primary-color);
+      color: white;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      text-decoration: none;
+      color: white;
+    }
+
+    .logo-icon {
+      background: white;
+      color: var(--primary-color);
+      border-radius: 50%;
+      padding: 0.4rem 0.7rem;
+      font-weight: bold;
+    }
+
+    .logo-text {
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+
+    .nav-toggle {
+      display: none;
+    }
+
+    .hero {
+      background: var(--primary-dark);
+      color: white;
+      padding: 4rem 2rem;
+      text-align: center;
+    }
+
+    .hero h1 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .hero p {
+      font-size: 1.1rem;
+      color: #f2f2f2;
+    }
+
+    .tabs {
+      display: flex;
+      justify-content: center;
+      background: #fff;
+      padding: 1rem;
+      gap: 1rem;
+      box-shadow: var(--shadow-light);
+    }
+
+    .tabs button {
+      padding: 0.6rem 1.2rem;
+      border: none;
+      background: #eee;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+    }
+
+    .tabs .active {
+      background: var(--primary-color);
+      color: white;
+    }
+
+    .container {
+      padding: 2rem;
+      max-width: 900px;
+      margin: auto;
+    }
+
+    .card {
+      background: white;
+      padding: 2rem;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow-light);
+      margin-bottom: 2rem;
+    }
+
+    .card h2 {
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    .team-card {
+      background: white;
+      padding: 1rem;
+      border-radius: var(--border-radius);
+      text-align: center;
+      box-shadow: var(--shadow-light);
+    }
+
+    .footer {
+      background: var(--primary-color);
+      color: white;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    .footer a {
+      color: white;
+      text-decoration: none;
+    }
+
+    .cta-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .btn {
+      padding: 0.7rem 1.2rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .btn-primary {
+      background: var(--accent-color);
+      color: #333;
+    }
+
+    .btn-secondary {
+      background: var(--white);
+      color: var(--primary-color);
+      border: 2px solid var(--primary-color);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <a href="index.html" class="logo">
+      <div class="logo-icon">SE</div>
+      <span class="logo-text">The Spear Exchange</span>
+    </a>
+  </header>
+
+  <section class="hero">
+    <h1>About The Spear Exchange</h1>
+    <p>Connecting FSU students through safe, affordable, and<br>convenient marketplace experiences since 2019.</p>
+  </section>
+
+  <div class="tabs">
+    <button class="active">Our Mission</button>
+    <button>Our Story</button>
+    <button>Our Values</button>
+  </div>
+
+  <div class="container">
+    <div class="card">
+      <h2>Our Mission</h2>
+      <p>To create a trusted, secure, and affordable marketplace exclusively for Florida State University students, fostering community connections while making essential items accessible to all Seminoles.</p>
+    </div>
+
+    <div class="card">
+      <h2>Meet Our Team</h2>
+      <p>The passionate FSU students behind The Spear Exchange, working to make campus commerce safer and more accessible for everyone.</p>
+      <div class="team-card">
+        <p><i class="fas fa-envelope"></i> Contact &nbsp; <i class="fab fa-linkedin"></i> LinkedIn</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Join Our Community</h2>
+      <p>Ready to start buying and selling with fellow Seminoles? Join thousands of FSU students who trust The Spear Exchange for safe, affordable transactions.</p>
+      <div class="cta-buttons">
+        <button class="btn btn-primary">Start Shopping</button>
+        <button class="btn btn-secondary">Sell Your Items</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <h3>Questions About The Spear Exchange?</h3>
+    <p>We're here to help! Reach out to our team for any questions or support.</p>
+    <p><i class="fas fa-envelope"></i> support@spearexchange.fsu.edu &nbsp; | &nbsp; <i class="fas fa-phone"></i> (850) 555-SPEAR</p>
+  </div>
+
+</body>
+</html>
