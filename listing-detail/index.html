@@ -902,12 +902,12 @@
                 description.length > 150 ? description.substring(0, 150) + '...' : description;
 
             // Update breadcrumb
-            document.getElementById('breadcrumb-category').textContent = listing.category || 'General';
+            document.getElementById('breadcrumb-category').textContent = capitalizeFirstLetter(listing.category) || 'General';
             document.getElementById('breadcrumb-title').textContent = listing.title || 'Listing';
 
             // Main listing info
             document.getElementById('listing-title').textContent = listing.title || 'No title';
-            document.getElementById('listing-category').textContent = listing.category || 'General';
+            document.getElementById('listing-category').textContent = capitalizeFirstLetter(listing.category) || 'General';
             document.getElementById('listing-location').textContent = listing.location || 'Location not specified';
             document.getElementById('listing-date').textContent = formatDate(listing.created_at);
             document.getElementById('listing-description').textContent = listing.description || 'No description provided';
@@ -959,7 +959,7 @@
             }
 
             // Setup contact methods - handle missing contact_method
-            const contactMethod = listing.contact_method || 'message'; // default to message
+            const contactMethod = listing.contact_method || 'email'; // default to email
             const phoneNumber = listing.seller_phone || listing.phone_number;
             setupContactMethods(contactMethod, phoneNumber);
         }
@@ -1030,14 +1030,14 @@
             const container = document.getElementById('contact-methods');
             container.innerHTML = '';
 
-            if (contactMethod === 'message' || contactMethod === 'both') {
-                const messageMethod = document.createElement('div');
-                messageMethod.className = 'contact-method';
-                messageMethod.innerHTML = `
-                    <i class="fas fa-comment"></i>
-                    <div>Message</div>
+            if (contactMethod === 'email' || contactMethod === 'both') {
+                const emailMethod = document.createElement('div');
+                emailMethod.className = 'contact-method';
+                emailMethod.innerHTML = `
+                    <i class="fas fa-envelope"></i>
+                    <div>Email</div>
                 `;
-                container.appendChild(messageMethod);
+                container.appendChild(emailMethod);
             }
 
             if (contactMethod === 'phone' || contactMethod === 'both') {
@@ -1055,7 +1055,11 @@
             }
         }
 
-        // Utility functions
+        // Utility function to capitalize first letter
+        function capitalizeFirstLetter(string) {
+            if (!string) return string;
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        }
         function formatPrice(price) {
             if (!price) return 'Free';
             return new Intl.NumberFormat('en-US', {
@@ -1076,9 +1080,9 @@
 
         function formatContactMethod(method) {
             switch (method) {
-                case 'message': return 'Message only';
+                case 'email': return 'Email only';
                 case 'phone': return 'Phone only';
-                case 'both': return 'Message & Phone';
+                case 'both': return 'Email & Phone';
                 default: return 'Not specified';
             }
         }
