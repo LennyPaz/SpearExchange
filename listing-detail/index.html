@@ -2123,6 +2123,13 @@
         }
 
         // Utility functions
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
         function capitalizeFirstLetter(string) {
             if (!string) return string;
             return string.charAt(0).toUpperCase() + string.slice(1);
