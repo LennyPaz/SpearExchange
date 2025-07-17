@@ -1458,15 +1458,19 @@
             document.getElementById('location').addEventListener('input', updateCharacterCount);
 
             // Toggle phone field visibility
+        // Toggle phone field visibility
         function togglePhoneField() {
             const phoneGroup = document.getElementById('phone-group');
+            const phoneInput = document.getElementById('phone');
             const selectedContact = document.querySelector('input[name="contact"]:checked');
             
             if (selectedContact && (selectedContact.value === 'phone' || selectedContact.value === 'both')) {
                 phoneGroup.style.display = 'block';
+                phoneInput.required = true;
             } else {
                 phoneGroup.style.display = 'none';
-                document.getElementById('phone').value = ''; // Clear phone when hidden
+                phoneInput.required = false;
+                phoneInput.value = ''; // Clear phone when hidden
             }
         }
 
@@ -1644,6 +1648,21 @@
                 isValid = false;
             }
             
+            // Validate phone number when required
+            const selectedContact = document.querySelector('input[name="contact"]:checked');
+            if (selectedContact && (selectedContact.value === 'phone' || selectedContact.value === 'both')) {
+                const phoneField = document.getElementById('phone');
+                const phoneValue = phoneField.value.trim();
+                
+                if (!phoneValue) {
+                    showFieldError(phoneField, 'Phone number is required when phone or both contact methods are selected');
+                    isValid = false;
+                } else if (phoneValue.replace(/\D/g, '').length !== 10) {
+                    showFieldError(phoneField, 'Please enter a valid 10-digit phone number');
+                    isValid = false;
+                }
+            }
+            
             // Validate terms agreement
             const termsCheckbox = document.getElementById('terms');
             if (!termsCheckbox.checked) {
@@ -1676,7 +1695,7 @@
                     location: document.getElementById('location').value.trim(),
                     negotiable: document.getElementById('negotiable').checked,
                     contact_method: document.querySelector('input[name="contact"]:checked').value,
-                    phone_number: document.getElementById('phone').value.trim(),
+                    phone_number: document.querySelector('input[name="contact"]:checked').value === 'email' ? '' : document.getElementById('phone').value.trim(),
                     imageUrls: uploadedImages.map(img => img.url)
                 };
                 
