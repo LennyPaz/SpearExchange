@@ -1943,9 +1943,38 @@
         // Initialize the page
         document.addEventListener('DOMContentLoaded', async () => {
             await checkAuthentication();
+            loadInitialFilters(); // Load filters from URL parameters
             await loadListings();
             setupEventListeners();
         });
+
+        // Load initial filters from URL parameters
+        function loadInitialFilters() {
+            const urlParams = new URLSearchParams(window.location.search);
+            
+            // Set category filter if present
+            const category = urlParams.get('category');
+            if (category) {
+                document.getElementById('category-filter').value = category;
+            }
+            
+            // Set search term if present
+            const search = urlParams.get('search');
+            if (search) {
+                document.getElementById('search-input').value = search;
+            }
+            
+            // Set min/max price if present
+            const minPrice = urlParams.get('minPrice');
+            if (minPrice) {
+                document.getElementById('min-price').value = minPrice;
+            }
+            
+            const maxPrice = urlParams.get('maxPrice');
+            if (maxPrice) {
+                document.getElementById('max-price').value = maxPrice;
+            }
+        }
 
         // Check if user is authenticated with enhanced method
         async function checkAuthentication() {
@@ -1984,6 +2013,10 @@
                     
                     listings = data.listings || [];
                     filteredListings = [...listings];
+                    
+                    // Apply any URL-based filters immediately
+                    filterListings();
+                    
                     displayListings();
                     updateResultsCount();
                 } else {
@@ -2070,7 +2103,7 @@
 					<p class="listing-description">${escapeHtml(listing.description)}</p>
 					<div class="listing-price">\$${listing.price.toFixed(2)}</div>
 					<div class="listing-meta">
-						<span class="listing-category">${escapeHtml(listing.category)}</span>
+					<span class="listing-category">${capitalizeFirstLetter(escapeHtml(listing.category))}</span>
 					</div>
 				</div>
 				<div class="listing-seller">
@@ -2112,7 +2145,7 @@
                     <div class="list-item-header">
                         <div>
                             <h3 class="listing-title">${escapeHtml(listing.title)}</h3>
-                            <span class="listing-category">${escapeHtml(listing.category)}</span>
+                            <span class="listing-category">${capitalizeFirstLetter(escapeHtml(listing.category))}</span>
                         </div>
                         <div class="list-item-price">\$${listing.price.toFixed(2)}</div>
                     </div>
@@ -2437,6 +2470,12 @@
         }
 
         // Utility functions
+        // Utility function to capitalize first letter
+        function capitalizeFirstLetter(string) {
+            if (!string) return string;
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        }
+
         function escapeHtml(text) {
             const div = document.createElement('div');
             div.textContent = text;
