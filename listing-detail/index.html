@@ -1806,7 +1806,7 @@
             // Price
             document.getElementById('listing-price').textContent = formatPrice(listing.price);
             if (listing.negotiable) {
-                document.getElementById('price-negotiable-text').classList.remove('hidden');
+                document.getElementById('price-negotiable-text').style.display = 'inline-flex';
             }
 
             // Details - with proper capitalization
@@ -1845,8 +1845,11 @@
                 document.getElementById('seller-avatar').src = avatarUrl;
             }
             
+            // Show verified badge if user is verified
             if (isVerified) {
-                document.getElementById('seller-verified').classList.remove('hidden');
+                document.getElementById('seller-verified').style.display = 'inline-flex';
+            } else {
+                document.getElementById('seller-verified').style.display = 'none';
             }
             
             if (memberSince) {
@@ -1860,7 +1863,8 @@
             
             // Show email if contact method includes email
             if (listing.contact_method === 'email' || listing.contact_method === 'both') {
-                const email = listing.email || listing.seller?.email || 'Email not provided';
+                // Email should come from the seller's user account, not the listing
+                const email = listing.seller?.email || listing.seller?.user_email || 'Email not provided';
                 contactHTML += `
                     <div class="contact-item">
                         <i class="fas fa-envelope"></i>
@@ -1952,10 +1956,14 @@
         function setupImageGallery(imageUrls) {
             images = imageUrls && imageUrls.length > 0 ? imageUrls : [];
             
+            const navButtons = document.querySelectorAll('.image-nav');
+            
             if (images.length === 0) {
                 document.getElementById('main-image').style.display = 'none';
                 document.getElementById('image-counter').textContent = '0 / 0';
                 document.getElementById('thumbnail-container').innerHTML = '';
+                // Hide navigation arrows when no images
+                navButtons.forEach(btn => btn.style.opacity = '0');
                 return;
             }
 
@@ -1963,6 +1971,13 @@
             document.getElementById('main-image').src = images[0];
             document.getElementById('main-image').style.display = 'block';
             document.getElementById('image-counter').textContent = `1 / ${images.length}`;
+            
+            // Show navigation arrows only if more than 1 image
+            if (images.length > 1) {
+                navButtons.forEach(btn => btn.style.opacity = '1');
+            } else {
+                navButtons.forEach(btn => btn.style.opacity = '0');
+            }
 
             const thumbnailContainer = document.getElementById('thumbnail-container');
             thumbnailContainer.innerHTML = '';
