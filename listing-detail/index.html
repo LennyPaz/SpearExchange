@@ -1706,7 +1706,7 @@
             <div class="comment-form">
                 <textarea 
                     class="comment-textarea" 
-                    placeholder="Hi! I'm interested in your MacBook. Could you come down to $1,500? I can meet at the Student Union."
+                    placeholder="Hi! I'm interested in your listing. Is this still available? I can meet at the Student Union."
                     maxlength="500"
                     id="comment-textarea"
                     oninput="updateCharacterCount()"
@@ -1746,7 +1746,30 @@
         // API Configuration
         const API_BASE_URL = 'https://spear-exchange.lenny-paz123.workers.dev';
 
-        // Load listing details
+        // Check authentication and update user info
+        async function checkAuthentication() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/me`, {
+                    credentials: 'include'
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const user = data.user;
+                    
+                    // Update header user info
+                    if (user.profile_name || user.name) {
+                        const userName = user.profile_name || user.name || 'User';
+                        document.getElementById('user-name').textContent = userName;
+                        document.getElementById('user-avatar').textContent = userName.charAt(0).toUpperCase();
+                    }
+                } else {
+                    console.log('Not authenticated, keeping default user display');
+                }
+            } catch (error) {
+                console.error('Auth check failed:', error);
+            }
+        }
         async function loadListingDetails() {
             try {
                 console.log('🔍 Loading listing with ID:', listingId);
@@ -1857,14 +1880,13 @@
                     `Member since ${formatDate(memberSince)}`;
             }
 
-            // Contact info - handle different contact preferences
+            // Contact info - Use correct field names from API response
             const contactInfo = document.getElementById('contact-info');
             let contactHTML = '';
             
-            // Show email if contact method includes email
+            // Show email if contact method includes email - Use seller_email from API
             if (listing.contact_method === 'email' || listing.contact_method === 'both') {
-                // Email should come from the seller's user account, not the listing
-                const email = listing.seller?.email || listing.seller?.user_email || 'Email not provided';
+                const email = listing.seller_email || 'Email not provided';
                 contactHTML += `
                     <div class="contact-item">
                         <i class="fas fa-envelope"></i>
@@ -1879,9 +1901,9 @@
                 `;
             }
             
-            // Show phone if contact method includes phone
+            // Show phone if contact method includes phone - Use seller_phone from API
             if (listing.contact_method === 'phone' || listing.contact_method === 'both') {
-                const phone = listing.phone_number || 'Phone not provided';
+                const phone = listing.seller_phone || 'Phone not provided';
                 contactHTML += `
                     <div class="contact-item" onclick="window.location.href='tel:${phone}'" style="cursor: pointer;">
                         <i class="fas fa-phone"></i>
@@ -1930,29 +1952,59 @@
                 document.querySelector('.rating-text').textContent = 'No ratings yet';
             }
             
-            // Handle mini portfolio (other listings)
-            const miniPortfolio = document.querySelector('.mini-portfolio');
-            if (listing.seller?.other_listings && listing.seller.other_listings.length > 0) {
-                let otherListingsHTML = '<h4>Other listings by this seller</h4>';
-                listing.seller.other_listings.forEach(otherListing => {
-                    otherListingsHTML += `
-                        <div class="mini-listing" onclick="window.location.href='?id=${otherListing.id}'">
-                            <img class="mini-listing-image" src="${otherListing.image_url || '/placeholder-image.jpg'}" alt="${escapeHtml(otherListing.title)}">
-                            <div class="mini-listing-info">
-                                <div class="mini-listing-title">${escapeHtml(otherListing.title)}</div>
-                                <div class="mini-listing-price">${otherListing.price.toFixed(2)}</div>
-                            </div>
-                        </div>
-                    `;
-                });
-                miniPortfolio.innerHTML = otherListingsHTML;
-            } else {
-                // Hide the mini portfolio if no other listings
-                miniPortfolio.style.display = 'none';
-            }
+            // Load other listings from same seller
+            loadOtherListings(listing.user_id, listing.id);
         }
 
-        // Setup image gallery
+        // Load other listings from the same seller
+        async function loadOtherListings(userId, currentListingId) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/users/${userId}/listings`, {
+                    credentials: 'include'
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    const otherListings = data.listings ? 
+                        data.listings.filter(listing => listing.id !== currentListingId).slice(0, 2) : [];
+                    
+                    // Update seller stats with actual listing count
+                    const totalListings = data.listings ? data.listings.length : 0;
+                    document.querySelector('.seller-stats .stat-item:nth-child(1) .stat-value').textContent = totalListings;
+                    
+                    // Display other listings if available
+                    const miniPortfolio = document.querySelector('.mini-portfolio');
+                    if (otherListings.length > 0) {
+                        let otherListingsHTML = '<h4>Other listings by this seller</h4>';
+                        otherListings.forEach(otherListing => {
+                            const imageUrl = otherListing.image_urls ? 
+                                (Array.isArray(otherListing.image_urls) ? otherListing.image_urls[0] : 
+                                 JSON.parse(otherListing.image_urls || '[]')[0]) : null;
+                            
+                            otherListingsHTML += `
+                                <div class="mini-listing" onclick="window.location.href='?id=${otherListing.id}'">
+                                    <img class="mini-listing-image" 
+                                         src="${imageUrl || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0yMCAyMEg0MFY0MEgyMFYyMFoiIGZpbGw9IiM5Q0EzQUYiLz4KPHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAyMCAyMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4PSIyMCIgeT0iMjAiPgo8cGF0aCBkPSJNMTUgMkg1QTMgMyAwIDAgMCAyIDVWMTVBMyAzIDAgMCAwIDUgMThIMTVBMyAzIDAgMCAwIDE4IDE1VjVBMyAzIDAgMCAwIDE1IDJaIiBzdHJva2U9IiM5Q0EzQUYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+Cjxwb2x5bGluZSBwb2ludHM9IjksOSAxMCw5IDEwLDEwIDksMTAiIHN0cm9rZT0iIzlDQTNBRiIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KPC9zdmc+Cjwvc3ZnPgo='}" 
+                                         alt="${escapeHtml(otherListing.title)}">
+                                    <div class="mini-listing-info">
+                                        <div class="mini-listing-title">${escapeHtml(otherListing.title)}</div>
+                                        <div class="mini-listing-price">${formatPrice(otherListing.price)}</div>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                        miniPortfolio.innerHTML = otherListingsHTML;
+                        miniPortfolio.style.display = 'block';
+                    } else {
+                        miniPortfolio.style.display = 'none';
+                    }
+                } else {
+                    console.log('Could not load other listings');
+                }
+            } catch (error) {
+                console.error('Error loading other listings:', error);
+            }
+        }
         function setupImageGallery(imageUrls) {
             images = imageUrls && imageUrls.length > 0 ? imageUrls : [];
             
@@ -2216,7 +2268,7 @@
         });
 
         // Initialize page
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
             listingId = getListingIdFromUrl();
             
             if (!listingId) {
@@ -2224,7 +2276,9 @@
                 return;
             }
 
-            loadListingDetails();
+            // Check authentication and load listing details
+            await checkAuthentication();
+            await loadListingDetails();
         });
     </script>
 </body>
