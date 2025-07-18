@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>About Us - The Spear Exchange</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
   <style>
     :root {
       --primary-color: #8B2635;
@@ -17,204 +17,259 @@
       --shadow-light: 0 2px 10px rgba(0,0,0,0.08);
       --shadow-medium: 0 8px 30px rgba(0,0,0,0.12);
       --border-radius: 12px;
+      --transition: all 0.3s ease;
     }
 
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
     body {
       font-family: 'Inter', sans-serif;
       background: var(--background-light);
       color: var(--text-dark);
+      line-height: 1.6;
     }
 
-    header {
-      background: var(--primary-color);
-      color: white;
+    .header {
+      background: #fff;
       padding: 1rem 2rem;
+      box-shadow: var(--shadow-light);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .nav {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      max-width: 1200px;
+      margin: auto;
     }
 
     .logo {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
       text-decoration: none;
-      color: white;
+      color: var(--primary-color);
+      font-weight: bold;
+      font-size: 1.25rem;
     }
 
     .logo-icon {
-      background: white;
+      background: var(--primary-color);
+      color: white;
+      font-weight: bold;
+      padding: 0.5rem 0.75rem;
+      border-radius: 12px;
+      margin-right: 0.5rem;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+    }
+
+    .nav-links a {
+      color: var(--text-dark);
+      text-decoration: none;
+      font-weight: 600;
+      transition: var(--transition);
+    }
+
+    .nav-links a:hover, .nav-links a.active {
       color: var(--primary-color);
-      border-radius: 50%;
-      padding: 0.4rem 0.7rem;
-      font-weight: bold;
-    }
-
-    .logo-text {
-      font-size: 1.2rem;
-      font-weight: bold;
-    }
-
-    .nav-toggle {
-      display: none;
     }
 
     .hero {
-      background: var(--primary-dark);
-      color: white;
-      padding: 4rem 2rem;
       text-align: center;
-    }
-
-    .hero h1 {
-      font-size: 2.5rem;
-      margin-bottom: 1rem;
-    }
-
-    .hero p {
-      font-size: 1.1rem;
-      color: #f2f2f2;
-    }
-
-    .tabs {
-      display: flex;
-      justify-content: center;
-      background: #fff;
-      padding: 1rem;
-      gap: 1rem;
-      box-shadow: var(--shadow-light);
-    }
-
-    .tabs button {
-      padding: 0.6rem 1.2rem;
-      border: none;
-      background: #eee;
-      border-radius: var(--border-radius);
-      cursor: pointer;
-    }
-
-    .tabs .active {
+      padding: 4rem 2rem;
       background: var(--primary-color);
       color: white;
     }
 
     .container {
-      padding: 2rem;
-      max-width: 900px;
-      margin: auto;
+      max-width: 1000px;
+      margin: 2rem auto;
+      padding: 1rem;
+      text-align: justify;
     }
 
     .card {
       background: white;
       padding: 2rem;
+      margin-bottom: 2rem;
       border-radius: var(--border-radius);
       box-shadow: var(--shadow-light);
-      margin-bottom: 2rem;
-    }
-
-    .card h2 {
-      margin-bottom: 1rem;
-      text-align: center;
     }
 
     .team-card {
-      background: white;
-      padding: 1rem;
-      border-radius: var(--border-radius);
-      text-align: center;
-      box-shadow: var(--shadow-light);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      justify-content: center;
+      margin-top: 1.5rem;
     }
 
-    .footer {
+    .team-member {
+      text-align: center;
+      width: 160px;
+    }
+
+    .team-member img {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 0.5rem;
+    }
+
+    .name-button {
       background: var(--primary-color);
       color: white;
-      padding: 2rem;
-      text-align: center;
+      padding: 0.4rem 0.9rem;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      display: inline-block;
+      margin-bottom: 0.3rem;
     }
 
-    .footer a {
-      color: white;
-      text-decoration: none;
+    .name-button:hover {
+      background: var(--primary-dark);
+    }
+
+    .linkedin-button {
+      display: inline-block;
+      font-size: 1.2rem;
+      color: var(--primary-color);
+    }
+
+    .linkedin-button:hover {
+      color: var(--primary-dark);
     }
 
     .cta-buttons {
-      display: flex;
-      justify-content: center;
-      gap: 1rem;
-      margin-top: 1rem;
+      text-align: center;
     }
 
-    .btn {
-      padding: 0.7rem 1.2rem;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: 600;
-    }
-
-    .btn-primary {
-      background: var(--accent-color);
-      color: #333;
+    .cta-buttons a {
+      display: inline-block;
+      margin: 0.5rem;
+      padding: 0.75rem 1.5rem;
+      border-radius: var(--border-radius);
+      text-decoration: none;
+      font-weight: bold;
     }
 
     .btn-secondary {
-      background: var(--white);
-      color: var(--primary-color);
+      background: white;
       border: 2px solid var(--primary-color);
+      color: var(--primary-color);
+    }
+
+    .btn-secondary:hover {
+      background: var(--primary-color);
+      color: white;
+    }
+
+    .footer {
+      background: var(--primary-dark);
+      color: white;
+      text-align: center;
+      padding: 2rem;
     }
   </style>
 </head>
 <body>
-
-  <header>
-    <a href="index.html" class="logo">
-      <div class="logo-icon">SE</div>
-      <span class="logo-text">The Spear Exchange</span>
-    </a>
+  <header class="header">
+    <div class="nav">
+      <a href="index.html" class="logo">
+        <div class="logo-icon">SE</div>
+        The Spear Exchange
+      </a>
+      <div class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="listings/">Browse</a>
+        <a href="about.html" class="active">About</a>
+        <a href="contact.html">Contact</a>
+      </div>
+    </div>
   </header>
 
   <section class="hero">
     <h1>About The Spear Exchange</h1>
-    <p>Connecting FSU students through safe, affordable, and<br>convenient marketplace experiences since 2019.</p>
+    <p>Connecting FSU students through safe, affordable, and convenient marketplace experiences since 2025.</p>
   </section>
-
-  <div class="tabs">
-    <button class="active">Our Mission</button>
-    <button>Our Story</button>
-    <button>Our Values</button>
-  </div>
 
   <div class="container">
     <div class="card">
-      <h2>Our Mission</h2>
-      <p>To create a trusted, secure, and affordable marketplace exclusively for Florida State University students, fostering community connections while making essential items accessible to all Seminoles.</p>
+      <h2 style="text-align: center;">Our Mission</h2>
+      <p>
+        To create a trusted, secure, and affordable marketplace exclusively for Florida State University students, fostering community connections while making essential items accessible to all Seminoles.
+      </p>
     </div>
 
     <div class="card">
-      <h2>Meet Our Team</h2>
+      <h2 style="text-align: center;">Meet Our Team</h2>
       <p>The passionate FSU students behind The Spear Exchange, working to make campus commerce safer and more accessible for everyone.</p>
       <div class="team-card">
-        <p><i class="fas fa-envelope"></i> Contact &nbsp; <i class="fab fa-linkedin"></i> LinkedIn</p>
+        <div class="team-member">
+          <img src="https://randomuser.me/api/portraits/lego/1.jpg" alt="Maksym Brailovskyi" />
+          <a href="https://www.linkedin.com/in/maksymbr/" target="_blank" class="name-button">Maksym Brailovskyi</a>
+          <br />
+          <a href="https://www.linkedin.com/in/maksymbr/" target="_blank" class="linkedin-button"><i class="fab fa-linkedin"></i></a>
+        </div>
+        <div class="team-member">
+          <img src="https://randomuser.me/api/portraits/lego/2.jpg" alt="Jose Mon" />
+          <a href="https://www.linkedin.com/in/josemon-it" target="_blank" class="name-button">Jose Mon</a>
+          <br />
+          <a href="https://www.linkedin.com/in/josemon-it" target="_blank" class="linkedin-button"><i class="fab fa-linkedin"></i></a>
+        </div>
+        <div class="team-member">
+          <img src="https://randomuser.me/api/portraits/lego/3.jpg" alt="Lenny Paz" />
+          <a href="https://www.linkedin.com/in/lennypaz/" target="_blank" class="name-button">Lenny Paz</a>
+          <br />
+          <a href="https://www.linkedin.com/in/lennypaz/" target="_blank" class="linkedin-button"><i class="fab fa-linkedin"></i></a>
+        </div>
+        <div class="team-member">
+          <img src="https://randomuser.me/api/portraits/lego/4.jpg" alt="Zaheen Rahman" />
+          <a href="https://www.linkedin.com/in/zaheen-rahman/" target="_blank" class="name-button">Zaheen Rahman</a>
+          <br />
+          <a href="https://www.linkedin.com/in/zaheen-rahman/" target="_blank" class="linkedin-button"><i class="fab fa-linkedin"></i></a>
+        </div>
+        <div class="team-member">
+          <img src="https://randomuser.me/api/portraits/lego/5.jpg" alt="Javin Vance" />
+          <a href="https://www.linkedin.com/in/javin-vance/" target="_blank" class="name-button">Javin Vance</a>
+          <br />
+          <a href="https://www.linkedin.com/in/javin-vance/" target="_blank" class="linkedin-button"><i class="fab fa-linkedin"></i></a>
+        </div>
       </div>
     </div>
 
     <div class="card">
-      <h2>Join Our Community</h2>
+      <h2 style="text-align: center;">Join Our Community</h2>
       <p>Ready to start buying and selling with fellow Seminoles? Join thousands of FSU students who trust The Spear Exchange for safe, affordable transactions.</p>
       <div class="cta-buttons">
-        <button class="btn btn-primary">Start Shopping</button>
-        <button class="btn btn-secondary">Sell Your Items</button>
+        <a href="listings/" class="btn-secondary">Start Shopping</a>
+        <a href="create-listing.html" class="btn-secondary">Sell Your Items</a>
       </div>
     </div>
   </div>
 
-  <div class="footer">
+  <footer class="footer">
     <h3>Questions About The Spear Exchange?</h3>
     <p>We're here to help! Reach out to our team for any questions or support.</p>
-    <p><i class="fas fa-envelope"></i> support@spearexchange.fsu.edu &nbsp; | &nbsp; <i class="fas fa-phone"></i> (850) 555-SPEAR</p>
-  </div>
-
+    <p>
+      <i class="fas fa-envelope"></i> support@spearexchange.fsu.edu
+      &nbsp;&nbsp;
+      <i class="fas fa-phone"></i> (850) 555-SPEAR
+    </p>
+  </footer>
 </body>
 </html>
+
