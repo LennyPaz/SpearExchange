@@ -85,6 +85,26 @@
       color: var(--primary-color);
     }
 
+    .auth-buttons {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .auth-buttons a {
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      border: 2px solid var(--primary-color);
+      color: var(--primary-color);
+      text-decoration: none;
+      font-weight: bold;
+      transition: var(--transition);
+    }
+
+    .auth-buttons a:hover {
+      background: var(--primary-color);
+      color: white;
+    }
+
     .hero {
       text-align: center;
       padding: 4rem 2rem;
@@ -198,8 +218,15 @@
         <a href="about.html" class="active">About</a>
         <a href="contact.html">Contact</a>
       </div>
+      <div class="auth-buttons">
+        <a href="login.html">Login</a>
+        <a href="signup.html">Sign Up</a>
+      </div>
     </div>
   </header>
+
+  <!-- Rest of the content remains unchanged -->
+
 
   <section class="hero">
     <h1>About The Spear Exchange</h1>
@@ -272,4 +299,5 @@
   </footer>
 </body>
 </html>
+
 
