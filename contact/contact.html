@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contact Us - The Spear Exchange</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  <style>
+    :root {
+      --primary-color: #8B2635;
+      --primary-dark: #6B1B2A;
+      --accent-color: #FFD700;
+      --text-dark: #2C3E50;
+      --text-light: #5A6C7D;
+      --background-light: #F8FAFC;
+      --white: #FFFFFF;
+      --shadow-light: 0 2px 10px rgba(0,0,0,0.08);
+      --shadow-medium: 0 8px 30px rgba(0,0,0,0.12);
+      --border-radius: 12px;
+      --transition: all 0.3s ease;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--background-light);
+      color: var(--text-dark);
+      line-height: 1.6;
+    }
+
+    .header {
+      background: #fff;
+      padding: 1rem 2rem;
+      box-shadow: var(--shadow-light);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1200px;
+      margin: auto;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+      color: var(--primary-color);
+      font-weight: bold;
+      font-size: 1.25rem;
+    }
+
+    .logo-icon {
+      background: var(--primary-color);
+      color: white;
+      font-weight: bold;
+      padding: 0.5rem 0.75rem;
+      border-radius: 12px;
+      margin-right: 0.5rem;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+    }
+
+    .nav-links a {
+      color: var(--text-dark);
+      text-decoration: none;
+      font-weight: 600;
+      transition: var(--transition);
+    }
+
+    .nav-links a:hover, .nav-links a.active {
+      color: var(--primary-color);
+    }
+
+    .auth-buttons {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .auth-buttons a {
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      border: 2px solid var(--primary-color);
+      color: var(--primary-color);
+      text-decoration: none;
+      font-weight: bold;
+      transition: var(--transition);
+    }
+
+    .auth-buttons a:hover {
+      background: var(--primary-color);
+      color: white;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 2rem auto;
+      padding: 1rem;
+    }
+
+    .support-cards {
+      display: flex;
+      justify-content: center;
+      gap: 4rem;
+      margin-top: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .support-card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: var(--shadow-light);
+      padding: 1.5rem;
+      text-align: center;
+      width: 290px;
+    }
+
+    .support-card i {
+      font-size: 2rem;
+      color: var(--primary-dark);
+      margin-bottom: 1rem;
+    }
+
+    .support-card h4 {
+      color: var(--primary-dark);
+      margin-bottom: 0.5rem;
+    }
+
+    .two-column {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+
+    .left-column, .right-column {
+      flex: 1 1 300px;
+      background: white;
+      padding: 2rem;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow-light);
+    }
+
+    label, select, input, textarea {
+      display: block;
+      width: 100%;
+      margin-bottom: 1rem;
+      padding: 0.75rem;
+      border: 1px solid #ccc;
+      border-radius: var(--border-radius);
+    }
+
+    button {
+      background: var(--primary-color);
+      color: white;
+      padding: 0.75rem;
+      border: none;
+      border-radius: var(--border-radius);
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .faq h4 {
+      margin: 1rem 0 0.5rem;
+      color: var(--primary-dark);
+    }
+
+    .location {
+      background: white;
+      padding: 2rem;
+      margin-top: 2rem;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow-light);
+    }
+
+    .footer {
+      background: var(--primary-dark);
+      color: white;
+      text-align: center;
+      padding: 2rem;
+      margin-top: 2rem;
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="nav">
+      <a href="../index.html" class="logo">
+        <div class="logo-icon">SE</div>
+        The Spear Exchange
+      </a>
+      <div class="nav-links">
+        <a href="../index.html">Home</a>
+        <a href="../listings/index.html">Browse</a>
+        <a href="../about.html">About Us</a>
+        <a href="contact.html" class="active">Contact</a>
+      </div>
+      <div class="auth-buttons">
+        <a href="../login/index.html">Login</a>
+        <a href="../signup/index.html">Sign Up</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="support-cards">
+      <div class="support-card">
+        <i class="fas fa-user"></i>
+        <h4>Student Support</h4>
+        <p>Get help with your account, listings, or transactions</p>
+        <p><strong>support@spearexchange.fsu.edu</strong></p>
+      </div>
+      <div class="support-card">
+        <i class="fas fa-shield-alt"></i>
+        <h4>Safety & Security</h4>
+        <p>Report suspicious activity or safety concerns</p>
+        <p><strong>safety@spearexchange.fsu.edu</strong></p>
+      </div>
+      <div class="support-card">
+        <i class="fas fa-clock"></i>
+        <h4>Business Hours</h4>
+        <p>Monday - Friday: 8:00 AM - 6:00 PM<br>Saturday: 10:00 AM - 4:00 PM<br>Sunday: Closed</p>
+      </div>
+    </div>
+
+    <div class="two-column">
+      <div class="left-column">
+        <h2>Send us a Message</h2>
+        <label>Full Name *</label>
+        <input type="text" placeholder="Enter your full name">
+
+        <label>FSU Email Address *</label>
+        <input type="email" placeholder="your.name@fsu.edu">
+
+        <label>Topic *</label>
+        <select>
+          <option>Select a topic</option>
+          <option>Account Help</option>
+          <option>Safety Concern</option>
+          <option>Listing Support</option>
+        </select>
+
+        <label>Message *</label>
+        <textarea rows="5" placeholder="Please describe your question or concern in detail..."></textarea>
+
+        <button type="submit">Send Message</button>
+      </div>
+
+      <div class="right-column faq">
+        <h2>Frequently Asked Questions</h2>
+        <h4>How do I verify my FSU student status?</h4>
+        <p>You’ll need to sign up with your official FSU email address (@fsu.edu). We'll send a verification link to confirm your student status before you can start buying or selling.</p>
+
+        <h4>What items are allowed on the platform?</h4>
+        <p>We allow textbooks, electronics, furniture, clothing, and other student-related items. Prohibited items include weapons, illegal substances, and items that violate FSU policies.</p>
+
+        <h4>How do I report a problem with a transaction?</h4>
+        <p>Contact our support team immediately at <strong>safety@spearexchange.fsu.edu</strong> with details about the issue. We take all reports seriously and will investigate promptly.</p>
+
+        <h4>Where should I meet for transactions?</h4>
+        <p>We recommend meeting in well-lit public areas on campus such as the Student Union, library, or dining halls. Never meet in private locations or off-campus.</p>
+      </div>
+    </div>
+
+    <div class="location">
+      <h2>Campus Location</h2>
+      <p><strong>Student Union Building</strong><br>75 N Woodward Ave, Tallahassee, FL 32306</p>
+      <p><strong>Phone Support</strong><br>(850) 642-3451</p>
+      <p><strong>Office Hours</strong><br>Room 203, Student Union<br>Monday–Friday: 9:00 AM – 5:00 PM</p>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <h3>Questions About The Spear Exchange?</h3>
+    <p>We're here to help! Reach out to our team for any questions or support.</p>
+    <p><i class="fas fa-envelope"></i> support@spearexchange.fsu.edu &nbsp;&nbsp; <i class="fas fa-phone"></i> (850) 555-SPEAR</p>
+  </footer>
+</body>
+</html>
