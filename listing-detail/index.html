@@ -1907,14 +1907,15 @@
             // Show phone if contact method includes phone - Use seller_phone from API
             if (listing.contact_method === 'phone' || listing.contact_method === 'both') {
                 const phone = listing.seller_phone || 'Phone not provided';
+                const formattedPhone = formatPhoneNumber(phone);
                 contactHTML += `
                     <div class="contact-item" onclick="window.location.href='tel:${phone}'" style="cursor: pointer;">
                         <i class="fas fa-phone"></i>
                         <div class="contact-item-content">
                             <div class="contact-item-label">Phone</div>
-                            <div class="contact-item-value">${escapeHtml(phone)}</div>
+                            <div class="contact-item-value">${escapeHtml(formattedPhone)}</div>
                         </div>
-                        <button class="contact-item-action" onclick="event.stopPropagation(); copyToClipboard('${escapeHtml(phone)}')">
+                        <button class="contact-item-action" onclick="event.stopPropagation(); copyToClipboard('${escapeHtml(formattedPhone)}')">
                             <i class="fas fa-copy"></i>
                         </button>
                     </div>
@@ -2212,6 +2213,21 @@
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
+        }
+
+        function formatPhoneNumber(phoneNumber) {
+            if (!phoneNumber) return phoneNumber;
+            
+            // Remove all non-digits
+            const cleaned = phoneNumber.replace(/\D/g, '');
+            
+            // Check if it's a valid US phone number (10 digits)
+            if (cleaned.length === 10) {
+                return `(${cleaned.slice(0, 3)})${cleaned.slice(3, 6)}-${cleaned.slice(6)}`;
+            }
+            
+            // If not 10 digits, return original
+            return phoneNumber;
         }
 
         function capitalizeFirstLetter(string) {
