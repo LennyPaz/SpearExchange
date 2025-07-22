@@ -678,15 +678,49 @@
         confirmPasswordInput.addEventListener('input', validateConfirmPassword);
         termsCheckbox.addEventListener('change', validateTerms);
 
-        // Phone number formatting
+        // Phone number formatting with proper backspace handling
         phoneInput.addEventListener('input', function(e) {
             let value = e.target.value.replace(/\D/g, '');
+            let cursorPosition = e.target.selectionStart;
+            let oldValue = e.target.value;
+            
+            // Handle backspace/delete by checking if we're removing characters
+            let isDeleting = oldValue.length > e.target.value.replace(/\D/g, '').length;
+            
             if (value.length >= 6) {
                 value = value.replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3');
             } else if (value.length >= 3) {
                 value = value.replace(/(\d{3})(\d{0,3})/, '($1) $2');
             }
+            
             e.target.value = value;
+            
+            // Restore cursor position for better UX
+            if (!isDeleting) {
+                // When typing, move cursor to end
+                e.target.setSelectionRange(value.length, value.length);
+            }
+        });
+        
+        // Handle backspace more intelligently
+        phoneInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Backspace') {
+                let cursorPosition = e.target.selectionStart;
+                let value = e.target.value;
+                
+                // If cursor is right after a formatting character, move it back
+                if (cursorPosition > 0) {
+                    let charBefore = value[cursorPosition - 1];
+                    if (charBefore === ')' || charBefore === ' ' || charBefore === '-') {
+                        e.preventDefault();
+                        // Remove the digit before the formatting character
+                        let newValue = value.substring(0, cursorPosition - 2) + value.substring(cursorPosition);
+                        e.target.value = newValue;
+                        // Trigger input event to reformat
+                        e.target.dispatchEvent(new Event('input'));
+                    }
+                }
+            }
         });
 
         // Validation functions
