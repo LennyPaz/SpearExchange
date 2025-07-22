@@ -1125,6 +1125,20 @@
             box-shadow: none;
         }
 
+        .comment-submit.sending {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .comment-submit.sending i {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
         /* Safety Tips Section */
         .safety-tips {
             margin-top: 2.5rem;
@@ -1724,11 +1738,7 @@
             </div>
 
             <div class="comments-list" id="comments-list">
-                <!-- Comments will be populated here -->
-                <div style="text-align: center; color: var(--text-light); padding: 2rem;">
-                    <i class="fas fa-comment-slash" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
-                    <p>No messages yet. Be the first to ask a question or make an offer!</p>
-                </div>
+                <!-- Messages will be populated here dynamically -->
             </div>
         </div>
     </main>
@@ -2171,15 +2181,113 @@
             counter.textContent = `${textarea.value.length} / 500`;
         }
 
-        function submitComment() {
+        // Phase 1 Messaging: Send message to listing owner
+        async function submitComment() {
             const textarea = document.getElementById('comment-textarea');
+            const submitBtn = document.querySelector('.comment-submit');
             const message = textarea.value.trim();
             
-            if (message) {
-                alert('Message functionality will be implemented in the next phase');
-                textarea.value = '';
-                updateCharacterCount();
+            if (!message) {
+                alert('Please enter a message');
+                return;
             }
+
+            // Check if user is authenticated
+            try {
+                const authResponse = await fetch(`${API_BASE_URL}/api/me`, {
+                    credentials: 'include'
+                });
+                
+                if (!authResponse.ok) {
+                    alert('Please log in to send messages');
+                    window.location.href = '../login/';
+                    return;
+                }
+            } catch (error) {
+                alert('Please log in to send messages');
+                window.location.href = '../login/';
+                return;
+            }
+
+            if (!currentListing) {
+                alert('Listing information not available');
+                return;
+            }
+
+            // Disable button and show loading state
+            submitBtn.classList.add('sending');
+            submitBtn.disabled = true;
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+            
+            try {
+                const messageData = {
+                    listing_id: parseInt(listingId),
+                    receiver_id: currentListing.user_id, // Send to listing owner
+                    message: message
+                };
+
+                console.log('Sending message:', messageData);
+
+                const response = await fetch(`${API_BASE_URL}/api/messages`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify(messageData)
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    console.log('Message sent successfully:', result);
+                    
+                    // Success!
+                    textarea.value = '';
+                    updateCharacterCount();
+                    showSuccessMessage('Message sent successfully! The seller will be able to respond to you.');
+                } else {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Failed to send message');
+                }
+                
+            } catch (error) {
+                console.error('Error sending message:', error);
+                alert(`Failed to send message: ${error.message}`);
+            } finally {
+                // Re-enable button
+                submitBtn.classList.remove('sending');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
+        }
+
+        // Show success message
+        function showSuccessMessage(message) {
+            // Remove any existing success message
+            const existing = document.querySelector('.message-success');
+            if (existing) existing.remove();
+
+            const successDiv = document.createElement('div');
+            successDiv.className = 'message-success';
+            successDiv.style.cssText = `
+                background: #d1fae5;
+                border: 1px solid #10b981;
+                color: #065f46;
+                padding: 1rem;
+                border-radius: 8px;
+                margin: 1rem 0;
+                text-align: center;
+            `;
+            successDiv.innerHTML = `<i class="fas fa-check"></i> ${message}`;
+            
+            const commentForm = document.querySelector('.comment-form');
+            commentForm.appendChild(successDiv);
+            
+            // Remove after 5 seconds
+            setTimeout(() => {
+                successDiv.remove();
+            }, 5000);
         }
 
         function toggleFavorite() {
