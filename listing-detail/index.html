@@ -2193,6 +2193,7 @@
             }
 
             // Check if user is authenticated
+            let currentUser;
             try {
                 const authResponse = await fetch(`${API_BASE_URL}/api/me`, {
                     credentials: 'include'
@@ -2203,6 +2204,9 @@
                     window.location.href = '../login/';
                     return;
                 }
+                
+                const authData = await authResponse.json();
+                currentUser = authData.user;
             } catch (error) {
                 alert('Please log in to send messages');
                 window.location.href = '../login/';
@@ -2211,6 +2215,12 @@
 
             if (!currentListing) {
                 alert('Listing information not available');
+                return;
+            }
+
+            // Check if user is trying to message their own listing
+            if (currentUser.id === currentListing.user_id) {
+                alert('You cannot send messages to your own listing. Use the edit function to update your listing instead.');
                 return;
             }
 
