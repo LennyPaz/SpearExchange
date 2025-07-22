@@ -814,7 +814,7 @@
 
         .browse-btn {
             background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-            color: white;
+            color: white !important;
             padding: 0.75rem 1.5rem;
             border: none;
             border-radius: 8px;
@@ -828,7 +828,7 @@
         .browse-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(139, 38, 53, 0.3);
-            color: white;
+            color: white !important;
         }
 
         /* Loading States */
@@ -873,8 +873,8 @@
             }
         }
         
-        /* Stage 2: 1050px - Further compression */
-        @media (max-width: 1050px) {
+        /* Stage 2: 1060px - Further compression */
+        @media (max-width: 1060px) {
             .nav {
                 padding: 1rem;
             }
@@ -1355,8 +1355,21 @@
             try {
                 showConversationsLoading(true);
                 
-                const response = await authenticatedFetch('https://spear-exchange.lenny-paz123.workers.dev/api/conversations');
+                // Note: This endpoint doesn't exist yet in the API
+                // For now, we'll show empty state and inform user
+                console.log('⚠️  Conversations API endpoint not yet implemented');
                 
+                // When the API is ready, this should work:
+                // const response = await authenticatedFetch('https://spear-exchange.lenny-paz123.workers.dev/api/conversations');
+                
+                // Simulate empty conversations for now
+                conversations = [];
+                filteredConversations = [];
+                
+                showEmptyConversations();
+                
+                // TODO: Remove this simulation once API endpoint is ready
+                /* 
                 if (response.ok) {
                     const data = await response.json();
                     conversations = data.conversations || [];
@@ -1364,13 +1377,13 @@
                     
                     displayConversations();
                     
-                    // Auto-select first conversation if available
                     if (conversations.length > 0 && !selectedConversationId) {
                         selectConversation(conversations[0].id);
                     }
                 } else {
                     throw new Error('Failed to load conversations');
                 }
+                */
             } catch (error) {
                 console.error('Error loading conversations:', error);
                 showEmptyConversations();
@@ -1439,6 +1452,7 @@
                     ${conversation.unread_count > 0 ? `<span class="unread-count">${conversation.unread_count}</span>` : ''}
                 </div>
             `;
+
 
             return element;
         }
@@ -1740,6 +1754,7 @@
 
         // Cleanup on page unload
         window.addEventListener('beforeunload', () => {
+
             if (refreshInterval) {
                 clearInterval(refreshInterval);
             }
