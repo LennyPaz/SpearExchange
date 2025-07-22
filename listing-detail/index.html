@@ -1856,8 +1856,8 @@
             // Seller info
             const sellerName = listing.seller?.profile_name || listing.seller_name || 'Anonymous';
             const sellerBio = listing.seller?.bio || 'No bio available';
-            const isVerified = listing.seller?.is_verified || false;
-            const memberSince = listing.seller?.member_since || listing.created_at;
+            const isVerified = listing.seller?.is_verified || listing.seller_verified || false;
+            const memberSince = listing.seller?.member_since || listing.seller_created_at || listing.created_at;
             const avatarUrl = listing.seller?.avatar_url || '';
             const stats = listing.seller?.stats || {};
             
@@ -2112,12 +2112,26 @@
             });
         }
 
-        function logout() {
+        async function logout() {
             // Close dropdown first
             document.getElementById('user-dropdown').classList.remove('show');
             
-            // Future: implement actual logout
-            alert('Logout functionality will be implemented when auth is added');
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/logout`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                // Redirect to home page after logout attempt
+                window.location.href = '../';
+            } catch (error) {
+                console.error('Logout error:', error);
+                // Still redirect even if logout request fails
+                window.location.href = '../';
+            }
         }
 
         // Mobile menu functions
