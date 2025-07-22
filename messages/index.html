@@ -1355,35 +1355,30 @@
             try {
                 showConversationsLoading(true);
                 
-                // Note: This endpoint doesn't exist yet in the API
-                // For now, we'll show empty state and inform user
-                console.log('⚠️  Conversations API endpoint not yet implemented');
+                console.log('📥 Loading conversations from API...');
+                const response = await authenticatedFetch('https://spear-exchange.lenny-paz123.workers.dev/api/conversations');
                 
-                // When the API is ready, this should work:
-                // const response = await authenticatedFetch('https://spear-exchange.lenny-paz123.workers.dev/api/conversations');
-                
-                // Simulate empty conversations for now
-                conversations = [];
-                filteredConversations = [];
-                
-                showEmptyConversations();
-                
-                // TODO: Remove this simulation once API endpoint is ready
-                /* 
                 if (response.ok) {
                     const data = await response.json();
                     conversations = data.conversations || [];
                     filteredConversations = [...conversations];
                     
-                    displayConversations();
+                    console.log(`✅ Loaded ${conversations.length} conversations`);
                     
-                    if (conversations.length > 0 && !selectedConversationId) {
-                        selectConversation(conversations[0].id);
+                    if (conversations.length > 0) {
+                        displayConversations();
+                        
+                        // Auto-select first conversation if none selected
+                        if (!selectedConversationId) {
+                            selectConversation(conversations[0].id);
+                        }
+                    } else {
+                        showEmptyConversations();
                     }
                 } else {
+                    console.error('Failed to load conversations:', response.status, response.statusText);
                     throw new Error('Failed to load conversations');
                 }
-                */
             } catch (error) {
                 console.error('Error loading conversations:', error);
                 showEmptyConversations();
@@ -1417,16 +1412,9 @@
             element.className = `conversation-item ${conversation.id === selectedConversationId ? 'active' : ''}`;
             element.onclick = () => selectConversation(conversation.id);
 
-            // Parse image URLs if they exist
-            let imageUrls = [];
-            try {
-                imageUrls = conversation.listing_image ? JSON.parse(conversation.listing_image) : [];
-            } catch (e) {
-                console.error('Error parsing image URLs:', e);
-            }
-
-            const imageContent = imageUrls.length > 0 
-                ? `<img src="${imageUrls[0]}" alt="${conversation.listing_title}" onerror="this.style.display='none'">`
+            // Use the image URL from the API response (already parsed)
+            const imageContent = conversation.listing.image_url
+                ? `<img src="${conversation.listing.image_url}" alt="${conversation.listing.title}" onerror="this.style.display='none'">`
                 : `<i class="fas fa-image"></i>`;
 
             element.innerHTML = `
@@ -1436,23 +1424,22 @@
                             ${imageContent}
                         </div>
                         <div class="conversation-details">
-                            <div class="listing-title">${escapeHtml(conversation.listing_title)}</div>
+                            <div class="listing-title">${escapeHtml(conversation.listing.title)}</div>
                             <div class="other-user">
                                 <i class="fas fa-user"></i>
-                                ${escapeHtml(conversation.other_user_name)}
-                                ${conversation.other_user_verified ? '<i class="fas fa-check-circle verified-badge"></i>' : ''}
+                                ${escapeHtml(conversation.other_user.name)}
+                                <i class="fas fa-check-circle verified-badge"></i>
                             </div>
                         </div>
                     </div>
                     <div class="conversation-time">${formatConversationTime(conversation.last_message_at)}</div>
                 </div>
-                <div class="last-message">${escapeHtml(conversation.last_message || 'No messages yet')}</div>
+                <div class="last-message">${escapeHtml(conversation.last_message_preview || 'No messages yet')}</div>
                 <div class="conversation-meta">
-                    <span class="user-role ${conversation.user_role}">${conversation.user_role}</span>
+                    <span class="user-role ${conversation.other_user.role}">${conversation.other_user.role}</span>
                     ${conversation.unread_count > 0 ? `<span class="unread-count">${conversation.unread_count}</span>` : ''}
                 </div>
             `;
-
 
             return element;
         }
@@ -1484,31 +1471,23 @@
             if (!conversation) return;
 
             // Update chat header
-            const chatHeader = document.getElementById('chat-header');
             const chatThumbnail = document.getElementById('chat-listing-thumbnail');
             const chatTitle = document.getElementById('chat-listing-title');
             const chatPrice = document.getElementById('chat-listing-price');
             const chatOtherUser = document.getElementById('chat-other-user-name');
             const chatUserRole = document.getElementById('chat-user-role');
 
-            // Parse image URLs
-            let imageUrls = [];
-            try {
-                imageUrls = conversation.listing_image ? JSON.parse(conversation.listing_image) : [];
-            } catch (e) {
-                console.error('Error parsing image URLs:', e);
-            }
-
-            const imageContent = imageUrls.length > 0 
-                ? `<img src="${imageUrls[0]}" alt="${conversation.listing_title}" onerror="this.style.display='none'">`
+            // Use the image URL from the API response
+            const imageContent = conversation.listing.image_url
+                ? `<img src="${conversation.listing.image_url}" alt="${conversation.listing.title}" onerror="this.style.display='none'">`
                 : `<i class="fas fa-image"></i>`;
 
             chatThumbnail.innerHTML = imageContent;
-            chatTitle.textContent = conversation.listing_title;
-            chatPrice.textContent = `${parseFloat(conversation.listing_price || 0).toFixed(2)}`;
-            chatOtherUser.textContent = conversation.other_user_name;
-            chatUserRole.textContent = conversation.user_role;
-            chatUserRole.className = `user-role ${conversation.user_role}`;
+            chatTitle.textContent = conversation.listing.title;
+            chatPrice.textContent = `${parseFloat(conversation.listing.price || 0).toFixed(2)}`;
+            chatOtherUser.textContent = conversation.other_user.name;
+            chatUserRole.textContent = conversation.other_user.role;
+            chatUserRole.className = `user-role ${conversation.other_user.role}`;
         }
 
         // Load messages for conversation
@@ -1625,9 +1604,9 @@
             const searchTerm = document.getElementById('search-conversations').value.toLowerCase();
             
             filteredConversations = conversations.filter(conversation => {
-                return conversation.listing_title.toLowerCase().includes(searchTerm) ||
-                       conversation.other_user_name.toLowerCase().includes(searchTerm) ||
-                       (conversation.last_message && conversation.last_message.toLowerCase().includes(searchTerm));
+                return conversation.listing.title.toLowerCase().includes(searchTerm) ||
+                       conversation.other_user.name.toLowerCase().includes(searchTerm) ||
+                       (conversation.last_message_preview && conversation.last_message_preview.toLowerCase().includes(searchTerm));
             });
 
             displayConversations();
