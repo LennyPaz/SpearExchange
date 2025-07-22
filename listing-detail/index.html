@@ -1080,6 +1080,11 @@
             resize: vertical;
             transition: var(--transition);
             background: var(--white);
+            /* Ensure proper text selection and cursor navigation */
+            user-select: text;
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
         }
 
         .comment-textarea:focus {
@@ -2426,6 +2431,25 @@
             if (!listingId) {
                 showError();
                 return;
+            }
+
+            // Setup textarea keyboard navigation
+            const textarea = document.getElementById('comment-textarea');
+            if (textarea) {
+                // Allow normal arrow key navigation in textarea
+                textarea.addEventListener('keydown', function(e) {
+                    // Don't prevent default for navigation keys
+                    if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(e.key)) {
+                        e.stopPropagation(); // Stop event from bubbling up
+                        return true; // Allow default behavior
+                    }
+                });
+                
+                // Ensure focus and selection work properly
+                textarea.addEventListener('focus', function() {
+                    // Restore normal text selection behavior
+                    this.style.userSelect = 'text';
+                });
             }
 
             // Check authentication and load listing details
