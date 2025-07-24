@@ -625,6 +625,8 @@
             display: flex;
             flex-direction: column;
             background: white;
+            height: 100%;
+            min-height: 0;
         }
 
         .chat-header {
@@ -777,6 +779,8 @@
             flex-shrink: 0;
             position: relative;
             z-index: 10;
+            width: 100%;
+            box-sizing: border-box;
         }
 
         #message-input-area {
@@ -784,10 +788,13 @@
             visibility: visible !important;
             opacity: 1 !important;
             height: auto !important;
+            position: relative !important;
+            bottom: 0 !important;
         }
 
         .chat-area #message-input-area {
             order: 3;
+            margin-top: auto;
         }
 
         .message-input-container {
@@ -1710,7 +1717,7 @@
 
             if (chatThumbnail) chatThumbnail.innerHTML = imageContent;
             if (chatTitle) chatTitle.textContent = conversation.listing.title;
-            if (chatPrice) chatPrice.textContent = `${parseFloat(conversation.listing.price || 0).toFixed(2)}`;
+            if (chatPrice) chatPrice.textContent = `$${conversation.listing.price.toFixed(2)}`;
             if (chatOtherUser) chatOtherUser.textContent = conversation.other_user.name;
             if (chatUserRole) {
                 chatUserRole.textContent = capitalizeFirst(conversation.other_user.role);
