@@ -463,6 +463,7 @@
         .conversations-list {
             flex: 1;
             overflow-y: auto;
+            overflow-x: hidden;
         }
 
         .conversation-item {
@@ -545,6 +546,7 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            max-width: 200px;
         }
 
         .other-user {
@@ -793,6 +795,12 @@
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             background: white;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .message-input::-webkit-scrollbar {
+            display: none;
         }
 
         .message-input:focus {
@@ -913,6 +921,34 @@
             align-items: center;
             padding: 3rem;
             color: var(--text-light);
+            flex: 1;
+            background: #FAFBFC;
+        }
+
+        .chat-loading {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            flex: 1;
+            background: linear-gradient(180deg, #FAFBFC 0%, #F3F4F6 100%);
+            padding: 4rem 2rem;
+        }
+
+        .chat-loading .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(139, 38, 53, 0.1);
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1.5rem;
+        }
+
+        .chat-loading span {
+            color: var(--text-light);
+            font-size: 1rem;
+            font-weight: 500;
         }
 
         .spinner {
@@ -1532,12 +1568,21 @@
                 const conversationElement = createConversationElement(conversation);
                 conversationsList.appendChild(conversationElement);
             });
+            
+            // Reapply active state after rebuilding the list
+            if (selectedConversationId) {
+                const activeItem = conversationsList.querySelector(`[data-conversation-id="${selectedConversationId}"]`);
+                if (activeItem) {
+                    activeItem.classList.add('active');
+                }
+            }
         }
 
         // Create conversation element
         function createConversationElement(conversation) {
             const element = document.createElement('div');
             element.className = `conversation-item ${conversation.id === selectedConversationId ? 'active' : ''}`;
+            element.setAttribute('data-conversation-id', conversation.id);
             element.onclick = () => selectConversation(conversation.id);
 
             // Use the image URL from the API response (already parsed)
@@ -1574,39 +1619,67 @@
 
         // Select a conversation
         async function selectConversation(conversationId) {
+            console.log('🔄 Selecting conversation:', conversationId);
+            
+            // Immediately update UI to show selection
             selectedConversationId = conversationId;
             
-            // Update active state in sidebar
+            // Update active state in sidebar immediately using data attribute
             document.querySelectorAll('.conversation-item').forEach(item => {
                 item.classList.remove('active');
             });
             
-            // Find and activate the selected conversation item
-            const selectedItem = document.querySelector(`[onclick="selectConversation(${conversationId})"]`);
+            // Find and activate the selected conversation item immediately
+            const selectedItem = document.querySelector(`[data-conversation-id="${conversationId}"]`);
             if (selectedItem) {
                 selectedItem.classList.add('active');
+                console.log('✅ Conversation highlighted immediately');
+            } else {
+                console.warn('⚠️ Could not find conversation item to highlight');
             }
             
-            // Load conversation details and messages
-            await loadConversationDetails(conversationId);
-            await loadMessages(conversationId);
+            // Show loading state in chat area
+            showChatLoading();
+            console.log('⌛ Loading state shown');
             
-            // Mark messages as read
-            await markMessagesAsRead(conversationId);
-            
-            // Show chat interface
-            showChatInterface();
-            
-            // Handle mobile navigation
+            // Handle mobile navigation immediately
             if (window.innerWidth <= 800) {
                 showMobileChatView();
+            }
+            
+            try {
+                // Load conversation details and messages
+                console.log('📥 Loading conversation details...');
+                await loadConversationDetails(conversationId);
+                
+                console.log('📥 Loading messages...');
+                await loadMessages(conversationId);
+                
+                // Mark messages as read
+                console.log('✅ Marking messages as read...');
+                await markMessagesAsRead(conversationId);
+                
+                // Show chat interface
+                console.log('🎯 Showing chat interface');
+                showChatInterface();
+                
+                console.log('✅ Conversation loaded successfully');
+            } catch (error) {
+                console.error('❌ Error loading conversation:', error);
+                showChatError();
             }
         }
 
         // Load conversation details
         async function loadConversationDetails(conversationId) {
+            console.log(`📄 Loading conversation details for ${conversationId}`);
             const conversation = conversations.find(c => c.id === conversationId);
-            if (!conversation) return;
+            if (!conversation) {
+                console.error('❌ Conversation not found in conversations array');
+                return;
+            }
+
+            console.log('📄 Found conversation:', conversation);
 
             // Update chat header
             const chatThumbnail = document.getElementById('chat-listing-thumbnail');
@@ -1620,30 +1693,38 @@
                 ? `<img src="${conversation.listing.image_url}" alt="${conversation.listing.title}" onerror="this.style.display='none'">`
                 : `<i class="fas fa-image"></i>`;
 
-            chatThumbnail.innerHTML = imageContent;
-            chatTitle.textContent = conversation.listing.title;
-            chatPrice.textContent = `${parseFloat(conversation.listing.price || 0).toFixed(2)}`;
-            chatOtherUser.textContent = conversation.other_user.name;
-            chatUserRole.textContent = capitalizeFirst(conversation.other_user.role);
-            chatUserRole.className = `user-role ${conversation.other_user.role}`;
+            if (chatThumbnail) chatThumbnail.innerHTML = imageContent;
+            if (chatTitle) chatTitle.textContent = conversation.listing.title;
+            if (chatPrice) chatPrice.textContent = `${parseFloat(conversation.listing.price || 0).toFixed(2)}`;
+            if (chatOtherUser) chatOtherUser.textContent = conversation.other_user.name;
+            if (chatUserRole) {
+                chatUserRole.textContent = capitalizeFirst(conversation.other_user.role);
+                chatUserRole.className = `user-role ${conversation.other_user.role}`;
+            }
+            
+            console.log('✅ Conversation details loaded successfully');
         }
 
         // Load messages for conversation
         async function loadMessages(conversationId) {
             try {
+                console.log(`📥 Loading messages for conversation ${conversationId}`);
                 const response = await authenticatedFetch(`https://spear-exchange.lenny-paz123.workers.dev/api/conversations/${conversationId}/messages`);
                 
                 if (response.ok) {
                     const data = await response.json();
                     messages = data.messages || [];
+                    console.log(`✅ Loaded ${messages.length} messages`);
                     displayMessages();
                 } else {
+                    console.error('❌ Failed to load messages:', response.status, response.statusText);
                     throw new Error('Failed to load messages');
                 }
             } catch (error) {
-                console.error('Error loading messages:', error);
+                console.error('❌ Error loading messages:', error);
                 messages = [];
                 displayMessages();
+                throw error; // Re-throw to trigger error state
             }
         }
 
@@ -1766,10 +1847,82 @@
 
         // Show/hide UI elements
         function showChatInterface() {
+            console.log('🎯 showChatInterface called');
+            
             document.getElementById('empty-chat').style.display = 'none';
-            document.getElementById('chat-header').style.display = 'block';
-            document.getElementById('messages-area').style.display = 'flex';
-            document.getElementById('message-input-area').style.display = 'block';
+            const chatLoading = document.getElementById('chat-loading');
+            if (chatLoading) chatLoading.style.display = 'none';
+            const chatError = document.getElementById('chat-error');
+            if (chatError) chatError.style.display = 'none';
+            
+            const chatHeader = document.getElementById('chat-header');
+            const messagesArea = document.getElementById('messages-area');
+            const messageInputArea = document.getElementById('message-input-area');
+            
+            if (chatHeader) {
+                chatHeader.style.display = 'block';
+                console.log('✅ Chat header shown');
+            } else {
+                console.error('❌ Chat header element not found');
+            }
+            
+            if (messagesArea) {
+                messagesArea.style.display = 'flex';
+                console.log('✅ Messages area shown');
+            } else {
+                console.error('❌ Messages area element not found');
+            }
+            
+            if (messageInputArea) {
+                messageInputArea.style.display = 'block';
+                console.log('✅ Message input area shown');
+            } else {
+                console.error('❌ Message input area element not found');
+            }
+        }
+        
+        function showChatLoading() {
+            document.getElementById('empty-chat').style.display = 'none';
+            const chatError = document.getElementById('chat-error');
+            if (chatError) chatError.style.display = 'none';
+            document.getElementById('chat-header').style.display = 'none';
+            document.getElementById('messages-area').style.display = 'none';
+            document.getElementById('message-input-area').style.display = 'none';
+            
+            // Show or create loading state
+            let loadingElement = document.getElementById('chat-loading');
+            if (!loadingElement) {
+                loadingElement = document.createElement('div');
+                loadingElement.id = 'chat-loading';
+                loadingElement.className = 'chat-loading';
+                loadingElement.innerHTML = '<div class="spinner"></div><span>Loading conversation...</span>';
+                document.getElementById('chat-area').appendChild(loadingElement);
+            }
+            loadingElement.style.display = 'flex';
+        }
+        
+        function showChatError() {
+            document.getElementById('empty-chat').style.display = 'none';
+            const chatLoading = document.getElementById('chat-loading');
+            if (chatLoading) chatLoading.style.display = 'none';
+            document.getElementById('chat-header').style.display = 'none';
+            document.getElementById('messages-area').style.display = 'none';
+            document.getElementById('message-input-area').style.display = 'none';
+            
+            // Show or create error state
+            let errorElement = document.getElementById('chat-error');
+            if (!errorElement) {
+                errorElement = document.createElement('div');
+                errorElement.id = 'chat-error';
+                errorElement.className = 'empty-chat';
+                errorElement.innerHTML = `
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <h3>Failed to load conversation</h3>
+                    <p>Please try selecting the conversation again</p>
+                `;
+                document.getElementById('chat-area').appendChild(errorElement);
+            }
+            errorElement.style.display = 'flex';
         }
         
         // Mobile navigation functions
