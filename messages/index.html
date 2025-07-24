@@ -773,6 +773,21 @@
             border-top: 1px solid rgba(229, 231, 235, 0.6);
             background: linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, white 100%);
             backdrop-filter: blur(10px);
+            min-height: 80px;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 10;
+        }
+
+        #message-input-area {
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            height: auto !important;
+        }
+
+        .chat-area #message-input-area {
+            order: 3;
         }
 
         .message-input-container {
@@ -1861,6 +1876,8 @@
             
             if (chatHeader) {
                 chatHeader.style.display = 'block';
+                chatHeader.style.visibility = 'visible';
+                chatHeader.style.opacity = '1';
                 console.log('✅ Chat header shown');
             } else {
                 console.error('❌ Chat header element not found');
@@ -1868,6 +1885,10 @@
             
             if (messagesArea) {
                 messagesArea.style.display = 'flex';
+                messagesArea.style.visibility = 'visible';
+                messagesArea.style.opacity = '1';
+                messagesArea.style.height = 'auto';
+                messagesArea.style.flex = '1';
                 console.log('✅ Messages area shown');
             } else {
                 console.error('❌ Messages area element not found');
@@ -1875,7 +1896,24 @@
             
             if (messageInputArea) {
                 messageInputArea.style.display = 'block';
+                messageInputArea.style.visibility = 'visible';
+                messageInputArea.style.opacity = '1';
+                messageInputArea.style.height = 'auto';
+                messageInputArea.style.minHeight = '80px';
+                messageInputArea.style.position = 'relative';
+                messageInputArea.style.zIndex = '1';
+                
+                // Force reflow
+                void messageInputArea.offsetHeight;
+                
                 console.log('✅ Message input area shown');
+                console.log('🔍 Message input area computed styles:', {
+                    display: window.getComputedStyle(messageInputArea).display,
+                    visibility: window.getComputedStyle(messageInputArea).visibility,
+                    opacity: window.getComputedStyle(messageInputArea).opacity,
+                    height: window.getComputedStyle(messageInputArea).height,
+                    position: window.getComputedStyle(messageInputArea).position
+                });
             } else {
                 console.error('❌ Message input area element not found');
             }
