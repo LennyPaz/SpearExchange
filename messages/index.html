@@ -384,45 +384,6 @@
         /* Page Header */
         .page-header {
             margin-bottom: 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-        }
-
-        .page-header-content {
-            flex: 1;
-        }
-
-        .page-header-actions {
-            display: flex;
-            gap: 1rem;
-            align-items: center;
-        }
-
-        .reset-chat-btn {
-            background: linear-gradient(135deg, #6B7280, #4B5563);
-            color: white;
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            box-shadow: 0 2px 8px rgba(107, 114, 128, 0.2);
-        }
-
-        .reset-chat-btn:hover {
-            background: linear-gradient(135deg, #4B5563, #374151);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(107, 114, 128, 0.3);
-        }
-
-        .reset-chat-btn:active {
-            transform: translateY(0);
         }
 
         .page-title {
@@ -1125,18 +1086,6 @@
 
             .page-header {
                 margin-bottom: 1rem;
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 1rem;
-            }
-
-            .page-header-actions {
-                align-self: flex-end;
-            }
-
-            .reset-chat-btn {
-                padding: 0.5rem 1rem;
-                font-size: 0.8rem;
             }
 
             .page-title {
@@ -1410,16 +1359,8 @@
     <main class="main-content">
         <!-- Page Header -->
         <div class="page-header">
-            <div class="page-header-content">
-                <h1 class="page-title">Messages</h1>
-                <p class="page-subtitle">Connect with fellow Seminoles about your listings</p>
-            </div>
-            <div class="page-header-actions">
-                <button class="reset-chat-btn" onclick="resetChat()" title="Reset chat for demo">
-                    <i class="fas fa-refresh"></i>
-                    Reset Chat
-                </button>
-            </div>
+            <h1 class="page-title">Messages</h1>
+            <p class="page-subtitle">Connect with fellow Seminoles about your listings</p>
         </div>
 
         <!-- Messages Container -->
@@ -1904,6 +1845,14 @@
             
             // Window resize handler
             window.addEventListener('resize', handleWindowResize);
+            
+            // Keyboard shortcut for demo refresh (backtick key)
+            document.addEventListener('keydown', (e) => {
+                if (e.key === '`' && !e.ctrlKey && !e.altKey && !e.shiftKey) {
+                    e.preventDefault();
+                    refreshChatForDemo();
+                }
+            });
         }
 
         // Filter conversations based on search
@@ -2211,45 +2160,33 @@
             }
         });
         
-        // Reset chat function for demo purposes
-        function resetChat() {
-            console.log('🔄 Resetting chat for demo...');
+        // Refresh chat for demo purposes (triggered by backtick key)
+        async function refreshChatForDemo() {
+            console.log('🔄 Demo refresh triggered by backtick key...');
             
-            // Clear global state
-            selectedConversationId = null;
-            messages = [];
-            
-            // Clear active conversation highlighting
-            document.querySelectorAll('.conversation-item').forEach(item => {
-                item.classList.remove('active');
-            });
-            
-            // Hide all chat interface elements
-            document.getElementById('chat-header').style.display = 'none';
-            document.getElementById('messages-area').style.display = 'none';
-            document.getElementById('message-input-area').style.display = 'none';
-            
-            // Hide loading and error states
-            const chatLoading = document.getElementById('chat-loading');
-            if (chatLoading) chatLoading.style.display = 'none';
-            const chatError = document.getElementById('chat-error');
-            if (chatError) chatError.style.display = 'none';
-            
-            // Show empty chat state
-            document.getElementById('empty-chat').style.display = 'flex';
-            
-            // Reset mobile view if applicable
-            if (window.innerWidth <= 800) {
-                showMobileConversationsView();
+            try {
+                // Store current conversation ID
+                const currentConversationId = selectedConversationId;
+                
+                // Reload conversations (same as 30-second refresh)
+                await loadConversations();
+                
+                // If we were in a conversation, reload its messages
+                if (currentConversationId) {
+                    console.log(`🔄 Refreshing messages for conversation ${currentConversationId}`);
+                    await loadMessages(currentConversationId);
+                    
+                    // Ensure the conversation stays highlighted
+                    const activeItem = document.querySelector(`[data-conversation-id="${currentConversationId}"]`);
+                    if (activeItem) {
+                        activeItem.classList.add('active');
+                    }
+                }
+                
+                console.log('✅ Demo refresh completed!');
+            } catch (error) {
+                console.error('❌ Demo refresh failed:', error);
             }
-            
-            // Remove mobile back button if present
-            const backButton = document.querySelector('.mobile-chat-back');
-            if (backButton) {
-                backButton.remove();
-            }
-            
-            console.log('✅ Chat reset completed - ready for demo!');
         }
     </script>
 </body>
