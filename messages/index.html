@@ -1192,6 +1192,15 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+        }
 
         /* RESPONSIVE NAVIGATION - SAME BREAKPOINTS AS BROWSE LISTINGS */
         
@@ -1890,70 +1899,71 @@
 
         // Select a conversation
         async function selectConversation(conversationId) {
-            console.log('🔄 Selecting conversation:', conversationId);
+            if (selectedConversationId === conversationId) return;
             
-            // Immediately update UI to show selection
+            console.log(`🎯 Selecting conversation ${conversationId}`);
             selectedConversationId = conversationId;
             
-            // Update active state in sidebar immediately using data attribute
-            document.querySelectorAll('.conversation-item').forEach(item => {
-                item.classList.remove('active');
-            });
-            
-            // Find and activate the selected conversation item immediately
-            const selectedItem = document.querySelector(`[data-conversation-id="${conversationId}"]`);
-            if (selectedItem) {
-                selectedItem.classList.add('active');
-                console.log('✅ Conversation highlighted immediately');
-            } else {
-                console.warn('⚠️ Could not find conversation item to highlight');
-            }
-            
-            // Show loading state in chat area
-            showChatLoading();
-            console.log('⌛ Loading state shown');
-            
-            // Handle mobile navigation immediately
-            if (window.innerWidth <= 800) {
-                showMobileChatView();
-            }
+            // Update active conversation in UI
+            updateActiveConversation(conversationId);
             
             try {
-                // Load conversation details and messages
-                console.log('📥 Loading conversation details...');
-                await loadConversationDetails(conversationId);
+                showChatLoading();
                 
-                console.log('📥 Loading messages...');
+                // Load conversation details and messages
+                const conversation = conversations.find(c => c.id === conversationId);
+                if (conversation) {
+                    loadConversationDetails(conversation);
+                }
+                
                 await loadMessages(conversationId);
                 
-                // Mark messages as read
-                console.log('✅ Marking messages as read...');
-                await markMessagesAsRead(conversationId);
-                
-                // Show chat interface
-                console.log('🎯 Showing chat interface');
-                showChatInterface();
-                
-                // Connect to WebSocket for real-time messaging
-                console.log('🔌 Connecting to WebSocket...');
+                // Connect WebSocket for this conversation
                 connectWebSocket(conversationId);
                 
-                console.log('✅ Conversation loaded successfully');
+                // Mark messages as read
+                await markMessagesAsRead(conversationId);
+                
+                showChatInterface();
+                
+                // Enhanced auto-scroll for conversation load
+                setTimeout(() => {
+                    scrollToBottom();
+                }, 100);
+                
+                // Focus message input
+                const messageInput = document.getElementById('message-input');
+                if (messageInput) {
+                    messageInput.focus();
+                }
+                
+                // Show mobile chat view on mobile
+                if (window.innerWidth <= 800) {
+                    showMobileChatView();
+                }
+                
             } catch (error) {
                 console.error('❌ Error loading conversation:', error);
                 showChatError();
             }
         }
+        
+        // Update active conversation in UI
+        function updateActiveConversation(conversationId) {
+            document.querySelectorAll('.conversation-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            const selectedItem = document.querySelector(`[data-conversation-id="${conversationId}"]`);
+            if (selectedItem) {
+                selectedItem.classList.add('active');
+            }
+        }
 
         // Load conversation details
-        async function loadConversationDetails(conversationId) {
-            console.log(`📄 Loading conversation details for ${conversationId}`);
-            const conversation = conversations.find(c => c.id === conversationId);
-            if (!conversation) {
-                console.error('❌ Conversation not found in conversations array');
-                return;
-            }
-
+        async function loadConversationDetails(conversation) {
+            console.log(`📄 Loading conversation details for ${conversation.id}`);
+            
             console.log('📄 Found conversation:', conversation);
 
             // Update chat header
@@ -2013,8 +2023,12 @@
                 messagesArea.appendChild(messageElement);
             });
 
-            // Auto-scroll to bottom
-            scrollToBottom();
+            // Enhanced auto-scroll with proper timing
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    scrollToBottom();
+                });
+            });
         }
 
         // Create message element
@@ -2041,28 +2055,75 @@
 
             try {
                 sendButton.disabled = true;
+                sendButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
                 
-                const response = await authenticatedFetch(`https://spear-exchange.lenny-paz123.workers.dev/api/conversations/${selectedConversationId}/messages`, {
-                    method: 'POST',
-                    body: JSON.stringify({ message: messageText })
-                });
-
-                if (response.ok) {
-                    const result = await response.json();
-                    console.log('✅ Message sent successfully:', result.message);
-                    messageInput.value = '';
-                    await loadMessages(selectedConversationId);
-                    await loadConversations(); // Refresh to update last message
+                // Clear input immediately for better UX
+                messageInput.value = '';
+                
+                // Send via WebSocket if available, fallback to HTTP
+                if (websocket && websocket.readyState === WebSocket.OPEN) {
+                    // Send via WebSocket for real-time delivery
+                    sendWebSocketMessage('new_message', {
+                        content: messageText,
+                        conversationId: selectedConversationId
+                    });
+                    
+                    // Add message to UI optimistically
+                    const messageElement = createMessageElement({
+                        id: Date.now(), // Temporary ID
+                        sender_id: currentUser.id,
+                        sender_name: currentUser.name,
+                        message: messageText,
+                        created_at: new Date().toISOString()
+                    });
+                    
+                    const messagesArea = document.getElementById('messages-area');
+                    messagesArea.appendChild(messageElement);
+                    scrollToBottom(true); // Smooth scroll for sent messages
                 } else {
-                    const errorData = await response.json();
-                    console.error('❌ Failed to send message:', errorData);
-                    throw new Error(errorData.error || 'Failed to send message');
+                    // Fallback to HTTP API
+                    const response = await authenticatedFetch(`https://spear-exchange.lenny-paz123.workers.dev/api/conversations/${selectedConversationId}/messages`, {
+                        method: 'POST',
+                        body: JSON.stringify({ message: messageText })
+                    });
+
+                    if (response.ok) {
+                        const result = await response.json();
+                        console.log('✅ Message sent successfully:', result.message);
+                        
+                        // Add message to UI immediately
+                        const messageElement = createMessageElement({
+                            id: result.messageId || Date.now(),
+                            sender_id: currentUser.id,
+                            sender_name: currentUser.name,
+                            message: messageText,
+                            created_at: new Date().toISOString()
+                        });
+                        
+                        const messagesArea = document.getElementById('messages-area');
+                        messagesArea.appendChild(messageElement);
+                        scrollToBottom(true);
+                        
+                        // Update conversation list
+                        await loadConversations();
+                    } else {
+                        const errorData = await response.json();
+                        console.error('❌ Failed to send message:', errorData);
+                        // Restore message text on error
+                        messageInput.value = messageText;
+                        throw new Error(errorData.error || 'Failed to send message');
+                    }
                 }
             } catch (error) {
                 console.error('Error sending message:', error);
+                // Restore message text on error
+                if (!messageInput.value) {
+                    messageInput.value = messageText;
+                }
                 alert('Failed to send message. Please try again.');
             } finally {
                 sendButton.disabled = false;
+                sendButton.innerHTML = '<i class="fas fa-paper-plane"></i>';
                 messageInput.focus();
             }
         }
@@ -2233,79 +2294,83 @@
 		
          // ===== WEBSOCKET FUNCTIONALITY =====
         
-        // WebSocket connection management
+        // Enhanced WebSocket Connection with Ping Management
         function connectWebSocket(conversationId) {
-            if (!conversationId || !currentUser) {
-                console.warn('⚠️ Cannot connect WebSocket: missing conversationId or currentUser');
-                return;
-            }
+            if (!conversationId || !currentUser) return;
             
             // Close existing connection
             if (websocket) {
-                console.log('🔄 Closing existing WebSocket connection');
                 websocket.close(1000, 'Switching conversations');
             }
             
             console.log('🔌 Connecting to WebSocket for conversation:', conversationId);
             
-            // Determine WebSocket URL based on current location
-            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-            const host = 'spear-exchange.lenny-paz123.workers.dev';
+            const wsUrl = `wss://spear-exchange.lenny-paz123.workers.dev/api/chat/connect?conversationId=${conversationId}&userId=${currentUser.id}&userName=${encodeURIComponent(currentUser.name)}`;
             
-            // Add session token for authentication
-            const sessionToken = localStorage.getItem('sessionToken');
-            const wsUrl = `${protocol}//${host}/api/chat/connect?conversationId=${conversationId}&userId=${currentUser.id}&userName=${encodeURIComponent(currentUser.name)}&token=${sessionToken || ''}`;
-            console.log('🔗 WebSocket URL:', wsUrl.replace(sessionToken || '', '[TOKEN]'));
+            websocket = new WebSocket(wsUrl);
             
-            try {
-                websocket = new WebSocket(wsUrl);
+            websocket.onopen = () => {
+                console.log('✅ WebSocket connected');
+                reconnectAttempts = 0;
+                reconnectDelay = 1000;
+                updateConnectionStatus(true);
                 
-                websocket.onopen = () => {
-                    console.log('✅ WebSocket connected successfully');
-                    reconnectAttempts = 0;
-                    reconnectDelay = 1000;
+                // Send initial join message
+                sendWebSocketMessage('join_conversation', {
+                    conversationId: conversationId,
+                    userId: currentUser.id,
+                    userName: currentUser.name
+                });
+            };
+            
+            websocket.onmessage = (event) => {
+                try {
+                    const data = JSON.parse(event.data);
+                    handleWebSocketMessage(data);
+                } catch (error) {
+                    console.error('❌ Failed to parse WebSocket message:', error);
+                }
+            };
+            
+            websocket.onclose = (event) => {
+                console.log('❌ WebSocket disconnected:', event.code, event.reason);
+                updateConnectionStatus(false);
+                
+                // Only attempt to reconnect if not intentionally closed
+                if (event.code !== 1000 && reconnectAttempts < maxReconnectAttempts) {
+                    setTimeout(() => {
+                        reconnectAttempts++;
+                        console.log(`🔄 Reconnecting... (${reconnectAttempts}/${maxReconnectAttempts})`);
+                        connectWebSocket(conversationId);
+                    }, reconnectDelay);
                     
-                    // Send initial ping to verify connection
-                    sendWebSocketMessage('ping', { timestamp: new Date().toISOString() });
-                };
-                
-                websocket.onmessage = (event) => {
-                    try {
-                        const data = JSON.parse(event.data);
-                        handleWebSocketMessage(data);
-                    } catch (error) {
-                        console.error('❌ Error parsing WebSocket message:', error, event.data);
-                    }
-                };
-                
-                websocket.onclose = (event) => {
-                    console.log('❌ WebSocket disconnected:', event.code, event.reason);
-                    
-                    // Attempt to reconnect if not intentionally closed and still on same conversation
-                    if (event.code !== 1000 && 
-                        reconnectAttempts < maxReconnectAttempts && 
-                        selectedConversationId === conversationId &&
-                        !document.hidden) { // Don't reconnect if page is hidden
-                        
-                        setTimeout(() => {
-                            reconnectAttempts++;
-                            console.log(`🔄 Reconnecting... (${reconnectAttempts}/${maxReconnectAttempts})`);
-                            connectWebSocket(conversationId);
-                        }, reconnectDelay);
-                        
-                        // Exponential backoff
-                        reconnectDelay = Math.min(reconnectDelay * 2, 30000);
-                    }
-                };
-                
-                websocket.onerror = (error) => {
-                    console.error('❌ WebSocket error:', error);
-                };
-            } catch (error) {
-                console.error('❌ Failed to create WebSocket:', error);
-                // Show user-friendly error
-                showWebSocketError();
-            }
+                    // Exponential backoff
+                    reconnectDelay = Math.min(reconnectDelay * 2, 30000);
+                }
+            };
+            
+            websocket.onerror = (error) => {
+                console.error('❌ WebSocket error:', error);
+                updateConnectionStatus(false);
+            };
+            
+            // Enhanced ping mechanism
+            const pingInterval = setInterval(() => {
+                if (websocket && websocket.readyState === WebSocket.OPEN) {
+                    const pingData = {
+                        type: 'ping',
+                        timestamp: new Date().toISOString(),
+                        userId: currentUser.id
+                    };
+                    websocket.send(JSON.stringify(pingData));
+                    console.log('🏓 Sent ping to server');
+                } else {
+                    clearInterval(pingInterval);
+                }
+            }, 30000); // Ping every 30 seconds
+            
+            // Store ping interval for cleanup
+            websocket.pingInterval = pingInterval;
         }
 
         // Handle incoming WebSocket messages
@@ -2315,7 +2380,7 @@
             switch (data.type) {
                 case 'connection_established':
                     console.log('🎉 Connected to chat room');
-                    clearWebSocketError(); // Clear any existing error indicators
+                    updateConnectionStatus(true);
                     break;
                     
                 case 'ping':
@@ -2325,6 +2390,7 @@
                     
                 case 'pong':
                     console.log('🏓 Received pong from server');
+                    // Don't trigger user_left for pong responses
                     break;
                     
                 case 'new_message':
@@ -2344,7 +2410,12 @@
                     break;
                     
                 case 'user_left':
-                    handleUserLeft(data);
+                    // Only handle if it's not a ping-pong related disconnect
+                    if (!data.isPingPong) {
+                        handleUserLeft(data);
+                    } else {
+                        console.log('🏓 Ignoring ping-pong related user_left event');
+                    }
                     break;
                     
                 case 'messages_read':
@@ -2353,7 +2424,6 @@
                     
                 case 'error':
                     console.error('WebSocket error:', data.message);
-                    showWebSocketError(data.message);
                     break;
                     
                 default:
@@ -2542,16 +2612,71 @@
         }
 
         // Scroll to bottom helper
-        function scrollToBottom() {
+        function scrollToBottom(smooth = false) {
             const messagesArea = document.getElementById('messages-area');
-            if (messagesArea) {
-                // Use requestAnimationFrame to ensure DOM is updated
-                requestAnimationFrame(() => {
+            if (!messagesArea) return;
+            
+            // Use requestAnimationFrame to ensure DOM is updated
+            requestAnimationFrame(() => {
+                const scrollOptions = {
+                    top: messagesArea.scrollHeight,
+                    behavior: smooth ? 'smooth' : 'auto'
+                };
+                
+                try {
+                    messagesArea.scrollTo(scrollOptions);
+                } catch (error) {
+                    // Fallback for older browsers
                     messagesArea.scrollTop = messagesArea.scrollHeight;
-                });
-            }
+                }
+                
+                console.log('📜 Scrolled to bottom:', messagesArea.scrollHeight);
+            });
         }
 
+        // Enhanced Connection Status Management
+        function updateConnectionStatus(isConnected) {
+            const statusIndicator = document.getElementById('connection-status');
+            
+            if (!statusIndicator) {
+                // Create status indicator if it doesn't exist
+                const indicator = document.createElement('div');
+                indicator.id = 'connection-status';
+                indicator.className = 'connection-status';
+                indicator.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    padding: 8px 16px;
+                    border-radius: 20px;
+                    font-size: 0.875rem;
+                    font-weight: 500;
+                    z-index: 1000;
+                    display: none;
+                    align-items: center;
+                    gap: 8px;
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                    transition: all 0.3s ease;
+                `;
+                document.body.appendChild(indicator);
+            }
+            
+            const indicator = document.getElementById('connection-status');
+            
+            if (isConnected) {
+                indicator.style.background = '#10b981';
+                indicator.style.color = 'white';
+                indicator.innerHTML = '<i class="fas fa-wifi"></i> Connected';
+                indicator.style.display = 'none'; // Hide when connected
+            } else {
+                indicator.style.background = '#ef4444';
+                indicator.style.color = 'white';
+                indicator.innerHTML = '<i class="fas fa-wifi-slash"></i> Reconnecting...';
+                indicator.style.display = 'flex'; // Show when disconnected
+                indicator.style.animation = 'pulse 2s infinite';
+            }
+        }
+        
         // Clear WebSocket error indicator
         function clearWebSocketError() {
             const errorIndicator = document.getElementById('websocket-error');
