@@ -754,164 +754,6 @@
             }
         }
 
-        // WebSocket connection management
-        function connectWebSocket(conversationId) {
-            if (!conversationId || !currentUser) return;
-            
-            // Close existing connection
-            if (websocket) {
-                websocket.close();
-            }
-            
-            console.log('🔌 Connecting to WebSocket for conversation:', conversationId);
-            
-            const wsUrl = `wss://spear-exchange.lenny-paz123.workers.dev/api/chat/connect?conversationId=${conversationId}&userId=${currentUser.id}&userName=${encodeURIComponent(currentUser.name)}`;
-            
-            websocket = new WebSocket(wsUrl);
-            
-            websocket.onopen = () => {
-                console.log('✅ WebSocket connected');
-                reconnectAttempts = 0;
-                reconnectDelay = 1000;
-                updateConnectionStatus(true);
-            };
-            
-            websocket.onmessage = (event) => {
-                handleWebSocketMessage(JSON.parse(event.data));
-            };
-            
-            websocket.onclose = (event) => {
-                console.log('❌ WebSocket disconnected:', event.code, event.reason);
-                updateConnectionStatus(false);
-                
-                // Attempt to reconnect if not intentionally closed
-                if (event.code !== 1000 && reconnectAttempts < maxReconnectAttempts) {
-                    setTimeout(() => {
-                        reconnectAttempts++;
-                        console.log(`🔄 Reconnecting... (${reconnectAttempts}/${maxReconnectAttempts})`);
-                        connectWebSocket(conversationId);
-                    }, reconnectDelay);
-                    
-                    // Exponential backoff
-                    reconnectDelay = Math.min(reconnectDelay * 2, 30000);
-                }
-            };
-            
-            websocket.onerror = (error) => {
-                console.error('❌ WebSocket error:', error);
-            };
-        }
-
-        // Handle incoming WebSocket messages
-        function handleWebSocketMessage(data) {
-            console.log('📨 WebSocket message received:', data);
-            
-            switch (data.type) {
-                case 'connection_established':
-                    console.log('🎉 Connected to chat room');
-                    break;
-                    
-                case 'new_message':
-                    handleNewMessageReceived(data);
-                    break;
-                    
-                case 'typing_start':
-                    handleTypingStart(data);
-                    break;
-                    
-                case 'typing_stop':
-                    handleTypingStop(data);
-                    break;
-                    
-                case 'user_joined':
-                    handleUserJoined(data);
-                    break;
-                    
-                case 'user_left':
-                    handleUserLeft(data);
-                    break;
-                    
-                case 'messages_read':
-                    handleMessagesRead(data);
-                    break;
-                    
-                case 'error':
-                    console.error('WebSocket error:', data.message);
-                    break;
-                    
-                default:
-                    console.log('Unknown WebSocket message type:', data.type);
-            }
-        }
-
-        // Handle new message received via WebSocket
-        function handleNewMessageReceived(data) {
-            // Only add if it's not from current user (avoid duplicates)
-            if (data.senderId !== currentUser.id) {
-                // Add message to the UI
-                const messagesArea = document.getElementById('messages-area');
-                const messageElement = createMessageElement({
-                    id: data.messageId,
-                    sender_id: data.senderId,
-                    sender_name: data.senderName,
-                    message: data.content,
-                    created_at: data.timestamp
-                });
-                
-                messagesArea.appendChild(messageElement);
-                scrollToBottom();
-                
-                // Play notification sound
-                playNotificationSound();
-                
-                // Update conversation list
-                loadConversations();
-            }
-        }
-
-        // Handle typing indicators
-        function handleTypingStart(data) {
-            if (data.userId !== currentUser.id) {
-                showTypingIndicator(data.userName);
-            }
-        }
-
-        function handleTypingStop(data) {
-            if (data.userId !== currentUser.id) {
-                hideTypingIndicator();
-            }
-        }
-
-        // Handle user presence
-        function handleUserJoined(data) {
-            if (data.userId !== currentUser.id) {
-                activeUsers.add(data.userId);
-                updateActiveUsersDisplay();
-                console.log(`👋 ${data.userName} joined the conversation`);
-            }
-        }
-
-        function handleUserLeft(data) {
-            activeUsers.delete(data.userId);
-            updateActiveUsersDisplay();
-            hideTypingIndicator();
-            console.log(`👋 ${data.userName} left the conversation`);
-        }
-
-        // Handle read receipts
-        function handleMessagesRead(data) {
-            console.log(`✓ User ${data.userId} read messages`);
-        }
-
-        // Send WebSocket message
-        function sendWebSocketMessage(type, data = {}) {
-            if (websocket && websocket.readyState === WebSocket.OPEN) {
-                websocket.send(JSON.stringify({ type, ...data }));
-                return true;
-            }
-            return false;
-        }
-
         .message-content {
             margin-bottom: 0.25rem;
             line-height: 1.4;
@@ -1871,6 +1713,10 @@
                 console.log('🎯 Showing chat interface');
                 showChatInterface();
                 
+                // Connect to WebSocket for real-time messaging
+                console.log('🔌 Connecting to WebSocket...');
+                connectWebSocket(conversationId);
+                
                 console.log('✅ Conversation loaded successfully');
             } catch (error) {
                 console.error('❌ Error loading conversation:', error);
@@ -2163,7 +2009,260 @@
             }
             errorElement.style.display = 'flex';
         }
+		
+         // ===== WEBSOCKET FUNCTIONALITY =====
         
+        // WebSocket connection management
+        function connectWebSocket(conversationId) {
+            if (!conversationId || !currentUser) {
+                console.warn('⚠️ Cannot connect WebSocket: missing conversationId or currentUser');
+                return;
+            }
+            
+            // Close existing connection
+            if (websocket) {
+                console.log('🔄 Closing existing WebSocket connection');
+                websocket.close(1000, 'Switching conversations');
+            }
+            
+            console.log('🔌 Connecting to WebSocket for conversation:', conversationId);
+            
+            const wsUrl = `wss://spear-exchange.lenny-paz123.workers.dev/api/chat/connect?conversationId=${conversationId}&userId=${currentUser.id}&userName=${encodeURIComponent(currentUser.name)}`;
+            console.log('🔗 WebSocket URL:', wsUrl);
+            
+            try {
+                websocket = new WebSocket(wsUrl);
+                
+                websocket.onopen = () => {
+                    console.log('✅ WebSocket connected successfully');
+                    reconnectAttempts = 0;
+                    reconnectDelay = 1000;
+                };
+                
+                websocket.onmessage = (event) => {
+                    try {
+                        const data = JSON.parse(event.data);
+                        handleWebSocketMessage(data);
+                    } catch (error) {
+                        console.error('❌ Error parsing WebSocket message:', error, event.data);
+                    }
+                };
+                
+                websocket.onclose = (event) => {
+                    console.log('❌ WebSocket disconnected:', event.code, event.reason);
+                    
+                    // Attempt to reconnect if not intentionally closed
+                    if (event.code !== 1000 && reconnectAttempts < maxReconnectAttempts && selectedConversationId === conversationId) {
+                        setTimeout(() => {
+                            reconnectAttempts++;
+                            console.log(`🔄 Reconnecting... (${reconnectAttempts}/${maxReconnectAttempts})`);
+                            connectWebSocket(conversationId);
+                        }, reconnectDelay);
+                        
+                        // Exponential backoff
+                        reconnectDelay = Math.min(reconnectDelay * 2, 30000);
+                    }
+                };
+                
+                websocket.onerror = (error) => {
+                    console.error('❌ WebSocket error:', error);
+                };
+            } catch (error) {
+                console.error('❌ Failed to create WebSocket:', error);
+            }
+        }
+
+        // Handle incoming WebSocket messages
+        function handleWebSocketMessage(data) {
+            console.log('📨 WebSocket message received:', data);
+            
+            switch (data.type) {
+                case 'connection_established':
+                    console.log('🎉 Connected to chat room');
+                    break;
+                    
+                case 'new_message':
+                    handleNewMessageReceived(data);
+                    break;
+                    
+                case 'typing_start':
+                    handleTypingStart(data);
+                    break;
+                    
+                case 'typing_stop':
+                    handleTypingStop(data);
+                    break;
+                    
+                case 'user_joined':
+                    handleUserJoined(data);
+                    break;
+                    
+                case 'user_left':
+                    handleUserLeft(data);
+                    break;
+                    
+                case 'messages_read':
+                    handleMessagesRead(data);
+                    break;
+                    
+                case 'error':
+                    console.error('WebSocket error:', data.message);
+                    break;
+                    
+                default:
+                    console.log('Unknown WebSocket message type:', data.type);
+            }
+        }
+
+        // Handle new message received via WebSocket
+        function handleNewMessageReceived(data) {
+            // Only add if it's not from current user (avoid duplicates)
+            if (data.senderId !== currentUser.id) {
+                // Add message to the UI
+                const messagesArea = document.getElementById('messages-area');
+                if (messagesArea) {
+                    const messageElement = createMessageElement({
+                        id: data.messageId,
+                        sender_id: data.senderId,
+                        sender_name: data.senderName,
+                        message: data.content,
+                        created_at: data.timestamp
+                    });
+                    
+                    messagesArea.appendChild(messageElement);
+                    scrollToBottom();
+                    
+                    // Play notification sound
+                    playNotificationSound();
+                    
+                    // Update conversation list to show new message
+                    loadConversations();
+                }
+            }
+        }
+
+        // Handle typing indicators
+        function handleTypingStart(data) {
+            if (data.userId !== currentUser.id) {
+                showTypingIndicator(data.userName);
+            }
+        }
+
+        function handleTypingStop(data) {
+            if (data.userId !== currentUser.id) {
+                hideTypingIndicator();
+            }
+        }
+
+        // Handle user presence
+        function handleUserJoined(data) {
+            if (data.userId !== currentUser.id) {
+                activeUsers.add(data.userId);
+                updateActiveUsersDisplay();
+                console.log(`👋 ${data.userName} joined the conversation`);
+            }
+        }
+
+        function handleUserLeft(data) {
+            activeUsers.delete(data.userId);
+            updateActiveUsersDisplay();
+            hideTypingIndicator();
+            console.log(`👋 ${data.userName} left the conversation`);
+        }
+
+        // Handle read receipts
+        function handleMessagesRead(data) {
+            console.log(`✓ User ${data.userId} read messages`);
+        }
+
+        // Send WebSocket message
+        function sendWebSocketMessage(type, data = {}) {
+            if (websocket && websocket.readyState === WebSocket.OPEN) {
+                const message = { type, ...data };
+                console.log('📤 Sending WebSocket message:', message);
+                websocket.send(JSON.stringify(message));
+                return true;
+            } else {
+                console.warn('⚠️ Cannot send WebSocket message: connection not open');
+                return false;
+            }
+        }
+
+        // Typing indicator functions
+        function showTypingIndicator(userName) {
+            let indicator = document.getElementById('typing-indicator');
+            if (!indicator) {
+                indicator = document.createElement('div');
+                indicator.id = 'typing-indicator';
+                indicator.className = 'typing-indicator';
+                indicator.innerHTML = `
+                    <span class="typing-user"></span> is typing
+                    <div class="typing-dots">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                `;
+                
+                const messagesArea = document.getElementById('messages-area');
+                if (messagesArea) {
+                    messagesArea.appendChild(indicator);
+                }
+            }
+            
+            const typingUser = indicator.querySelector('.typing-user');
+            if (typingUser) {
+                typingUser.textContent = userName;
+            }
+            
+            indicator.style.display = 'flex';
+            scrollToBottom();
+        }
+
+        function hideTypingIndicator() {
+            const indicator = document.getElementById('typing-indicator');
+            if (indicator) {
+                indicator.style.display = 'none';
+            }
+        }
+
+        // Notification sound (optional)
+        function playNotificationSound() {
+            try {
+                // Create a simple notification sound
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+                gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.1);
+            } catch (error) {
+                // Silent fail if audio context is not available
+                console.log('Audio notification not available');
+            }
+        }
+
+        // Scroll to bottom helper
+        function scrollToBottom() {
+            const messagesArea = document.getElementById('messages-area');
+            if (messagesArea) {
+                messagesArea.scrollTop = messagesArea.scrollHeight;
+            }
+        }
+
+        // Update active users display
+        function updateActiveUsersDisplay() {
+            // This could be implemented to show active user count
+            console.log('Active users:', Array.from(activeUsers));
+        }
+		
         // Mobile navigation functions
         function showMobileChatView() {
             const conversationsSidebar = document.querySelector('.conversations-sidebar');
