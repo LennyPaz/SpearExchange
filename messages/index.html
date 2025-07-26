@@ -464,6 +464,26 @@
             flex: 1;
             overflow-y: auto;
             overflow-x: hidden;
+            max-height: calc(100vh - 200px); /* Ensure it doesn't exceed viewport */
+        }
+        
+        /* Custom scrollbar styling */
+        .conversations-list::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .conversations-list::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+        
+        .conversations-list::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
+        }
+        
+        .conversations-list::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
         }
 
         .conversation-item {
@@ -1683,12 +1703,16 @@
 
         // WebSocket state
         let websocket = null;
+        let globalWebSocket = null; // Global connection for all conversations
         let reconnectAttempts = 0;
         let maxReconnectAttempts = 5;
         let reconnectDelay = 1000; // Start with 1 second
         let typingTimeout = null;
         let isTyping = false;
         let activeUsers = new Set();
+        let audioContext = null;
+        let notificationQueue = [];
+        let isAudioInitialized = false;
 
         // Helper function to detect mobile
         function isMobile() {
@@ -1757,10 +1781,20 @@
             setupEventListeners();
             startAutoRefresh();
             
+            // Initialize global WebSocket connection
+            connectGlobalWebSocket();
+            
+            // Initialize audio on first user interaction
+            document.addEventListener('click', initializeAudioContext, { once: true });
+            document.addEventListener('keydown', initializeAudioContext, { once: true });
+            
             // Handle page unload to close WebSocket
             window.addEventListener('beforeunload', () => {
                 if (websocket) {
                     websocket.close();
+                }
+                if (globalWebSocket) {
+                    globalWebSocket.close();
                 }
             });
             
@@ -1770,6 +1804,11 @@
                     console.log('Page hidden');
                 } else {
                     console.log('Page visible');
+                    // Reconnect global WebSocket if needed
+                    if (!globalWebSocket || globalWebSocket.readyState !== WebSocket.OPEN) {
+                        connectGlobalWebSocket();
+                    }
+                    // Reconnect conversation WebSocket if needed
                     if (selectedConversationId && (!websocket || websocket.readyState !== WebSocket.OPEN)) {
                         connectWebSocket(selectedConversationId);
                     }
@@ -1957,6 +1996,12 @@
             const selectedItem = document.querySelector(`[data-conversation-id="${conversationId}"]`);
             if (selectedItem) {
                 selectedItem.classList.add('active');
+                
+                // Clear unread count when entering conversation
+                const unreadElement = selectedItem.querySelector('.unread-count');
+                if (unreadElement) {
+                    unreadElement.remove();
+                }
             }
         }
 
@@ -2294,7 +2339,51 @@
 		
          // ===== WEBSOCKET FUNCTIONALITY =====
         
-        // Enhanced WebSocket Connection with Ping Management
+        // Initialize global WebSocket connection for all conversations
+        function connectGlobalWebSocket() {
+            if (!currentUser) return;
+            
+            console.log('🌐 Connecting to global WebSocket for all conversations');
+            
+            const wsUrl = `wss://spear-exchange.lenny-paz123.workers.dev/api/chat/connect?userId=${currentUser.id}&userName=${encodeURIComponent(currentUser.name)}&global=true`;
+            
+            globalWebSocket = new WebSocket(wsUrl);
+            
+            globalWebSocket.onopen = () => {
+                console.log('✅ Global WebSocket connected');
+                updateConnectionStatus(true);
+            };
+            
+            globalWebSocket.onmessage = (event) => {
+                try {
+                    const data = JSON.parse(event.data);
+                    handleGlobalWebSocketMessage(data);
+                } catch (error) {
+                    console.error('❌ Failed to parse global WebSocket message:', error);
+                }
+            };
+            
+            globalWebSocket.onclose = (event) => {
+                console.log('❌ Global WebSocket disconnected:', event.code, event.reason);
+                updateConnectionStatus(false);
+                
+                // Attempt to reconnect
+                if (event.code !== 1000 && reconnectAttempts < maxReconnectAttempts) {
+                    setTimeout(() => {
+                        reconnectAttempts++;
+                        console.log(`🔄 Reconnecting global WebSocket... (${reconnectAttempts}/${maxReconnectAttempts})`);
+                        connectGlobalWebSocket();
+                    }, reconnectDelay);
+                    
+                    reconnectDelay = Math.min(reconnectDelay * 2, 30000);
+                }
+            };
+            
+            globalWebSocket.onerror = (error) => {
+                console.error('❌ Global WebSocket error:', error);
+                updateConnectionStatus(false);
+            };
+        }
         function connectWebSocket(conversationId) {
             if (!conversationId || !currentUser) return;
             
@@ -2373,7 +2462,170 @@
             websocket.pingInterval = pingInterval;
         }
 
-        // Handle incoming WebSocket messages
+        // Handle global WebSocket messages (for all conversations)
+        function handleGlobalWebSocketMessage(data) {
+            console.log('🌐 Global WebSocket message received:', data);
+            
+            switch (data.type) {
+                case 'connection_established':
+                    console.log('🎉 Connected to global chat system');
+                    break;
+                    
+                case 'new_message':
+                    handleGlobalNewMessage(data);
+                    break;
+                    
+                case 'conversation_updated':
+                    handleConversationUpdate(data);
+                    break;
+                    
+                case 'ping':
+                    // Respond to ping with pong
+                    sendGlobalWebSocketMessage('pong', { timestamp: new Date().toISOString() });
+                    break;
+                    
+                case 'pong':
+                    console.log('🏓 Global pong received');
+                    break;
+                    
+                default:
+                    console.log('Unknown global message type:', data.type);
+            }
+        }
+        
+        // Handle new messages from any conversation
+        function handleGlobalNewMessage(data) {
+            const conversationId = data.conversationId;
+            
+            // If this is for the currently active conversation, let the regular handler deal with it
+            if (conversationId === selectedConversationId) {
+                return;
+            }
+            
+            // Update conversation in sidebar
+            updateConversationInSidebar(data);
+            
+            // Show notification for non-active conversations
+            showCrossConversationNotification(data);
+            
+            // Play notification sound
+            playNotificationSound();
+        }
+        
+        // Update conversation in sidebar with new message
+        function updateConversationInSidebar(messageData) {
+            const conversationId = messageData.conversationId;
+            const conversationItem = document.querySelector(`[data-conversation-id="${conversationId}"]`);
+            
+            if (conversationItem) {
+                // Update last message preview
+                const lastMessageElement = conversationItem.querySelector('.last-message');
+                if (lastMessageElement) {
+                    lastMessageElement.textContent = messageData.content.substring(0, 50) + (messageData.content.length > 50 ? '...' : '');
+                }
+                
+                // Update time
+                const timeElement = conversationItem.querySelector('.conversation-time');
+                if (timeElement) {
+                    timeElement.textContent = formatConversationTime(messageData.timestamp);
+                }
+                
+                // Update or add unread count
+                updateUnreadCount(conversationId, conversationItem);
+                
+                // Move conversation to top
+                moveConversationToTop(conversationItem);
+            }
+        }
+        
+        // Update unread count for a conversation
+        function updateUnreadCount(conversationId, conversationItem) {
+            let unreadElement = conversationItem.querySelector('.unread-count');
+            
+            if (!unreadElement) {
+                // Create unread count element
+                unreadElement = document.createElement('span');
+                unreadElement.className = 'unread-count';
+                unreadElement.textContent = '1';
+                
+                const metaElement = conversationItem.querySelector('.conversation-meta');
+                if (metaElement) {
+                    metaElement.appendChild(unreadElement);
+                }
+            } else {
+                // Increment existing count
+                const currentCount = parseInt(unreadElement.textContent) || 0;
+                unreadElement.textContent = (currentCount + 1).toString();
+            }
+        }
+        
+        // Move conversation to top of list
+        function moveConversationToTop(conversationItem) {
+            const conversationsList = document.getElementById('conversations-list');
+            const firstChild = conversationsList.firstChild;
+            
+            // Only move if it's not already at the top
+            if (firstChild !== conversationItem) {
+                conversationsList.insertBefore(conversationItem, firstChild);
+                
+                // Add a subtle animation
+                conversationItem.style.backgroundColor = 'rgba(139, 38, 53, 0.1)';
+                setTimeout(() => {
+                    conversationItem.style.backgroundColor = '';
+                }, 2000);
+            }
+        }
+        
+        // Show notification for messages in other conversations
+        function showCrossConversationNotification(messageData) {
+            // Create a temporary notification element
+            const notification = document.createElement('div');
+            notification.className = 'cross-conversation-notification';
+            notification.style.cssText = `
+                position: fixed;
+                top: 80px;
+                right: 20px;
+                background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+                color: white;
+                padding: 12px 16px;
+                border-radius: 12px;
+                box-shadow: 0 4px 20px rgba(139, 38, 53, 0.3);
+                z-index: 1001;
+                max-width: 300px;
+                opacity: 0;
+                transform: translateX(100%);
+                transition: all 0.3s ease;
+                cursor: pointer;
+            `;
+            
+            notification.innerHTML = `
+                <div style="font-weight: 600; margin-bottom: 4px;">💬 New Message</div>
+                <div style="font-size: 0.9rem; opacity: 0.9;">
+                    <strong>${messageData.senderName}:</strong> ${messageData.content.substring(0, 50)}${messageData.content.length > 50 ? '...' : ''}
+                </div>
+            `;
+            
+            // Click to open conversation
+            notification.onclick = () => {
+                selectConversation(messageData.conversationId);
+                notification.remove();
+            };
+            
+            document.body.appendChild(notification);
+            
+            // Animate in
+            requestAnimationFrame(() => {
+                notification.style.opacity = '1';
+                notification.style.transform = 'translateX(0)';
+            });
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                notification.style.transform = 'translateX(100%)';
+                setTimeout(() => notification.remove(), 300);
+            }, 5000);
+        }
         function handleWebSocketMessage(data) {
             console.log('📨 WebSocket message received:', data);
             
@@ -2537,7 +2789,17 @@
             }, 5000);
         }
 
-        // Send WebSocket message
+        // Send global WebSocket message
+        function sendGlobalWebSocketMessage(type, data = {}) {
+            if (globalWebSocket && globalWebSocket.readyState === WebSocket.OPEN) {
+                const message = { type, ...data };
+                globalWebSocket.send(JSON.stringify(message));
+                return true;
+            } else {
+                console.warn('⚠️ Cannot send global WebSocket message: connection not open');
+                return false;
+            }
+        }
         function sendWebSocketMessage(type, data = {}) {
             if (websocket && websocket.readyState === WebSocket.OPEN) {
                 const message = { type, ...data };
@@ -2588,26 +2850,62 @@
             }
         }
 
-        // Notification sound (optional)
+        // Initialize audio context after user interaction
+        function initializeAudioContext() {
+            if (isAudioInitialized) return;
+            
+            try {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                isAudioInitialized = true;
+                console.log('🔊 Audio context initialized');
+                
+                // Process any queued notifications
+                if (notificationQueue.length > 0) {
+                    notificationQueue.forEach(() => playNotificationSound());
+                    notificationQueue = [];
+                }
+            } catch (error) {
+                console.error('Failed to initialize audio context:', error);
+            }
+        }
+        
+        // Enhanced notification sound with proper user gesture handling
         function playNotificationSound() {
             try {
-                // Create a simple notification sound
-                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                if (!isAudioInitialized) {
+                    // Queue the notification for later
+                    notificationQueue.push(true);
+                    return;
+                }
+                
+                if (!audioContext) {
+                    initializeAudioContext();
+                    return;
+                }
+                
+                // Resume audio context if suspended
+                if (audioContext.state === 'suspended') {
+                    audioContext.resume();
+                }
+                
+                // Create a pleasant notification sound
                 const oscillator = audioContext.createOscillator();
                 const gainNode = audioContext.createGain();
                 
                 oscillator.connect(gainNode);
                 gainNode.connect(audioContext.destination);
                 
+                // Create a pleasant two-tone notification
                 oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+                oscillator.frequency.setValueAtTime(1000, audioContext.currentTime + 0.1);
+                
                 gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
                 
                 oscillator.start(audioContext.currentTime);
-                oscillator.stop(audioContext.currentTime + 0.1);
+                oscillator.stop(audioContext.currentTime + 0.3);
             } catch (error) {
-                // Silent fail if audio context is not available
-                console.log('Audio notification not available');
+                console.log('Audio notification not available:', error);
             }
         }
 
