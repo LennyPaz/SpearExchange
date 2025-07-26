@@ -2243,14 +2243,20 @@
             }
         }
 
-        // Start auto-refresh
+        // Start auto-refresh - DISABLED when using WebSockets
         function startAutoRefresh() {
+            // WebSocket handles real-time updates, so we don't need polling
+            // Only enable refresh as fallback if WebSocket fails
+            console.log('🔄 Auto-refresh disabled - using WebSocket for real-time updates');
+            
+            // Optional: Enable a much slower fallback refresh (5 minutes) only for conversations list
+            // in case WebSocket connection fails
             refreshInterval = setInterval(async () => {
-                if (selectedConversationId) {
-                    await loadMessages(selectedConversationId);
+                if (!websocket || websocket.readyState !== WebSocket.OPEN) {
+                    console.log('🔄 WebSocket not connected, refreshing conversations list...');
+                    await loadConversations();
                 }
-                await loadConversations();
-            }, 30000); // Refresh every 30 seconds
+            }, 300000); // 5 minutes instead of 30 seconds
         }
 
         // Mobile menu functions
