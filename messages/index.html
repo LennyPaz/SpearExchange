@@ -20,7 +20,7 @@
             --shadow-light: 0 2px 10px rgba(0,0,0,0.08);
             --shadow-medium: 0 8px 30px rgba(0,0,0,0.12);
             --border-radius: 12px;
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1)
         }
 
         * {
@@ -2220,7 +2220,140 @@
                 if (timeout) clearTimeout(timeout);
             });
         }
+        // Update conversation unread count
+        function updateConversationUnreadCount(conversationId) {
+            const conversationElement = document.querySelector(`[data-conversation-id="${conversationId}"]`);
+            if (conversationElement) {
+                let unreadElement = conversationElement.querySelector('.unread-count');
+                if (!unreadElement) {
+                    unreadElement = document.createElement('span');
+                    unreadElement.className = 'unread-count';
+                    const metaElement = conversationElement.querySelector('.conversation-meta');
+                    if (metaElement) {
+                        metaElement.appendChild(unreadElement);
+                    }
+                }
+                
+                // Get current count and increment
+                const currentCount = parseInt(unreadElement.textContent) || 0;
+                unreadElement.textContent = currentCount + 1;
+            }
+        }
         
+        // Enhanced WebSocket message handler for conversation
+        function handleWebSocketMessage(data) {
+            console.log('💬 WebSocket message:', data.type);
+            
+            switch (data.type) {
+                case 'connection_established':
+                    console.log('✅ Conversation connection established');
+                    updateConnectionStatus('connected');
+                    break;
+                    
+                case 'new_message':
+                    if (data.conversationId === selectedConversationId) {
+                        // Add message to current conversation
+                        const messageElement = createMessageElement({
+                            id: data.messageId,
+                            sender_id: data.senderId,
+                            sender_name: data.senderName,
+                            message: data.content,
+                            created_at: data.timestamp
+                        }, 'delivered');
+                        
+                        const messagesArea = document.getElementById('messages-area');
+                        if (messagesArea) {
+                            messagesArea.appendChild(messageElement);
+                            scrollToBottom(true);
+                        }
+                        
+                        // Play sound for received messages
+                        if (data.senderId !== currentUser.id) {
+                            playNotificationSound('message');
+                        }
+                    }
+                    break;
+                    
+                case 'typing_start':
+                    if (data.userId !== currentUser.id) {
+                        showTypingIndicator(data.userName);
+                    }
+                    break;
+                    
+                case 'typing_stop':
+                    hideTypingIndicator(data.userId);
+                    break;
+                    
+                case 'delivery_receipt':
+                    updateMessageStatus(data.messageId, 'delivered');
+                    break;
+                    
+                case 'read_receipt':
+                    updateMessageStatus(data.messageId, 'read');
+                    break;
+                    
+                case 'user_joined':
+                    console.log(`User ${data.userName} joined the conversation`);
+                    break;
+                    
+                case 'user_left':
+                    console.log(`User ${data.userName} left the conversation`);
+                    hideTypingIndicator(data.userId);
+                    break;
+                    
+                case 'ping':
+                    // Respond to server ping
+                    if (websocket && websocket.readyState === WebSocket.OPEN) {
+                        websocket.send(JSON.stringify({
+                            type: 'pong',
+                            timestamp: data.timestamp,
+                            clientTime: Date.now()
+                        }));
+                    }
+                    break;
+                    
+                case 'pong':
+                    handlePongResponse(data);
+                    break;
+                    
+                case 'catchup_start':
+                    console.log(`🔄 Receiving ${data.messageCount} missed messages`);
+                    break;
+                    
+                case 'missed_message':
+                    // Handle missed message during catchup
+                    const missedMessageElement = createMessageElement({
+                        id: data.messageId,
+                        sender_id: data.senderId,
+                        sender_name: data.senderName,
+                        message: data.content,
+                        created_at: data.timestamp
+                    });
+                    
+                    const messagesArea2 = document.getElementById('messages-area');
+                    if (messagesArea2) {
+                        messagesArea2.appendChild(missedMessageElement);
+                    }
+                    break;
+                    
+                case 'catchup_complete':
+                    console.log('✅ Message catchup complete');
+                    scrollToBottom();
+                    break;
+                    
+                case 'error':
+                    console.error('❌ WebSocket error:', data.message);
+                    if (data.tempId) {
+                        updateMessageStatus(data.tempId, 'failed');
+                    }
+                    showErrorFeedback(data.message);
+                    break;
+                    
+                default:
+                    console.log('🤷 Unknown message type:', data.type);
+            }
+        }
+           
         // Check authentication
         async function checkAuthentication() {
             const authResult = await enhancedCheckAuth();
@@ -3160,7 +3293,31 @@
             }, 5000);
         }
         
-        // ===== WEBSOCKET FUNCTIONALITY =====
+        // Stop ping interval for a session
+        function stopPingInterval(session) {
+            if (session && session.pingInterval) {
+                clearInterval(session.pingInterval);
+                session.pingInterval = null;
+            }
+        }
+        
+        // Send WebSocket message safely
+        function sendWebSocketMessage(type, data) {
+            if (websocket && websocket.readyState === WebSocket.OPEN) {
+                try {
+                    websocket.send(JSON.stringify({
+                        type: type,
+                        ...data,
+                        timestamp: new Date().toISOString()
+                    }));
+                    return true;
+                } catch (error) {
+                    console.error('Failed to send WebSocket message:', error);
+                    return false;
+                }
+            }
+            return false;
+        }
         
         // Initialize global WebSocket connection for all conversations
         function connectGlobalWebSocket() {
@@ -3174,7 +3331,10 @@
             
             globalWebSocket.onopen = () => {
                 console.log('✅ Global WebSocket connected');
-                updateConnectionStatus(true);
+                reconnectAttempts = 0;
+                reconnectDelay = 1000;
+                updateConnectionStatus('connected');
+                playNotificationSound('connected');
             };
             
             globalWebSocket.onmessage = (event) => {
@@ -3188,24 +3348,71 @@
             
             globalWebSocket.onclose = (event) => {
                 console.log('❌ Global WebSocket disconnected:', event.code, event.reason);
-                updateConnectionStatus(false);
+                updateConnectionStatus('disconnected');
                 
-                // Attempt to reconnect
+                // Attempt to reconnect if not intentionally closed
                 if (event.code !== 1000 && reconnectAttempts < maxReconnectAttempts) {
+                    updateConnectionStatus('reconnecting');
                     setTimeout(() => {
                         reconnectAttempts++;
                         console.log(`🔄 Reconnecting global WebSocket... (${reconnectAttempts}/${maxReconnectAttempts})`);
                         connectGlobalWebSocket();
                     }, reconnectDelay);
                     
-                    reconnectDelay = Math.min(reconnectDelay * 2, 30000);
+                    reconnectDelay = Math.min(reconnectDelay * 2, 30000); // Max 30 seconds
                 }
             };
             
             globalWebSocket.onerror = (error) => {
                 console.error('❌ Global WebSocket error:', error);
-                updateConnectionStatus(false);
+                updateConnectionStatus('disconnected');
             };
+        }
+        
+        // Handle global WebSocket messages
+        function handleGlobalWebSocketMessage(data) {
+            console.log('🌐 Global WebSocket message:', data.type);
+            
+            switch (data.type) {
+                case 'connection_established':
+                    console.log('✅ Global connection established');
+                    updateConnectionStatus('connected');
+                    break;
+                    
+                case 'new_message':
+                    // Handle cross-conversation notifications
+                    if (data.conversationId !== selectedConversationId) {
+                        playNotificationSound('message');
+                        showDesktopNotification(
+                            'New Message',
+                            `${data.senderName}: ${data.content}`,
+                            { conversationId: data.conversationId }
+                        );
+                        
+                        // Update unread count in conversations list
+                        updateConversationUnreadCount(data.conversationId);
+                    }
+                    break;
+                    
+                case 'ping':
+                    // Respond to server ping
+                    if (globalWebSocket && globalWebSocket.readyState === WebSocket.OPEN) {
+                        globalWebSocket.send(JSON.stringify({
+                            type: 'pong',
+                            timestamp: data.timestamp,
+                            clientTime: Date.now()
+                        }));
+                    }
+                    break;
+                    
+                case 'pong':
+                    // Handle server pong response
+                    handlePongResponse(data);
+                    break;
+                    
+                default:
+                    console.log('🤷 Unknown global message type:', data.type);
+            }
         }
         function connectWebSocket(conversationId) {
             if (!conversationId || !currentUser) return;
@@ -3271,7 +3478,7 @@
             
             websocket.onclose = (event) => {
                 clearTimeout(connectionTimeout);
-                stopPingInterval();
+                stopPingInterval(session);
                 console.log('❌ WebSocket disconnected:', event.code, event.reason);
                 updateConnectionStatus('disconnected');
                 
