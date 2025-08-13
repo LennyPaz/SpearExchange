@@ -464,26 +464,42 @@
             flex: 1;
             overflow-y: auto;
             overflow-x: hidden;
-            max-height: calc(100vh - 200px); /* Ensure it doesn't exceed viewport */
+            /* Use flex-based height calculation instead of viewport calc */
+            min-height: 0; /* Allow flex child to shrink */
+            /* Force scrollbar to always be visible */
+            scrollbar-gutter: stable;
         }
         
-        /* Custom scrollbar styling */
+        /* Enhanced scrollbar styling - always visible */
         .conversations-list::-webkit-scrollbar {
-            width: 6px;
+            width: 8px;
+            background: #f8f9fa;
         }
         
         .conversations-list::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 3px;
+            background: #f1f3f4;
+            border-radius: 4px;
+            margin: 4px;
         }
         
         .conversations-list::-webkit-scrollbar-thumb {
-            background: #c1c1c1;
-            border-radius: 3px;
+            background: #c1c7cd;
+            border-radius: 4px;
+            border: 1px solid #e8eaed;
         }
         
         .conversations-list::-webkit-scrollbar-thumb:hover {
-            background: #a8a8a8;
+            background: #a0a6ac;
+        }
+        
+        .conversations-list::-webkit-scrollbar-thumb:active {
+            background: #8a9097;
+        }
+        
+        /* Firefox scrollbar */
+        .conversations-list {
+            scrollbar-width: auto;
+            scrollbar-color: #c1c7cd #f1f3f4;
         }
 
         .conversation-item {
@@ -634,35 +650,85 @@
             box-shadow: 0 2px 8px rgba(139, 38, 53, 0.3);
             animation: unreadPulse 2s infinite;
         }
-		/* Connection Status Indicator */
+		/* Enhanced Connection Status Indicator */
 		.connection-status {
-			position: absolute;
-			top: 10px;
-			right: 10px;
-			padding: 4px 8px;
-			border-radius: 12px;
-			font-size: 0.75rem;
-			font-weight: 500;
-			display: flex;
-			align-items: center;
-			gap: 4px;
-			transition: all 0.3s ease;
+		position: absolute;
+		top: 10px;
+		right: 10px;
+		padding: 6px 12px;
+		border-radius: 16px;
+		font-size: 0.75rem;
+		font-weight: 500;
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		transition: all 0.3s ease;
+		    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+		    z-index: 100;
 		}
 
 		.connection-status.online {
-			background: rgba(34, 197, 94, 0.1);
-			color: #22c55e;
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.15), rgba(34, 197, 94, 0.25));
+		    color: #16a34a;
+		border: 1px solid rgba(34, 197, 94, 0.3);
 		}
 
-		.connection-status.offline {
-			background: rgba(239, 68, 68, 0.1);
-			color: #ef4444;
+        .connection-status.offline {
+		    background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(239, 68, 68, 0.25));
+		color: #dc2626;
+		border: 1px solid rgba(239, 68, 68, 0.3);
 		}
+        
+        .connection-status.connecting {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(59, 130, 246, 0.25));
+            color: #2563eb;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+        
+        .connection-status.reconnecting {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(245, 158, 11, 0.25));
+            color: #d97706;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+        
+        .connection-status.poor {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(245, 158, 11, 0.25));
+            color: #d97706;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
 
-		.connection-status i {
-			font-size: 0.6rem;
-			animation: pulse 2s infinite;
-		}
+        .connection-status i {
+            font-size: 0.65rem;
+            animation: pulse 2s infinite;
+        }
+        
+        .connection-status.connecting i,
+        .connection-status.reconnecting i {
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes slideOut {
+            from {
+                opacity: 1;
+                transform: translateX(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+        }
 
 		/* Typing Indicator */
 		.typing-indicator {
@@ -894,6 +960,114 @@
             position: relative;
             animation: messageSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             margin-bottom: 0.5rem;
+        }
+        
+        /* Enhanced message delivery status */
+        .message-status {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.7rem;
+            margin-top: 0.25rem;
+            opacity: 0.8;
+        }
+        
+        .message-status i {
+            font-size: 0.65rem;
+        }
+        
+        .status-sending {
+            color: #f59e0b;
+        }
+        
+        .status-sent {
+            color: #6b7280;
+        }
+        
+        .status-delivered {
+            color: #3b82f6;
+        }
+        
+        .status-read {
+            color: #10b981;
+        }
+        
+        .status-failed {
+            color: #ef4444;
+            cursor: pointer;
+        }
+        
+        .status-failed:hover {
+            opacity: 1;
+        }
+        
+        /* Enhanced error feedback */
+        .error-banner {
+            position: fixed;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(239, 68, 68, 0.3);
+            z-index: 1001;
+            font-size: 0.9rem;
+            font-weight: 500;
+            animation: slideInFromTop 0.3s ease;
+        }
+        
+        .offline-indicator {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            padding: 10px 16px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+            z-index: 1000;
+            font-size: 0.85rem;
+            animation: slideInFromLeft 0.3s ease;
+        }
+        
+        .retry-button {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            margin-left: 8px;
+            transition: all 0.2s ease;
+        }
+        
+        .retry-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        @keyframes slideInFromTop {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+        
+        @keyframes slideInFromLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
         }
 
         .message.sent {
@@ -1705,7 +1879,7 @@
         let websocket = null;
         let globalWebSocket = null; // Global connection for all conversations
         let reconnectAttempts = 0;
-        let maxReconnectAttempts = 5;
+        let maxReconnectAttempts = 10;
         let reconnectDelay = 1000; // Start with 1 second
         let typingTimeout = null;
         let isTyping = false;
@@ -1713,6 +1887,46 @@
         let audioContext = null;
         let notificationQueue = [];
         let isAudioInitialized = false;
+        
+        // Enhanced connection state management
+        let connectionState = 'disconnected'; // disconnected, connecting, connected, reconnecting, poor
+        let connectionQuality = 'good'; // good, poor, offline
+        let lastPingTime = null;
+        let lastPongTime = null;
+        let missedPings = 0;
+        let connectionLatency = 0;
+        
+        // Enhanced message buffering for offline state
+        let messageBuffer = [];
+        let deliveryReceipts = new Map();
+        let readReceipts = new Map();
+        let pendingMessages = new Map(); // Track message delivery status
+        let messageRetryQueue = [];
+        let offlineMessageQueue = [];
+        
+        // Rate limiting
+        let lastMessageTime = 0;
+        let messagesSentInLastMinute = 0;
+        let messageRateLimit = 30; // messages per minute
+        
+        // Typing indicators
+        let typingUsers = new Map();
+        let localTypingTimeout = null;
+        
+        // Enhanced notifications
+        let notificationPermission = null;
+        let soundEnabled = true;
+        let desktopNotificationsEnabled = true;
+        
+        // Performance optimization
+        let lastDOMUpdate = 0;
+        let pendingDOMUpdates = new Set();
+        let updateQueue = [];
+        
+        // Connection monitoring
+        let pingInterval = null;
+        let connectionMonitorInterval = null;
+        let qualityCheckInterval = null;
 
         // Helper function to detect mobile
         function isMobile() {
@@ -1777,6 +1991,7 @@
         // Initialize the page
         document.addEventListener('DOMContentLoaded', async () => {
             await checkAuthentication();
+            await initializeEnhancedFeatures();
             await loadConversations();
             setupEventListeners();
             startAutoRefresh();
@@ -1790,32 +2005,222 @@
             
             // Handle page unload to close WebSocket
             window.addEventListener('beforeunload', () => {
-                if (websocket) {
-                    websocket.close();
-                }
-                if (globalWebSocket) {
-                    globalWebSocket.close();
-                }
+                cleanup();
             });
             
             // Handle visibility change to manage connections
-            document.addEventListener('visibilitychange', () => {
-                if (document.hidden) {
-                    console.log('Page hidden');
-                } else {
-                    console.log('Page visible');
-                    // Reconnect global WebSocket if needed
-                    if (!globalWebSocket || globalWebSocket.readyState !== WebSocket.OPEN) {
-                        connectGlobalWebSocket();
-                    }
-                    // Reconnect conversation WebSocket if needed
-                    if (selectedConversationId && (!websocket || websocket.readyState !== WebSocket.OPEN)) {
-                        connectWebSocket(selectedConversationId);
-                    }
-                }
-            });
+            document.addEventListener('visibilitychange', handleVisibilityChange);
+            
+            // Handle network status changes
+            window.addEventListener('online', handleNetworkOnline);
+            window.addEventListener('offline', handleNetworkOffline);
+            
+            // Handle focus/blur for notifications
+            window.addEventListener('focus', handleWindowFocus);
+            window.addEventListener('blur', handleWindowBlur);
         });
+        
+        // Initialize enhanced features
+        async function initializeEnhancedFeatures() {
+            // Request notification permission
+            if ('Notification' in window) {
+                notificationPermission = await Notification.requestPermission();
+                desktopNotificationsEnabled = notificationPermission === 'granted';
+            }
+            
+            // Initialize connection status UI
+            createConnectionStatusIndicator();
+            
+            // Start connection monitoring
+            startConnectionMonitoring();
+            
+            // Load user preferences
+            loadUserPreferences();
+            
+            console.log('✅ Enhanced messaging features initialized');
+        }
+        
+        // Create connection status indicator
+        function createConnectionStatusIndicator() {
+            const indicator = document.createElement('div');
+            indicator.id = 'connection-status';
+            indicator.className = 'connection-status offline';
+            indicator.innerHTML = `
+                <i class="fas fa-circle"></i>
+                <span>Connecting...</span>
+            `;
+            
+            // Add to chat header
+            const chatHeader = document.getElementById('chat-header');
+            if (chatHeader) {
+                chatHeader.appendChild(indicator);
+            } else {
+                // Add to page if no chat header
+                document.body.appendChild(indicator);
+            }
+        }
+        
+        // Update connection status UI
+        function updateConnectionStatus(state, options = {}) {
+            connectionState = state;
+            const indicator = document.getElementById('connection-status');
+            if (!indicator) return;
+            
+            // Clear all state classes
+            indicator.className = 'connection-status';
+            
+            let icon, text, className;
+            switch (state) {
+                case 'connected':
+                    icon = 'fas fa-circle';
+                    text = connectionQuality === 'poor' ? 'Poor connection' : 'Connected';
+                    className = connectionQuality === 'poor' ? 'poor' : 'online';
+                    break;
+                case 'connecting':
+                    icon = 'fas fa-circle-notch';
+                    text = 'Connecting...';
+                    className = 'connecting';
+                    break;
+                case 'reconnecting':
+                    icon = 'fas fa-redo-alt';
+                    text = `Reconnecting... (${reconnectAttempts}/${maxReconnectAttempts})`;
+                    className = 'reconnecting';
+                    break;
+                case 'disconnected':
+                case 'offline':
+                default:
+                    icon = 'fas fa-exclamation-circle';
+                    text = 'Offline';
+                    className = 'offline';
+                    break;
+            }
+            
+            indicator.className = `connection-status ${className}`;
+            indicator.innerHTML = `
+                <i class="${icon}"></i>
+                <span>${text}</span>
+            `;
+            
+            // Add latency info if available
+            if (connectionLatency > 0 && state === 'connected') {
+                const latencyText = connectionLatency < 100 ? 'Fast' : 
+                                   connectionLatency < 300 ? 'Good' : 'Slow';
+                indicator.innerHTML += ` <small>(${latencyText})</small>`;
+            }
+        }
 
+        // Load user preferences
+        function loadUserPreferences() {
+            try {
+                const prefs = JSON.parse(localStorage.getItem('messagePreferences') || '{}');
+                soundEnabled = prefs.soundEnabled !== false;
+                desktopNotificationsEnabled = prefs.desktopNotificationsEnabled !== false;
+            } catch (error) {
+                console.warn('Failed to load preferences:', error);
+            }
+        }
+        
+        // Save user preferences
+        function saveUserPreferences() {
+            try {
+                localStorage.setItem('messagePreferences', JSON.stringify({
+                    soundEnabled,
+                    desktopNotificationsEnabled
+                }));
+            } catch (error) {
+                console.warn('Failed to save preferences:', error);
+            }
+        }
+        
+        // Handle window visibility changes
+        function handleVisibilityChange() {
+            if (document.hidden) {
+                console.log('🔄 Page hidden - reducing activity');
+                // Reduce ping frequency when hidden
+                if (pingInterval) {
+                    clearInterval(pingInterval);
+                    pingInterval = setInterval(sendPing, 60000); // 1 minute when hidden
+                }
+            } else {
+                console.log('🔄 Page visible - resuming normal activity');
+                // Resume normal ping frequency
+                if (pingInterval) {
+                    clearInterval(pingInterval);
+                    pingInterval = setInterval(sendPing, 30000); // 30 seconds when visible
+                }
+                
+                // Reconnect if needed
+                if (!globalWebSocket || globalWebSocket.readyState !== WebSocket.OPEN) {
+                    setTimeout(connectGlobalWebSocket, 1000);
+                }
+                if (selectedConversationId && (!websocket || websocket.readyState !== WebSocket.OPEN)) {
+                    setTimeout(() => connectWebSocket(selectedConversationId), 1500);
+                }
+                
+                // Clear any queued notifications
+                clearNotificationQueue();
+            }
+        }
+        
+        // Handle network status changes
+        function handleNetworkOnline() {
+            console.log('📶 Network back online');
+            connectionQuality = 'good';
+            updateConnectionStatus('connecting');
+            
+            // Hide offline indicator
+            hideOfflineIndicator();
+            
+            // Attempt to reconnect
+            setTimeout(() => {
+                connectGlobalWebSocket();
+                if (selectedConversationId) {
+                    connectWebSocket(selectedConversationId);
+                }
+                
+                // Process any buffered messages
+                setTimeout(processMessageBuffer, 2000);
+            }, 1000);
+        }
+        
+        function handleNetworkOffline() {
+            console.log('📵 Network offline');
+            connectionQuality = 'offline';
+            updateConnectionStatus('offline');
+        }
+        
+        // Handle window focus events for notifications
+        function handleWindowFocus() {
+            clearNotificationQueue();
+        }
+        
+        function handleWindowBlur() {
+            // Enable enhanced notifications when window is not focused
+        }
+        
+        // Cleanup function
+        function cleanup() {
+            console.log('🧹 Cleaning up connections...');
+            
+            // Close WebSocket connections gracefully
+            if (websocket && websocket.readyState === WebSocket.OPEN) {
+                websocket.close(1000, 'Page unload');
+            }
+            if (globalWebSocket && globalWebSocket.readyState === WebSocket.OPEN) {
+                globalWebSocket.close(1000, 'Page unload');
+            }
+            
+            // Clear intervals
+            [refreshInterval, pingInterval, connectionMonitorInterval, qualityCheckInterval].forEach(interval => {
+                if (interval) clearInterval(interval);
+            });
+            
+            // Clear timeouts
+            [typingTimeout, localTypingTimeout].forEach(timeout => {
+                if (timeout) clearTimeout(timeout);
+            });
+        }
+        
         // Check authentication
         async function checkAuthentication() {
             const authResult = await enhancedCheckAuth();
@@ -2076,27 +2481,73 @@
             });
         }
 
-        // Create message element
-        function createMessageElement(message) {
+        // Enhanced create message element with delivery status
+        function createMessageElement(message, status = 'sent') {
             const element = document.createElement('div');
             const isSent = message.sender_id === currentUser.id;
             element.className = `message ${isSent ? 'sent' : 'received'}`;
+            element.setAttribute('data-message-id', message.id || message.tempId || Date.now());
+
+            let statusHtml = '';
+            if (isSent) {
+                statusHtml = `<div class="message-status" id="status-${message.id || message.tempId}">${getStatusIndicator(status)}</div>`;
+            }
 
             element.innerHTML = `
                 <div class="message-content">${escapeHtml(message.message)}</div>
                 <div class="message-time">${formatMessageTime(message.created_at)}</div>
+                ${statusHtml}
             `;
 
             return element;
         }
+        
+        // Get status indicator HTML
+        function getStatusIndicator(status) {
+            switch (status) {
+                case 'sending':
+                    return '<span class="status-sending"><i class="fas fa-clock"></i> Sending...</span>';
+                case 'sent':
+                    return '<span class="status-sent"><i class="fas fa-check"></i> Sent</span>';
+                case 'delivered':
+                    return '<span class="status-delivered"><i class="fas fa-check-double"></i> Delivered</span>';
+                case 'read':
+                    return '<span class="status-read"><i class="fas fa-check-double"></i> Read</span>';
+                case 'failed':
+                    return '<span class="status-failed" onclick="retryMessage(this)"><i class="fas fa-exclamation-triangle"></i> Failed - Tap to retry</span>';
+                default:
+                    return '<span class="status-sent"><i class="fas fa-check"></i> Sent</span>';
+            }
+        }
+        
+        // Update message status
+        function updateMessageStatus(messageId, status) {
+            const statusElement = document.getElementById(`status-${messageId}`);
+            if (statusElement) {
+                statusElement.innerHTML = getStatusIndicator(status);
+            }
+        }
 
-        // Send message
+        // Enhanced send message with buffering and status tracking
         async function sendMessage() {
             const messageInput = document.getElementById('message-input');
             const sendButton = document.getElementById('send-button');
             const messageText = messageInput.value.trim();
 
             if (!messageText || !selectedConversationId) return;
+            
+            // Check rate limiting
+            if (!checkRateLimit()) return;
+            
+            const tempId = Date.now() + Math.random();
+            const messageData = {
+                id: tempId,
+                tempId: tempId,
+                sender_id: currentUser.id,
+                sender_name: currentUser.name,
+                message: messageText,
+                created_at: new Date().toISOString()
+            };
 
             try {
                 sendButton.disabled = true;
@@ -2105,67 +2556,75 @@
                 // Clear input immediately for better UX
                 messageInput.value = '';
                 
-                // Send via WebSocket if available, fallback to HTTP
+                // Track message as pending
+                pendingMessages.set(tempId, 'sending');
+                
+                // Add message to UI optimistically with sending status
+                const messageElement = createMessageElement(messageData, 'sending');
+                const messagesArea = document.getElementById('messages-area');
+                messagesArea.appendChild(messageElement);
+                scrollToBottom(true);
+                
+                // Update rate limiting
+                lastMessageTime = Date.now();
+                messagesSentInLastMinute++;
+                
+                // Try to send via WebSocket first, then HTTP
                 if (websocket && websocket.readyState === WebSocket.OPEN) {
                     // Send via WebSocket for real-time delivery
                     sendWebSocketMessage('new_message', {
                         content: messageText,
-                        conversationId: selectedConversationId
+                        conversationId: selectedConversationId,
+                        tempId: tempId
                     });
                     
-                    // Add message to UI optimistically
-                    const messageElement = createMessageElement({
-                        id: Date.now(), // Temporary ID
-                        sender_id: currentUser.id,
-                        sender_name: currentUser.name,
-                        message: messageText,
-                        created_at: new Date().toISOString()
-                    });
+                    // Update status to sent (will be updated to delivered/read via WebSocket)
+                    setTimeout(() => {
+                        if (pendingMessages.get(tempId) === 'sending') {
+                            updateMessageStatus(tempId, 'sent');
+                            pendingMessages.set(tempId, 'sent');
+                        }
+                    }, 1000);
                     
-                    const messagesArea = document.getElementById('messages-area');
-                    messagesArea.appendChild(messageElement);
-                    scrollToBottom(true); // Smooth scroll for sent messages
-                } else {
-                    // Fallback to HTTP API
-                    const response = await authenticatedFetch(`https://spear-exchange.lenny-paz123.workers.dev/api/conversations/${selectedConversationId}/messages`, {
-                        method: 'POST',
-                        body: JSON.stringify({ message: messageText })
-                    });
-
-                    if (response.ok) {
-                        const result = await response.json();
-                        console.log('✅ Message sent successfully:', result.message);
-                        
-                        // Add message to UI immediately
-                        const messageElement = createMessageElement({
-                            id: result.messageId || Date.now(),
-                            sender_id: currentUser.id,
-                            sender_name: currentUser.name,
-                            message: messageText,
-                            created_at: new Date().toISOString()
+                } else if (connectionState !== 'offline') {
+                    // Try HTTP API when WebSocket unavailable but online
+                    try {
+                        const response = await authenticatedFetch(`https://spear-exchange.lenny-paz123.workers.dev/api/conversations/${selectedConversationId}/messages`, {
+                            method: 'POST',
+                            body: JSON.stringify({ message: messageText })
                         });
-                        
-                        const messagesArea = document.getElementById('messages-area');
-                        messagesArea.appendChild(messageElement);
-                        scrollToBottom(true);
-                        
-                        // Update conversation list
-                        await loadConversations();
-                    } else {
-                        const errorData = await response.json();
-                        console.error('❌ Failed to send message:', errorData);
-                        // Restore message text on error
-                        messageInput.value = messageText;
-                        throw new Error(errorData.error || 'Failed to send message');
+
+                        if (response.ok) {
+                            const result = await response.json();
+                            console.log('✅ Message sent via HTTP:', result.message);
+                            updateMessageStatus(tempId, 'sent');
+                            pendingMessages.set(tempId, 'sent');
+                            
+                            // Update conversation list
+                            await loadConversations();
+                        } else {
+                            throw new Error('HTTP send failed');
+                        }
+                    } catch (httpError) {
+                        console.error('HTTP send failed, buffering message:', httpError);
+                        bufferMessage(messageData, selectedConversationId);
+                        updateMessageStatus(tempId, 'failed');
                     }
+                } else {
+                    // Offline - buffer the message
+                    console.log('📴 Offline - buffering message');
+                    bufferMessage(messageData, selectedConversationId);
+                    updateMessageStatus(tempId, 'failed');
                 }
+                
             } catch (error) {
                 console.error('Error sending message:', error);
-                // Restore message text on error
-                if (!messageInput.value) {
-                    messageInput.value = messageText;
-                }
-                alert('Failed to send message. Please try again.');
+                
+                // Buffer the message on any error
+                bufferMessage(messageData, selectedConversationId);
+                updateMessageStatus(tempId, 'failed');
+                
+                showErrorFeedback('Message failed to send. It will be retried automatically.');
             } finally {
                 sendButton.disabled = false;
                 sendButton.innerHTML = '<i class="fas fa-paper-plane"></i>';
@@ -2337,7 +2796,371 @@
             errorElement.style.display = 'flex';
         }
 		
-         // ===== WEBSOCKET FUNCTIONALITY =====
+         // ===== ENHANCED AUDIO & NOTIFICATIONS =====
+        
+        // Initialize audio context for notifications
+        function initializeAudioContext() {
+            if (isAudioInitialized) return;
+            
+            try {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                isAudioInitialized = true;
+                console.log('🔊 Audio context initialized');
+            } catch (error) {
+                console.warn('Failed to initialize audio context:', error);
+            }
+        }
+        
+        // Enhanced notification sound
+        function playNotificationSound(type = 'message') {
+            if (!soundEnabled || !isAudioInitialized || !audioContext) return;
+            
+            try {
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                // Different sounds for different types
+                switch (type) {
+                    case 'message':
+                        oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+                        oscillator.frequency.setValueAtTime(600, audioContext.currentTime + 0.1);
+                        break;
+                    case 'typing':
+                        oscillator.frequency.setValueAtTime(400, audioContext.currentTime);
+                        break;
+                    case 'error':
+                        oscillator.frequency.setValueAtTime(300, audioContext.currentTime);
+                        oscillator.frequency.setValueAtTime(200, audioContext.currentTime + 0.2);
+                        break;
+                    case 'connected':
+                        oscillator.frequency.setValueAtTime(600, audioContext.currentTime);
+                        oscillator.frequency.setValueAtTime(800, audioContext.currentTime + 0.1);
+                        break;
+                }
+                
+                oscillator.type = 'sine';
+                gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+                gainNode.gain.linearRampToValueAtTime(0.1, audioContext.currentTime + 0.01);
+                gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.3);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.3);
+            } catch (error) {
+                console.warn('Failed to play notification sound:', error);
+            }
+        }
+        
+        // Enhanced desktop notifications
+        function showDesktopNotification(title, body, options = {}) {
+            if (!desktopNotificationsEnabled || notificationPermission !== 'granted') {
+                return;
+            }
+            
+            // Don't show notifications if window is focused
+            if (!document.hidden) return;
+            
+            const notification = new Notification(title, {
+                body: body,
+                icon: '../assets/logo-192.png',
+                badge: '../assets/badge-72.png',
+                tag: options.tag || 'spear-exchange-message',
+                requireInteraction: false,
+                silent: false,
+                ...options
+            });
+            
+            // Auto-close after 5 seconds
+            setTimeout(() => {
+                notification.close();
+            }, 5000);
+            
+            // Handle click to focus window
+            notification.onclick = () => {
+                window.focus();
+                if (options.conversationId) {
+                    selectConversation(options.conversationId);
+                }
+                notification.close();
+            };
+            
+            return notification;
+        }
+        
+        // Clear notification queue
+        function clearNotificationQueue() {
+            notificationQueue.forEach(notification => {
+                if (notification && typeof notification.close === 'function') {
+                    notification.close();
+                }
+            });
+            notificationQueue = [];
+        }
+        
+        // Connection monitoring system
+        function startConnectionMonitoring() {
+            // Monitor connection quality every 10 seconds
+            qualityCheckInterval = setInterval(() => {
+                checkConnectionQuality();
+            }, 10000);
+            
+            // Overall connection monitoring
+            connectionMonitorInterval = setInterval(() => {
+                monitorConnectionHealth();
+            }, 5000);
+        }
+        
+        // Check connection quality based on ping times
+        function checkConnectionQuality() {
+            if (!lastPingTime || !lastPongTime) return;
+            
+            const now = Date.now();
+            const timeSinceLastPong = now - lastPongTime;
+            
+            if (timeSinceLastPong > 90000) { // 90 seconds
+                connectionQuality = 'offline';
+                updateConnectionStatus('offline');
+            } else if (connectionLatency > 1000 || timeSinceLastPong > 45000) {
+                connectionQuality = 'poor';
+                updateConnectionStatus('connected');
+            } else {
+                connectionQuality = 'good';
+                updateConnectionStatus('connected');
+            }
+        }
+        
+        // Monitor overall connection health
+        function monitorConnectionHealth() {
+            // Check global WebSocket
+            if (globalWebSocket && globalWebSocket.readyState !== WebSocket.OPEN) {
+                if (connectionState !== 'reconnecting' && connectionState !== 'connecting') {
+                    console.log('🔄 Global WebSocket disconnected, attempting reconnect...');
+                    connectGlobalWebSocket();
+                }
+            }
+            
+            // Check conversation WebSocket
+            if (selectedConversationId && websocket && websocket.readyState !== WebSocket.OPEN) {
+                if (connectionState !== 'reconnecting' && connectionState !== 'connecting') {
+                    console.log('🔄 Conversation WebSocket disconnected, attempting reconnect...');
+                    connectWebSocket(selectedConversationId);
+                }
+            }
+        }
+        
+        // Send ping to measure latency
+        function sendPing() {
+            if (websocket && websocket.readyState === WebSocket.OPEN) {
+                lastPingTime = Date.now();
+                const pingData = {
+                    type: 'ping',
+                    timestamp: lastPingTime,
+                    clientId: currentUser?.id
+                };
+                websocket.send(JSON.stringify(pingData));
+            }
+        }
+        
+        // Handle pong response
+        function handlePongResponse(pongData) {
+            lastPongTime = Date.now();
+            if (pongData.timestamp) {
+                connectionLatency = lastPongTime - pongData.timestamp;
+                console.log(`🏓 Ping: ${connectionLatency}ms`);
+            }
+            missedPings = 0;
+        }
+        
+        // Enhanced rate limiting
+        function checkRateLimit() {
+            const now = Date.now();
+            const timeSinceLastMessage = now - lastMessageTime;
+            
+            // Reset counter every minute
+            if (timeSinceLastMessage > 60000) {
+                messagesSentInLastMinute = 0;
+            }
+            
+            if (messagesSentInLastMinute >= messageRateLimit) {
+                const timeUntilReset = 60000 - timeSinceLastMessage;
+                const secondsRemaining = Math.ceil(timeUntilReset / 1000);
+                
+                showErrorFeedback(`Rate limit exceeded. Try again in ${secondsRemaining} seconds.`);
+                return false;
+            }
+            
+            return true;
+        }
+        
+        // Enhanced message buffering for offline/failed states
+        function bufferMessage(message, conversationId) {
+            const bufferedMessage = {
+                ...message,
+                tempId: Date.now() + Math.random(),
+                conversationId,
+                timestamp: Date.now(),
+                retryCount: 0
+            };
+            
+            messageBuffer.push(bufferedMessage);
+            pendingMessages.set(bufferedMessage.tempId, 'buffered');
+            
+            console.log('📦 Message buffered for later delivery:', bufferedMessage.tempId);
+            
+            // Show offline indicator if not already shown
+            if (connectionState === 'offline' && !document.getElementById('offline-indicator')) {
+                showOfflineIndicator();
+            }
+            
+            return bufferedMessage;
+        }
+        
+        // Process buffered messages when connection is restored
+        function processMessageBuffer() {
+            if (messageBuffer.length === 0) return;
+            
+            console.log(`🔄 Processing ${messageBuffer.length} buffered messages`);
+            
+            const messagesToProcess = [...messageBuffer];
+            messageBuffer = [];
+            
+            messagesToProcess.forEach(async (bufferedMessage) => {
+                try {
+                    await sendBufferedMessage(bufferedMessage);
+                } catch (error) {
+                    console.error('Failed to send buffered message:', error);
+                    // Re-add to buffer with incremented retry count
+                    if (bufferedMessage.retryCount < 3) {
+                        bufferedMessage.retryCount++;
+                        messageBuffer.push(bufferedMessage);
+                        updateMessageStatus(bufferedMessage.tempId, 'failed');
+                    } else {
+                        updateMessageStatus(bufferedMessage.tempId, 'failed');
+                        pendingMessages.delete(bufferedMessage.tempId);
+                    }
+                }
+            });
+        }
+        
+        // Send a buffered message
+        async function sendBufferedMessage(bufferedMessage) {
+            updateMessageStatus(bufferedMessage.tempId, 'sending');
+            
+            if (websocket && websocket.readyState === WebSocket.OPEN) {
+                // Send via WebSocket
+                sendWebSocketMessage('new_message', {
+                    content: bufferedMessage.message,
+                    conversationId: bufferedMessage.conversationId,
+                    tempId: bufferedMessage.tempId
+                });
+            } else {
+                // Send via HTTP API
+                const response = await authenticatedFetch(
+                    `https://spear-exchange.lenny-paz123.workers.dev/api/conversations/${bufferedMessage.conversationId}/messages`,
+                    {
+                        method: 'POST',
+                        body: JSON.stringify({ message: bufferedMessage.message })
+                    }
+                );
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    updateMessageStatus(bufferedMessage.tempId, 'sent');
+                    pendingMessages.delete(bufferedMessage.tempId);
+                } else {
+                    throw new Error('Failed to send buffered message');
+                }
+            }
+        }
+        
+        // Retry failed message
+        function retryMessage(statusElement) {
+            const messageElement = statusElement.closest('.message');
+            const messageId = messageElement.getAttribute('data-message-id');
+            const messageContent = messageElement.querySelector('.message-content').textContent;
+            
+            console.log('🔄 Retrying message:', messageId);
+            
+            // Find and retry the buffered message
+            const bufferedMessage = messageBuffer.find(m => m.tempId == messageId);
+            if (bufferedMessage) {
+                sendBufferedMessage(bufferedMessage).catch(error => {
+                    console.error('Retry failed:', error);
+                    showErrorFeedback('Message retry failed. Please check your connection.');
+                });
+            } else {
+                // Create new buffered message for retry
+                const retryMessage = {
+                    message: messageContent,
+                    tempId: messageId,
+                    conversationId: selectedConversationId,
+                    retryCount: 0
+                };
+                sendBufferedMessage(retryMessage).catch(error => {
+                    console.error('Retry failed:', error);
+                    showErrorFeedback('Message retry failed. Please check your connection.');
+                });
+            }
+        }
+        
+        // Show offline indicator
+        function showOfflineIndicator() {
+            if (document.getElementById('offline-indicator')) return;
+            
+            const indicator = document.createElement('div');
+            indicator.id = 'offline-indicator';
+            indicator.className = 'offline-indicator';
+            indicator.innerHTML = `
+                📵 You're offline
+                <button class="retry-button" onclick="processMessageBuffer()">Retry Messages</button>
+            `;
+            
+            document.body.appendChild(indicator);
+        }
+        
+        // Hide offline indicator
+        function hideOfflineIndicator() {
+            const indicator = document.getElementById('offline-indicator');
+            if (indicator) {
+                indicator.remove();
+            }
+        }
+        
+        // Show error feedback to user
+        function showErrorFeedback(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-feedback';
+            errorDiv.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #ef4444;
+                color: white;
+                padding: 12px 16px;
+                border-radius: 8px;
+                font-size: 14px;
+                font-weight: 500;
+                z-index: 1000;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+                animation: slideIn 0.3s ease;
+            `;
+            errorDiv.textContent = message;
+            
+            document.body.appendChild(errorDiv);
+            
+            setTimeout(() => {
+                errorDiv.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => {
+                    if (errorDiv.parentNode) {
+                        errorDiv.parentNode.removeChild(errorDiv);
+                    }
+                }, 300);
+            }, 5000);
+        }
+        
+        // ===== WEBSOCKET FUNCTIONALITY =====
         
         // Initialize global WebSocket connection for all conversations
         function connectGlobalWebSocket() {
@@ -2392,17 +3215,36 @@
                 websocket.close(1000, 'Switching conversations');
             }
             
+            // Don't reconnect if already connecting
+            if (websocket && websocket.readyState === WebSocket.CONNECTING) {
+                console.log('🔄 WebSocket already connecting, skipping...');
+                return;
+            }
+            
+            updateConnectionStatus('connecting');
             console.log('🔌 Connecting to WebSocket for conversation:', conversationId);
             
             const wsUrl = `wss://spear-exchange.lenny-paz123.workers.dev/api/chat/connect?conversationId=${conversationId}&userId=${currentUser.id}&userName=${encodeURIComponent(currentUser.name)}`;
             
             websocket = new WebSocket(wsUrl);
             
+            // Connection timeout
+            const connectionTimeout = setTimeout(() => {
+                if (websocket.readyState === WebSocket.CONNECTING) {
+                    console.log('⏰ WebSocket connection timeout');
+                    websocket.close();
+                }
+            }, 10000);
+            
             websocket.onopen = () => {
+                clearTimeout(connectionTimeout);
                 console.log('✅ WebSocket connected');
                 reconnectAttempts = 0;
                 reconnectDelay = 1000;
-                updateConnectionStatus(true);
+                updateConnectionStatus('connected');
+                
+                // Start ping interval
+                startPingInterval();
                 
                 // Send initial join message
                 sendWebSocketMessage('join_conversation', {
@@ -2410,6 +3252,12 @@
                     userId: currentUser.id,
                     userName: currentUser.name
                 });
+                
+                // Process any buffered messages for this conversation
+                processMessageBuffer(conversationId);
+                
+                // Play connection sound
+                playNotificationSound('connected');
             };
             
             websocket.onmessage = (event) => {
@@ -2422,11 +3270,14 @@
             };
             
             websocket.onclose = (event) => {
+                clearTimeout(connectionTimeout);
+                stopPingInterval();
                 console.log('❌ WebSocket disconnected:', event.code, event.reason);
-                updateConnectionStatus(false);
+                updateConnectionStatus('disconnected');
                 
-                // Only attempt to reconnect if not intentionally closed
-                if (event.code !== 1000 && reconnectAttempts < maxReconnectAttempts) {
+                // Only attempt to reconnect if not intentionally closed and we have a conversation selected
+                if (event.code !== 1000 && reconnectAttempts < maxReconnectAttempts && selectedConversationId === conversationId) {
+                    updateConnectionStatus('reconnecting');
                     setTimeout(() => {
                         reconnectAttempts++;
                         console.log(`🔄 Reconnecting... (${reconnectAttempts}/${maxReconnectAttempts})`);
@@ -2434,32 +3285,20 @@
                     }, reconnectDelay);
                     
                     // Exponential backoff
-                    reconnectDelay = Math.min(reconnectDelay * 2, 30000);
+                    reconnectDelay = Math.min(reconnectDelay * 1.5, 30000);
+                } else if (reconnectAttempts >= maxReconnectAttempts) {
+                    console.log('❌ Max reconnection attempts reached');
+                    updateConnectionStatus('offline');
+                    showErrorFeedback('Connection lost. Please refresh the page.');
                 }
             };
             
             websocket.onerror = (error) => {
+                clearTimeout(connectionTimeout);
                 console.error('❌ WebSocket error:', error);
-                updateConnectionStatus(false);
+                updateConnectionStatus('disconnected');
+                playNotificationSound('error');
             };
-            
-            // Enhanced ping mechanism
-            const pingInterval = setInterval(() => {
-                if (websocket && websocket.readyState === WebSocket.OPEN) {
-                    const pingData = {
-                        type: 'ping',
-                        timestamp: new Date().toISOString(),
-                        userId: currentUser.id
-                    };
-                    websocket.send(JSON.stringify(pingData));
-                    console.log('🏓 Sent ping to server');
-                } else {
-                    clearInterval(pingInterval);
-                }
-            }, 30000); // Ping every 30 seconds
-            
-            // Store ping interval for cleanup
-            websocket.pingInterval = pingInterval;
         }
 
         // Handle global WebSocket messages (for all conversations)
@@ -2502,7 +3341,7 @@
                 return;
             }
             
-            // Update conversation in sidebar
+            // Update conversation in sidebar with real-time data
             updateConversationInSidebar(data);
             
             // Show notification for non-active conversations
@@ -2521,7 +3360,10 @@
                 // Update last message preview
                 const lastMessageElement = conversationItem.querySelector('.last-message');
                 if (lastMessageElement) {
-                    lastMessageElement.textContent = messageData.content.substring(0, 50) + (messageData.content.length > 50 ? '...' : '');
+                    const preview = messageData.content.length > 50 
+                        ? messageData.content.substring(0, 50) + '...' 
+                        : messageData.content;
+                    lastMessageElement.textContent = preview;
                 }
                 
                 // Update time
@@ -2535,6 +3377,16 @@
                 
                 // Move conversation to top
                 moveConversationToTop(conversationItem);
+                
+                // Add visual emphasis
+                conversationItem.style.backgroundColor = 'rgba(139, 38, 53, 0.05)';
+                setTimeout(() => {
+                    conversationItem.style.backgroundColor = '';
+                }, 2000);
+            } else {
+                // Conversation not in current list - reload conversations
+                console.log('🔄 New conversation detected, reloading list...');
+                loadConversations();
             }
         }
         
@@ -2557,58 +3409,135 @@
                 const currentCount = parseInt(unreadElement.textContent) || 0;
                 unreadElement.textContent = (currentCount + 1).toString();
             }
+            
+            // Add pulse animation
+            unreadElement.style.animation = 'none';
+            void unreadElement.offsetHeight; // Force reflow
+            unreadElement.style.animation = 'unreadPulse 0.5s ease-in-out 3';
         }
         
-        // Move conversation to top of list
+        // Move conversation to top of list with smooth animation
         function moveConversationToTop(conversationItem) {
             const conversationsList = document.getElementById('conversations-list');
             const firstChild = conversationsList.firstChild;
             
             // Only move if it's not already at the top
             if (firstChild !== conversationItem) {
+                // Create a smooth transition effect
+                const originalHeight = conversationItem.offsetHeight;
+                conversationItem.style.transition = 'all 0.3s ease';
+                
+                // Move to top
                 conversationsList.insertBefore(conversationItem, firstChild);
                 
-                // Add a subtle animation
-                conversationItem.style.backgroundColor = 'rgba(139, 38, 53, 0.1)';
+                // Add subtle highlight animation
+                conversationItem.style.transform = 'translateX(4px)';
+                conversationItem.style.boxShadow = '0 4px 12px rgba(139, 38, 53, 0.15)';
+                
                 setTimeout(() => {
-                    conversationItem.style.backgroundColor = '';
-                }, 2000);
+                    conversationItem.style.transform = '';
+                    conversationItem.style.boxShadow = '';
+                    conversationItem.style.transition = '';
+                }, 300);
             }
         }
         
-        // Show notification for messages in other conversations
+        // Show enhanced notification for messages in other conversations
         function showCrossConversationNotification(messageData) {
-            // Create a temporary notification element
+            // Don't show notifications if already in the conversation
+            if (messageData.conversationId === selectedConversationId) {
+                return;
+            }
+            
+            // Remove any existing notification for this conversation
+            const existingNotification = document.querySelector(`[data-notification-conversation="${messageData.conversationId}"]`);
+            if (existingNotification) {
+                existingNotification.remove();
+            }
+            
+            // Create new notification element
             const notification = document.createElement('div');
             notification.className = 'cross-conversation-notification';
+            notification.setAttribute('data-notification-conversation', messageData.conversationId);
             notification.style.cssText = `
                 position: fixed;
-                top: 80px;
+                top: 100px;
                 right: 20px;
                 background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
                 color: white;
-                padding: 12px 16px;
-                border-radius: 12px;
-                box-shadow: 0 4px 20px rgba(139, 38, 53, 0.3);
-                z-index: 1001;
-                max-width: 300px;
+                padding: 14px 18px;
+                border-radius: 16px;
+                box-shadow: 0 6px 25px rgba(139, 38, 53, 0.4);
+                z-index: 1002;
+                max-width: 350px;
                 opacity: 0;
-                transform: translateX(100%);
-                transition: all 0.3s ease;
+                transform: translateX(100%) scale(0.8);
+                transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
                 cursor: pointer;
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                backdrop-filter: blur(10px);
             `;
             
+            // Get conversation details from sidebar
+            const conversationItem = document.querySelector(`[data-conversation-id="${messageData.conversationId}"]`);
+            let listingTitle = 'Unknown Listing';
+            if (conversationItem) {
+                const titleElement = conversationItem.querySelector('.listing-title');
+                if (titleElement) {
+                    listingTitle = titleElement.textContent;
+                }
+            }
+            
+            // Truncate message for notification
+            const maxLength = 60;
+            const truncatedMessage = messageData.content.length > maxLength 
+                ? messageData.content.substring(0, maxLength) + '...' 
+                : messageData.content;
+            
             notification.innerHTML = `
-                <div style="font-weight: 600; margin-bottom: 4px;">💬 New Message</div>
-                <div style="font-size: 0.9rem; opacity: 0.9;">
-                    <strong>${messageData.senderName}:</strong> ${messageData.content.substring(0, 50)}${messageData.content.length > 50 ? '...' : ''}
+                <div style="display: flex; align-items: flex-start; gap: 12px;">
+                    <div style="
+                        width: 40px;
+                        height: 40px;
+                        background: rgba(255, 255, 255, 0.2);
+                        border-radius: 50%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-size: 18px;
+                        flex-shrink: 0;
+                    ">💬</div>
+                    <div style="flex: 1; min-width: 0;">
+                        <div style="font-weight: 600; margin-bottom: 4px; font-size: 14px;">
+                            New message • ${listingTitle}
+                        </div>
+                        <div style="font-size: 13px; opacity: 0.95; margin-bottom: 6px;">
+                            <strong>${escapeHtml(messageData.senderName)}:</strong> ${escapeHtml(truncatedMessage)}
+                        </div>
+                        <div style="font-size: 11px; opacity: 0.8;">
+                            Click to view conversation
+                        </div>
+                    </div>
+                    <button onclick="event.stopPropagation(); this.parentElement.parentElement.remove();" style="
+                        background: none;
+                        border: none;
+                        color: rgba(255, 255, 255, 0.8);
+                        cursor: pointer;
+                        padding: 4px;
+                        font-size: 16px;
+                        line-height: 1;
+                        border-radius: 4px;
+                        transition: all 0.2s ease;
+                    " onmouseover="this.style.background='rgba(255,255,255,0.2)'" onmouseout="this.style.background='none'">&times;</button>
                 </div>
             `;
             
             // Click to open conversation
-            notification.onclick = () => {
-                selectConversation(messageData.conversationId);
-                notification.remove();
+            notification.onclick = (e) => {
+                if (e.target.tagName !== 'BUTTON') {
+                    selectConversation(messageData.conversationId);
+                    notification.remove();
+                }
             };
             
             document.body.appendChild(notification);
@@ -2616,15 +3545,21 @@
             // Animate in
             requestAnimationFrame(() => {
                 notification.style.opacity = '1';
-                notification.style.transform = 'translateX(0)';
+                notification.style.transform = 'translateX(0) scale(1)';
             });
             
-            // Auto-remove after 5 seconds
+            // Auto-remove after 8 seconds
             setTimeout(() => {
-                notification.style.opacity = '0';
-                notification.style.transform = 'translateX(100%)';
-                setTimeout(() => notification.remove(), 300);
-            }, 5000);
+                if (notification.parentNode) {
+                    notification.style.opacity = '0';
+                    notification.style.transform = 'translateX(100%) scale(0.8)';
+                    setTimeout(() => {
+                        if (notification.parentNode) {
+                            notification.remove();
+                        }
+                    }, 400);
+                }
+            }, 8000);
         }
         function handleWebSocketMessage(data) {
             console.log('📨 WebSocket message received:', data);
@@ -2683,7 +3618,7 @@
             }
         }
 
-        // Handle new message received via WebSocket
+        // Handle new message received via WebSocket with enhanced features
         function handleNewMessageReceived(data) {
             // Only add if it's not from current user (avoid duplicates)
             if (data.senderId !== currentUser.id) {
@@ -2698,14 +3633,53 @@
                         created_at: data.timestamp
                     });
                     
+                    // Add with animation
+                    messageElement.style.opacity = '0';
+                    messageElement.style.transform = 'translateY(20px)';
                     messagesArea.appendChild(messageElement);
-                    scrollToBottom();
                     
-                    // Play notification sound
+                    // Animate in
+                    requestAnimationFrame(() => {
+                        messageElement.style.transition = 'all 0.3s ease';
+                        messageElement.style.opacity = '1';
+                        messageElement.style.transform = 'translateY(0)';
+                    });
+                    
+                    scrollToBottom(true); // Smooth scroll for received messages
+                    
+                    // Play notification sound for received messages in active conversation
                     playNotificationSound();
                     
-                    // Update conversation list to show new message
-                    loadConversations();
+                    // Update conversation list without full reload
+                    updateConversationPreview(selectedConversationId, data.content, data.timestamp);
+                }
+            }
+        }
+        
+        // Update conversation preview without full reload
+        function updateConversationPreview(conversationId, messageContent, timestamp) {
+            const conversationItem = document.querySelector(`[data-conversation-id="${conversationId}"]`);
+            if (conversationItem) {
+                // Update last message preview
+                const lastMessageElement = conversationItem.querySelector('.last-message');
+                if (lastMessageElement) {
+                    const preview = messageContent.length > 50 
+                        ? messageContent.substring(0, 50) + '...' 
+                        : messageContent;
+                    lastMessageElement.textContent = preview;
+                }
+                
+                // Update timestamp
+                const timeElement = conversationItem.querySelector('.conversation-time');
+                if (timeElement) {
+                    timeElement.textContent = formatConversationTime(timestamp);
+                }
+                
+                // Move to top if not already there
+                const conversationsList = document.getElementById('conversations-list');
+                const firstChild = conversationsList.firstChild;
+                if (firstChild !== conversationItem) {
+                    conversationsList.insertBefore(conversationItem, firstChild);
                 }
             }
         }
@@ -2799,6 +3773,194 @@
                 console.warn('⚠️ Cannot send global WebSocket message: connection not open');
                 return false;
             }
+        }
+        
+        // Start ping mechanism for global WebSocket
+        function startGlobalPingMechanism() {
+            if (pingInterval) {
+                clearInterval(pingInterval);
+            }
+            
+            pingInterval = setInterval(() => {
+                if (globalWebSocket && globalWebSocket.readyState === WebSocket.OPEN) {
+                    lastPingTime = Date.now();
+                    globalWebSocket.send(JSON.stringify({
+                        type: 'ping',
+                        timestamp: new Date().toISOString(),
+                        clientId: 'global-client'
+                    }));
+                    
+                    // Set timeout for pong response
+                    if (pongTimeout) clearTimeout(pongTimeout);
+                    pongTimeout = setTimeout(() => {
+                        console.warn('⚠️ Global pong timeout - connection may be unstable');
+                        connectionQuality = 'poor';
+                        updateConnectionStatus();
+                    }, 10000); // 10 second timeout
+                    
+                    console.log('🏓 Sent global ping to server');
+                } else {
+                    clearInterval(pingInterval);
+                    pingInterval = null;
+                }
+            }, 30000); // Ping every 30 seconds
+        }
+        
+        // Start ping mechanism for conversation WebSocket
+        function startConversationPingMechanism() {
+            if (websocket && websocket.pingInterval) {
+                clearInterval(websocket.pingInterval);
+            }
+            
+            websocket.pingInterval = setInterval(() => {
+                if (websocket && websocket.readyState === WebSocket.OPEN) {
+                    websocket.send(JSON.stringify({
+                        type: 'ping',
+                        timestamp: new Date().toISOString(),
+                        clientId: 'conversation-client'
+                    }));
+                    console.log('🏓 Sent conversation ping to server');
+                } else {
+                    clearInterval(websocket.pingInterval);
+                    websocket.pingInterval = null;
+                }
+            }, 30000); // Ping every 30 seconds
+        }
+        
+        // Enhanced Connection Status Management
+        function updateConnectionStatus() {
+            const statusElement = document.getElementById('connection-status');
+            const isGlobalConnected = connectionState.global === 'connected';
+            const isConversationConnected = connectionState.conversation === 'connected' || !selectedConversationId;
+            
+            // Create status element if it doesn't exist
+            if (!statusElement) {
+                const newStatusElement = document.createElement('div');
+                newStatusElement.id = 'connection-status';
+                newStatusElement.className = 'connection-status';
+                
+                // Add to appropriate location
+                const chatHeader = document.getElementById('chat-header');
+                if (chatHeader) {
+                    chatHeader.appendChild(newStatusElement);
+                } else {
+                    // Fallback to conversations header if chat header not available
+                    const conversationsHeader = document.querySelector('.conversations-header');
+                    if (conversationsHeader) {
+                        conversationsHeader.appendChild(newStatusElement);
+                    }
+                }
+            }
+            
+            const statusEl = document.getElementById('connection-status');
+            if (!statusEl) return;
+            
+            // Determine overall connection status
+            let status, text, className;
+            
+            if (connectionState.global === 'connecting' || connectionState.conversation === 'connecting') {
+                status = 'connecting';
+                text = 'Connecting...';
+                className = 'connection-status connecting';
+            } else if (connectionState.global === 'reconnecting' || connectionState.conversation === 'reconnecting') {
+                status = 'reconnecting';
+                text = 'Reconnecting...';
+                className = 'connection-status reconnecting';
+            } else if (isGlobalConnected && isConversationConnected) {
+                if (connectionQuality === 'poor') {
+                    status = 'poor';
+                    text = 'Poor connection';
+                    className = 'connection-status poor';
+                } else {
+                    status = 'connected';
+                    text = 'Connected';
+                    className = 'connection-status online';
+                }
+            } else {
+                status = 'disconnected';
+                text = 'Disconnected';
+                className = 'connection-status offline';
+            }
+            
+            statusEl.className = className;
+            statusEl.innerHTML = `
+                <i class="fas fa-circle"></i>
+                <span>${text}</span>
+            `;
+            
+            // Auto-hide if connected and good quality
+            if (status === 'connected' && connectionQuality === 'good') {
+                setTimeout(() => {
+                    if (statusEl && statusEl.className.includes('online')) {
+                        statusEl.style.opacity = '0.5';
+                        setTimeout(() => {
+                            if (statusEl && statusEl.className.includes('online')) {
+                                statusEl.style.display = 'none';
+                            }
+                        }, 2000);
+                    }
+                }, 3000);
+            } else {
+                statusEl.style.opacity = '1';
+                statusEl.style.display = 'flex';
+            }
+        }
+        
+        // Show connection error to user
+        function showConnectionError(message) {
+            // Remove any existing error
+            const existingError = document.getElementById('connection-error');
+            if (existingError) {
+                existingError.remove();
+            }
+            
+            const errorDiv = document.createElement('div');
+            errorDiv.id = 'connection-error';
+            errorDiv.style.cssText = `
+                position: fixed;
+                top: 90px;
+                right: 20px;
+                background: linear-gradient(135deg, #fee2e2, #fecaca);
+                color: #dc2626;
+                padding: 12px 16px;
+                border-radius: 12px;
+                border: 1px solid #f87171;
+                box-shadow: 0 4px 12px rgba(220, 38, 38, 0.15);
+                z-index: 1001;
+                max-width: 300px;
+                font-size: 14px;
+                animation: slideIn 0.3s ease;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            `;
+            
+            errorDiv.innerHTML = `
+                <i class="fas fa-exclamation-triangle"></i>
+                <div>
+                    <div style="font-weight: 600; margin-bottom: 2px;">Connection Issue</div>
+                    <div style="font-size: 13px; opacity: 0.9;">${message}</div>
+                </div>
+                <button onclick="this.parentElement.remove()" style="
+                    background: none;
+                    border: none;
+                    color: #dc2626;
+                    cursor: pointer;
+                    padding: 4px;
+                    margin-left: 8px;
+                    font-size: 16px;
+                ">&times;</button>
+            `;
+            
+            document.body.appendChild(errorDiv);
+            
+            // Auto-remove after 10 seconds
+            setTimeout(() => {
+                if (errorDiv && errorDiv.parentNode) {
+                    errorDiv.style.animation = 'slideOut 0.3s ease';
+                    setTimeout(() => errorDiv.remove(), 300);
+                }
+            }, 10000);
         }
         function sendWebSocketMessage(type, data = {}) {
             if (websocket && websocket.readyState === WebSocket.OPEN) {
