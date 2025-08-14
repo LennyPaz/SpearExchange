@@ -2003,10 +2003,22 @@
             document.addEventListener('click', initializeAudioContext, { once: true });
             document.addEventListener('keydown', initializeAudioContext, { once: true });
             
-            // Handle page unload to close WebSocket
-            window.addEventListener('beforeunload', () => {
-                cleanup();
-            });
+            // Cleanup on page unload
+			window.addEventListener('beforeunload', () => {
+				// Stop typing indicators
+				if (isTyping && websocket && websocket.readyState === WebSocket.OPEN) {
+					sendWebSocketMessage('typing_stop');
+				}
+
+				// Close websocket cleanly
+				if (websocket) {
+					websocket.close(1000, 'Page unloading');
+				}
+
+				if (refreshInterval) {
+					clearInterval(refreshInterval);
+				}
+			});
             
             // Handle visibility change to manage connections
             document.addEventListener('visibilitychange', handleVisibilityChange);
@@ -4113,6 +4125,14 @@
             }
         }
         
+		// Clear WebSocket error indicator
+        function clearWebSocketError() {
+            const errorIndicator = document.getElementById('websocket-error');
+            if (errorIndicator) {
+                errorIndicator.remove();
+            }
+        }
+		
         // Show connection error to user
         function showConnectionError(message) {
             // Remove any existing error
@@ -4208,150 +4228,184 @@
                 typingUser.textContent = userName;
             }
             
-            indicator.style.display = 'flex';
-            scrollToBottom();
+            scrollToBottom(true);
         }
-
+        
         function hideTypingIndicator() {
             const indicator = document.getElementById('typing-indicator');
             if (indicator) {
-                indicator.style.display = 'none';
-            }
-        }
-
-        // Initialize audio context after user interaction
-        function initializeAudioContext() {
-            if (isAudioInitialized) return;
-            
-            try {
-                audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                isAudioInitialized = true;
-                console.log('🔊 Audio context initialized');
-                
-                // Process any queued notifications
-                if (notificationQueue.length > 0) {
-                    notificationQueue.forEach(() => playNotificationSound());
-                    notificationQueue = [];
-                }
-            } catch (error) {
-                console.error('Failed to initialize audio context:', error);
+                indicator.remove();
             }
         }
         
-        // Enhanced notification sound with proper user gesture handling
-        function playNotificationSound() {
-            try {
-                if (!isAudioInitialized) {
-                    // Queue the notification for later
-                    notificationQueue.push(true);
-                    return;
-                }
-                
-                if (!audioContext) {
-                    initializeAudioContext();
-                    return;
-                }
-                
-                // Resume audio context if suspended
-                if (audioContext.state === 'suspended') {
-                    audioContext.resume();
-                }
-                
-                // Create a pleasant notification sound
-                const oscillator = audioContext.createOscillator();
-                const gainNode = audioContext.createGain();
-                
-                oscillator.connect(gainNode);
-                gainNode.connect(audioContext.destination);
-                
-                // Create a pleasant two-tone notification
-                oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
-                oscillator.frequency.setValueAtTime(1000, audioContext.currentTime + 0.1);
-                
-                gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
-                
-                oscillator.start(audioContext.currentTime);
-                oscillator.stop(audioContext.currentTime + 0.3);
-            } catch (error) {
-                console.log('Audio notification not available:', error);
+        // Typing start/stop functions
+        function sendTypingStart() {
+            if (!isTyping && websocket && websocket.readyState === WebSocket.OPEN) {
+                sendWebSocketMessage('typing_start', {
+                    conversationId: selectedConversationId,
+                    userId: currentUser.id,
+                    userName: currentUser.name
+                });
+                isTyping = true;
+            }
+            
+            // Clear existing timeout
+            if (localTypingTimeout) {
+                clearTimeout(localTypingTimeout);
+            }
+            
+            // Send typing stop after 3 seconds of inactivity
+            localTypingTimeout = setTimeout(() => {
+                sendTypingStop();
+            }, 3000);
+        }
+        
+        function sendTypingStop() {
+            if (isTyping && websocket && websocket.readyState === WebSocket.OPEN) {
+                sendWebSocketMessage('typing_stop', {
+                    conversationId: selectedConversationId,
+                    userId: currentUser.id
+                });
+                isTyping = false;
+            }
+            
+            if (localTypingTimeout) {
+                clearTimeout(localTypingTimeout);
+                localTypingTimeout = null;
             }
         }
-
-        // Scroll to bottom helper
+        
+        // Enhanced scroll to bottom
         function scrollToBottom(smooth = false) {
             const messagesArea = document.getElementById('messages-area');
             if (!messagesArea) return;
             
-            // Use requestAnimationFrame to ensure DOM is updated
-            requestAnimationFrame(() => {
-                const scrollOptions = {
-                    top: messagesArea.scrollHeight,
-                    behavior: smooth ? 'smooth' : 'auto'
-                };
-                
-                try {
-                    messagesArea.scrollTo(scrollOptions);
-                } catch (error) {
-                    // Fallback for older browsers
-                    messagesArea.scrollTop = messagesArea.scrollHeight;
-                }
-                
-                console.log('📜 Scrolled to bottom:', messagesArea.scrollHeight);
-            });
+            const scrollOptions = {
+                top: messagesArea.scrollHeight,
+                behavior: smooth ? 'smooth' : 'auto'
+            };
+            
+            messagesArea.scrollTo(scrollOptions);
         }
-
-        // Enhanced Connection Status Management
-        function updateConnectionStatus(isConnected) {
-            const statusIndicator = document.getElementById('connection-status');
+        
+        // Utility functions
+        function showConversationsLoading(show) {
+            const loading = document.getElementById('conversations-loading');
+            const empty = document.getElementById('empty-conversations');
             
-            if (!statusIndicator) {
-                // Create status indicator if it doesn't exist
-                const indicator = document.createElement('div');
-                indicator.id = 'connection-status';
-                indicator.className = 'connection-status';
-                indicator.style.cssText = `
-                    position: fixed;
-                    top: 20px;
-                    right: 20px;
-                    padding: 8px 16px;
-                    border-radius: 20px;
-                    font-size: 0.875rem;
-                    font-weight: 500;
-                    z-index: 1000;
-                    display: none;
-                    align-items: center;
-                    gap: 8px;
-                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-                    transition: all 0.3s ease;
-                `;
-                document.body.appendChild(indicator);
-            }
-            
-            const indicator = document.getElementById('connection-status');
-            
-            if (isConnected) {
-                indicator.style.background = '#10b981';
-                indicator.style.color = 'white';
-                indicator.innerHTML = '<i class="fas fa-wifi"></i> Connected';
-                indicator.style.display = 'none'; // Hide when connected
+            if (show) {
+                if (loading) loading.style.display = 'flex';
+                if (empty) empty.style.display = 'none';
             } else {
-                indicator.style.background = '#ef4444';
-                indicator.style.color = 'white';
-                indicator.innerHTML = '<i class="fas fa-wifi-slash"></i> Reconnecting...';
-                indicator.style.display = 'flex'; // Show when disconnected
-                indicator.style.animation = 'pulse 2s infinite';
+                if (loading) loading.style.display = 'none';
             }
         }
         
-        // Clear WebSocket error indicator
-        function clearWebSocketError() {
-            const errorIndicator = document.getElementById('websocket-error');
-            if (errorIndicator) {
-                errorIndicator.remove();
-            }
+        function showEmptyConversations() {
+            const loading = document.getElementById('conversations-loading');
+            const empty = document.getElementById('empty-conversations');
+            
+            if (loading) loading.style.display = 'none';
+            if (empty) empty.style.display = 'flex';
         }
-		
+        
+        function hideEmptyConversations() {
+            const empty = document.getElementById('empty-conversations');
+            if (empty) empty.style.display = 'none';
+        }
+        
+        // Start auto-refresh - DISABLED when using WebSockets
+        function startAutoRefresh() {
+            // WebSocket handles real-time updates, so we don't need polling
+            // Only enable refresh as fallback if WebSocket fails
+            console.log('🔄 Auto-refresh disabled - using WebSocket for real-time updates');
+            
+            // Optional: Enable a much slower fallback refresh (5 minutes) only for conversations list
+            // in case WebSocket connection fails
+            refreshInterval = setInterval(async () => {
+                if (!websocket || websocket.readyState !== WebSocket.OPEN) {
+                    console.log('🔄 WebSocket not connected, refreshing conversations list...');
+                    await loadConversations();
+                    
+                    // Try to reconnect WebSocket if we have a selected conversation
+                    if (selectedConversationId) {
+                        console.log('🔄 Attempting to reconnect WebSocket...');
+                        connectWebSocket(selectedConversationId);
+                    }
+                }
+            }, 300000); // 5 minutes instead of 30 seconds
+        }
+        
+        // Format conversation time
+        function formatConversationTime(timestamp) {
+            if (!timestamp) return '';
+            
+            const date = new Date(timestamp);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMs / 3600000);
+            const diffDays = Math.floor(diffMs / 86400000);
+            
+            if (diffMins < 1) return 'Just now';
+            if (diffMins < 60) return `${diffMins}m ago`;
+            if (diffHours < 24) return `${diffHours}h ago`;
+            if (diffDays < 7) return `${diffDays}d ago`;
+            
+            return date.toLocaleDateString();
+        }
+        
+        // Format message time
+        function formatMessageTime(timestamp) {
+            if (!timestamp) return '';
+            
+            const date = new Date(timestamp);
+            const now = new Date();
+            
+            // If today, show time
+            if (date.toDateString() === now.toDateString()) {
+                return date.toLocaleTimeString('en-US', {
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    hour12: true
+                });
+            }
+            
+            // If this week, show day and time
+            const diffDays = Math.floor((now - date) / 86400000);
+            if (diffDays < 7) {
+                return date.toLocaleDateString('en-US', {
+                    weekday: 'short',
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    hour12: true
+                });
+            }
+            
+            // Otherwise show date and time
+            return date.toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                hour: 'numeric',
+                minute: '2-digit',
+                hour12: true
+            });
+        }
+        
+        // Escape HTML
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // Capitalize first letter
+        function capitalizeFirst(str) {
+            if (!str) return '';
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+        
         // Mobile navigation functions
         function showMobileChatView() {
             const conversationsSidebar = document.querySelector('.conversations-sidebar');
@@ -4388,71 +4442,54 @@
             chatHeader.insertBefore(backButton, chatHeader.firstChild);
         }
         
-        // Handle window resize
+        function hideMobileChatView() {
+            const sidebar = document.querySelector('.conversations-sidebar');
+            const chatArea = document.querySelector('.chat-area');
+            
+            if (sidebar) sidebar.classList.remove('mobile-hidden');
+            if (chatArea) chatArea.classList.remove('mobile-visible');
+            
+            // Remove mobile back button
+            const backButton = document.querySelector('.mobile-chat-back');
+            if (backButton) {
+                backButton.remove();
+            }
+        }
+        
         function handleWindowResize() {
             if (window.innerWidth > 800) {
-                // Reset mobile classes for desktop view
-                const conversationsSidebar = document.querySelector('.conversations-sidebar');
+                // Reset mobile classes on desktop
+                const sidebar = document.querySelector('.conversations-sidebar');
                 const chatArea = document.querySelector('.chat-area');
                 
-                conversationsSidebar.classList.remove('mobile-hidden');
-                chatArea.classList.remove('mobile-visible');
+                if (sidebar) sidebar.classList.remove('mobile-hidden');
+                if (chatArea) chatArea.classList.remove('mobile-visible');
                 
-                // Remove mobile back button
                 const backButton = document.querySelector('.mobile-chat-back');
                 if (backButton) {
                     backButton.remove();
                 }
             }
         }
-
-        function showConversationsLoading(show) {
-            const loading = document.getElementById('conversations-loading');
-            if (loading) {
-                loading.style.display = show ? 'flex' : 'none';
+        
+        // Navigation functions
+        function toggleUserMenu() {
+            const dropdown = document.getElementById('user-dropdown');
+            if (dropdown) {
+                dropdown.classList.toggle('show');
             }
         }
-
-        function showEmptyConversations() {
-            const emptyConversations = document.getElementById('empty-conversations');
-            const conversationsLoading = document.getElementById('conversations-loading');
-            if (emptyConversations) {
-                emptyConversations.style.display = 'flex';
-            }
-            if (conversationsLoading) {
-                conversationsLoading.style.display = 'none';
-            }
-        }
-
-        function hideEmptyConversations() {
-            const emptyConversations = document.getElementById('empty-conversations');
-            if (emptyConversations) {
-                emptyConversations.style.display = 'none';
-            }
-        }
-
-        // Start auto-refresh - DISABLED when using WebSockets
-        function startAutoRefresh() {
-            // WebSocket handles real-time updates, so we don't need polling
-            // Only enable refresh as fallback if WebSocket fails
-            console.log('🔄 Auto-refresh disabled - using WebSocket for real-time updates');
+        
+        // Close user menu when clicking outside
+        document.addEventListener('click', (e) => {
+            const userMenu = document.querySelector('.user-menu');
+            const dropdown = document.getElementById('user-dropdown');
             
-            // Optional: Enable a much slower fallback refresh (5 minutes) only for conversations list
-            // in case WebSocket connection fails
-            refreshInterval = setInterval(async () => {
-                if (!websocket || websocket.readyState !== WebSocket.OPEN) {
-                    console.log('🔄 WebSocket not connected, refreshing conversations list...');
-                    await loadConversations();
-                    
-                    // Try to reconnect WebSocket if we have a selected conversation
-                    if (selectedConversationId) {
-                        console.log('🔄 Attempting to reconnect WebSocket...');
-                        connectWebSocket(selectedConversationId);
-                    }
-                }
-            }, 300000); // 5 minutes instead of 30 seconds
-        }
-
+            if (userMenu && dropdown && !userMenu.contains(e.target)) {
+                dropdown.classList.remove('show');
+            }
+        });
+        
         // Mobile menu functions
         function toggleMobileMenu() {
             const sidebar = document.getElementById('mobile-sidebar');
@@ -4462,7 +4499,7 @@
             overlay.classList.toggle('active');
             document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : '';
         }
-
+        
         function closeMobileMenu() {
             const sidebar = document.getElementById('mobile-sidebar');
             const overlay = document.querySelector('.mobile-overlay');
@@ -4471,8 +4508,8 @@
             overlay.classList.remove('active');
             document.body.style.overflow = '';
         }
-
-        // Toggle user menu
+        
+		// Toggle user menu
         function toggleUserMenu() {
             const dropdown = document.getElementById('user-dropdown');
             dropdown.classList.toggle('show');
@@ -4484,122 +4521,132 @@
                 }
             });
         }
-
+		
         function logout() {
             document.getElementById('user-dropdown').classList.remove('show');
             enhancedLogout();
         }
-
-        // Utility functions
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
-        function capitalizeFirst(str) {
-            if (!str) return '';
-            return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
-        }
-
-        function formatConversationTime(dateString) {
-            if (!dateString) return '';
-            
-            let date;
-            try {
-                // Check if dateString already includes timezone info (ISO format)
-                if (dateString.includes('T') && (dateString.includes('Z') || dateString.includes('+') || dateString.includes('-'))) {
-                    // Already has timezone info
-                    date = new Date(dateString);
-                } else {
-                    // Database format without timezone (add Z to treat as UTC)
-                    date = new Date(dateString + 'Z');
-                }
-                
-                // Check if date is valid
-                if (isNaN(date.getTime())) {
-                    console.error('Invalid conversation date:', dateString);
-                    return 'Unknown';
-                }
-                
-                const now = new Date();
-                const diffTime = now.getTime() - date.getTime();
-                const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-                
-                if (diffDays === 0) {
-                    return date.toLocaleTimeString('en-US', { 
-                        hour: 'numeric', 
-                        minute: '2-digit',
-                        hour12: true,
-                        timeZone: 'America/New_York'
-                    });
-                } else if (diffDays === 1) {
-                    return 'Yesterday';
-                } else if (diffDays <= 7) {
-                    return `${diffDays}d ago`;
-                } else {
-                    return date.toLocaleDateString('en-US', { 
-                        month: 'short', 
-                        day: 'numeric',
-                        timeZone: 'America/New_York'
-                    });
-                }
-            } catch (error) {
-                console.error('Error formatting conversation time:', error, dateString);
-                return 'Unknown';
-            }
-        }
-
-        function formatMessageTime(dateString) {
-            if (!dateString) return '';
-            
-            let date;
-            try {
-                // Check if dateString already includes timezone info (ISO format from WebSocket)
-                if (dateString.includes('T') && (dateString.includes('Z') || dateString.includes('+') || dateString.includes('-'))) {
-                    // Already has timezone info (from WebSocket new messages)
-                    date = new Date(dateString);
-                } else {
-                    // Database format without timezone (add Z to treat as UTC)
-                    date = new Date(dateString + 'Z');
-                }
-                
-                // Check if date is valid
-                if (isNaN(date.getTime())) {
-                    console.error('Invalid date:', dateString);
-                    return 'Now';
-                }
-                
-                return date.toLocaleTimeString('en-US', { 
-                    hour: 'numeric', 
-                    minute: '2-digit',
-                    hour12: true,
-                    timeZone: 'America/New_York'
-                });
-            } catch (error) {
-                console.error('Error formatting message time:', error, dateString);
-                return 'Now';
-            }
-        }
-
-        // Cleanup on page unload
-        window.addEventListener('beforeunload', () => {
-            // Stop typing indicators
-            if (isTyping && websocket && websocket.readyState === WebSocket.OPEN) {
-                sendWebSocketMessage('typing_stop');
-            }
-            
-            // Close websocket cleanly
-            if (websocket) {
-                websocket.close(1000, 'Page unloading');
-            }
-            
-            if (refreshInterval) {
-                clearInterval(refreshInterval);
-            }
-        });
         
-        // Refresh chat for demo purposes (triggered by backtick key)
+        // Demo function
+        function refreshChatForDemo() {
+            console.log('🔄 Demo refresh triggered');
+            
+            // Add a demo message
+            if (selectedConversationId) {
+                const demoMessage = {
+                    id: Date.now(),
+                    sender_id: currentUser.id === 1 ? 2 : 1, // Opposite user
+                    sender_name: 'Demo User',
+                    message: 'This is a demo message! 👋',
+                    created_at: new Date().toISOString()
+                };
+                
+                const messageElement = createMessageElement(demoMessage);
+                const messagesArea = document.getElementById('messages-area');
+                if (messagesArea) {
+                    messagesArea.appendChild(messageElement);
+                    scrollToBottom(true);
+                }
+                
+                playNotificationSound('message');
+                showTypingIndicator('Demo User');
+                
+                setTimeout(() => {
+                    hideTypingIndicator();
+                }, 2000);
+            }
+        }
+        
+        // Enhanced message input setup
+        function setupEnhancedMessageInput() {
+            const messageInput = document.getElementById('message-input');
+            if (!messageInput) return;
+            
+            // Typing indicators
+            messageInput.addEventListener('input', () => {
+                if (selectedConversationId && messageInput.value.trim()) {
+                    sendTypingStart();
+                } else {
+                    sendTypingStop();
+                }
+            });
+            
+            // Stop typing when focus is lost
+            messageInput.addEventListener('blur', () => {
+                sendTypingStop();
+            });
+            
+            // Handle paste events
+            messageInput.addEventListener('paste', (e) => {
+                // Allow paste but limit length
+                setTimeout(() => {
+                    if (messageInput.value.length > 1000) {
+                        messageInput.value = messageInput.value.substring(0, 1000);
+                        showErrorFeedback('Message too long. Maximum 1000 characters.');
+                    }
+                }, 10);
+            });
+        }
+        
+        // Setup keyboard navigation
+        function setupKeyboardNavigation() {
+            document.addEventListener('keydown', (e) => {
+                // Escape key to close mobile menu
+                if (e.key === 'Escape') {
+                    closeMobileMenu();
+                    
+                    const dropdown = document.getElementById('user-dropdown');
+                    if (dropdown) dropdown.classList.remove('show');
+                }
+                
+                // Ctrl/Cmd + Enter to send message
+                if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                    e.preventDefault();
+                    sendMessage();
+                }
+                
+                // Alt + 1-9 to switch conversations
+                if (e.altKey && e.key >= '1' && e.key <= '9') {
+                    e.preventDefault();
+                    const index = parseInt(e.key) - 1;
+                    if (conversations[index]) {
+                        selectConversation(conversations[index].id);
+                    }
+                }
+            });
+        }
+        
+        // Setup ARIA labels and roles for accessibility
+        function setupAccessibility() {
+            // Add ARIA labels to key elements
+            const elements = {
+                'conversations-list': 'Conversations list',
+                'messages-area': 'Messages',
+                'message-input': 'Type your message',
+                'send-button': 'Send message',
+                'search-conversations': 'Search conversations'
+            };
+            
+            Object.entries(elements).forEach(([id, label]) => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.setAttribute('aria-label', label);
+                }
+            });
+            
+            // Add live region for status updates
+            const liveRegion = document.createElement('div');
+            liveRegion.id = 'status-live-region';
+            liveRegion.setAttribute('aria-live', 'polite');
+            liveRegion.setAttribute('aria-atomic', 'true');
+            liveRegion.style.position = 'absolute';
+            liveRegion.style.left = '-10000px';
+            liveRegion.style.width = '1px';
+            liveRegion.style.height = '1px';
+            liveRegion.style.overflow = 'hidden';
+            document.body.appendChild(liveRegion);
+        }
+		// Refresh chat for demo purposes (triggered by backtick key)
         async function refreshChatForDemo() {
             console.log('🔄 Demo refresh triggered by backtick key...');
             
@@ -4626,6 +4673,54 @@
             } catch (error) {
                 console.error('❌ Demo refresh failed:', error);
             }
+        }
+        
+        // Announce status changes for screen readers
+        function announceStatusChange(message) {
+            const liveRegion = document.getElementById('status-live-region');
+            if (liveRegion) {
+                liveRegion.textContent = message;
+            }
+        }
+        
+        // Initialize ping interval
+        function startPingInterval() {
+            if (pingInterval) {
+                clearInterval(pingInterval);
+            }
+            
+            pingInterval = setInterval(() => {
+                sendPing();
+            }, 30000); // Ping every 30 seconds
+        }
+        
+        // Stop ping interval
+        function stopPingInterval() {
+            if (pingInterval) {
+                clearInterval(pingInterval);
+                pingInterval = null;
+            }
+        }
+        
+        // Enhanced setup after DOM loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            setupEnhancedMessageInput();
+            console.log('✅ All enhanced messaging features initialized');
+        });
+        
+        // Export functions for debugging (only in development)
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            window.messagingDebug = {
+                connectGlobalWebSocket,
+                connectWebSocket,
+                sendWebSocketMessage,
+                processMessageBuffer,
+                showTypingIndicator,
+                hideTypingIndicator,
+                playNotificationSound,
+                updateConnectionStatus,
+                checkConnectionQuality: () => checkConnectionQuality()
+            };
         }
     </script>
 </body>
