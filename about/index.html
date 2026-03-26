@@ -105,26 +105,194 @@
       color: white;
     }
 
+    .page-shell {
+      background:
+        radial-gradient(circle at top left, rgba(255, 215, 0, 0.12), transparent 32%),
+        radial-gradient(circle at top right, rgba(139, 38, 53, 0.16), transparent 28%),
+        linear-gradient(180deg, #fffdf9 0%, #f8fafc 30%, #f3f6fb 100%);
+      min-height: 100vh;
+    }
+
     .hero {
-      text-align: center;
-      padding: 4rem 2rem;
-      background: var(--primary-color);
+      position: relative;
+      overflow: hidden;
+      padding: 5.5rem 2rem 4.5rem;
       color: white;
+      background:
+        linear-gradient(135deg, rgba(107, 27, 42, 0.92), rgba(139, 38, 53, 0.94)),
+        linear-gradient(180deg, #8B2635, #6B1B2A);
+    }
+
+    .hero::before,
+    .hero::after {
+      content: "";
+      position: absolute;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      filter: blur(2px);
+    }
+
+    .hero::before {
+      width: 220px;
+      height: 220px;
+      top: -60px;
+      right: 8%;
+    }
+
+    .hero::after {
+      width: 320px;
+      height: 320px;
+      bottom: -180px;
+      left: 4%;
+    }
+
+    .hero-inner {
+      position: relative;
+      z-index: 1;
+      max-width: 1150px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 2rem;
+      align-items: end;
+    }
+
+    .hero-copy {
+      max-width: 700px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.45rem 0.9rem;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.14);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 1.25rem;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.5rem, 5vw, 4.5rem);
+      line-height: 1.05;
+      margin-bottom: 1rem;
+      letter-spacing: -0.03em;
+    }
+
+    .hero p {
+      font-size: 1.08rem;
+      line-height: 1.8;
+      color: rgba(255, 255, 255, 0.9);
+      max-width: 62ch;
+    }
+
+    .hero-metrics {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem;
+    }
+
+    .metric-card {
+      padding: 1.25rem;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.16);
+    }
+
+    .metric-value {
+      font-size: 1.8rem;
+      font-weight: 800;
+      margin-bottom: 0.3rem;
+    }
+
+    .metric-label {
+      font-size: 0.92rem;
+      color: rgba(255, 255, 255, 0.82);
     }
 
     .container {
-      max-width: 1000px;
-      margin: 2rem auto;
-      padding: 1rem;
-      text-align: justify;
+      max-width: 1150px;
+      margin: 0 auto;
+      padding: 2rem 1.25rem 4rem;
+    }
+
+    .section-grid {
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 1.5rem;
+      margin-top: -2.5rem;
+      position: relative;
+      z-index: 2;
     }
 
     .card {
-      background: white;
+      background: rgba(255, 255, 255, 0.92);
       padding: 2rem;
-      margin-bottom: 2rem;
-      border-radius: var(--border-radius);
-      box-shadow: var(--shadow-light);
+      margin-bottom: 1.5rem;
+      border-radius: 22px;
+      box-shadow: var(--shadow-medium);
+      border: 1px solid rgba(139, 38, 53, 0.08);
+      backdrop-filter: blur(10px);
+    }
+
+    .card h2 {
+      font-size: 1.6rem;
+      margin-bottom: 0.9rem;
+      letter-spacing: -0.02em;
+    }
+
+    .card p {
+      color: var(--text-light);
+      line-height: 1.8;
+    }
+
+    .mission-points {
+      display: grid;
+      gap: 0.9rem;
+      margin-top: 1.35rem;
+    }
+
+    .mission-point {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 0.85rem;
+      align-items: start;
+      padding: 0.95rem 1rem;
+      border-radius: 16px;
+      background: rgba(139, 38, 53, 0.05);
+    }
+
+    .mission-point i {
+      color: var(--primary-color);
+      margin-top: 0.25rem;
+    }
+
+    .mission-point strong {
+      display: block;
+      color: var(--text-dark);
+      margin-bottom: 0.15rem;
+    }
+
+    .pill-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.65rem;
+      margin-top: 1.25rem;
+    }
+
+    .pill {
+      padding: 0.55rem 0.9rem;
+      border-radius: 999px;
+      background: rgba(255, 215, 0, 0.14);
+      color: var(--primary-dark);
+      font-weight: 700;
+      font-size: 0.9rem;
     }
 
     .team-card {
@@ -137,15 +305,39 @@
 
     .team-member {
       text-align: center;
-      width: 160px;
+      width: 280px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1.5rem;
+      border-radius: 20px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(248,250,252,0.96));
+      border: 1px solid rgba(139, 38, 53, 0.08);
+      box-shadow: var(--shadow-light);
     }
 
-    .team-member img {
+    .team-member img,
+    .team-avatar {
       width: 120px;
       height: 120px;
       border-radius: 50%;
-      object-fit: cover;
       margin-bottom: 0.5rem;
+    }
+
+    .team-member img {
+      object-fit: cover;
+    }
+
+    .team-avatar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, var(--primary-color), #B45309);
+      color: white;
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      box-shadow: 0 10px 25px rgba(139, 38, 53, 0.22);
     }
 
     .name-button {
@@ -163,6 +355,27 @@
       background: var(--primary-dark);
     }
 
+    .team-role {
+      color: var(--primary-color);
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .team-bio {
+      color: var(--text-light);
+      font-size: 0.95rem;
+      line-height: 1.7;
+      text-align: left;
+      margin-bottom: 0.9rem;
+    }
+
+    .team-links {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+      margin-top: auto;
+    }
+
     .linkedin-button {
       display: inline-block;
       font-size: 1.2rem;
@@ -175,6 +388,7 @@
 
     .cta-buttons {
       text-align: center;
+      margin-top: 1.25rem;
     }
 
     .cta-buttons a {
@@ -203,99 +417,206 @@
       text-align: center;
       padding: 2rem;
     }
+
+    .footer p {
+      color: rgba(255, 255, 255, 0.86);
+    }
+
+    @media (max-width: 900px) {
+      .hero-inner,
+      .section-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-metrics {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 760px) {
+      .header {
+        padding: 1rem;
+      }
+
+      .nav {
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .nav-links,
+      .auth-buttons {
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      .hero {
+        padding: 4.5rem 1.25rem 3.5rem;
+      }
+
+      .hero-metrics {
+        grid-template-columns: 1fr;
+      }
+
+      .team-member {
+        width: 100%;
+      }
+    }
   </style>
 </head>
 <body>
-  <header class="header">
-    <div class="nav">
-      <a href="../index.html" class="logo">
-        <div class="logo-icon">SE</div>
-        The Spear Exchange
-      </a>
-      <div class="nav-links">
-        <a href="../index.html">Home</a>
-        <a href="../listings/index.html">Browse</a>
-        <a href="about.html" class="active">About Us</a>
-        <a href="../contact/contact.html">Contact</a>
+  <div class="page-shell">
+    <header class="header">
+      <div class="nav">
+        <a href="../" class="logo">
+          <div class="logo-icon">SE</div>
+          The Spear Exchange
+        </a>
+        <div class="nav-links">
+          <a href="../">Home</a>
+          <a href="../listings/">Browse</a>
+          <a href="../about/" class="active">About Us</a>
+          <a href="../contact/">Contact</a>
+        </div>
+        <div class="auth-buttons">
+          <a href="../login/">Login</a>
+          <a href="../signup/">Sign Up</a>
+        </div>
       </div>
-      <div class="auth-buttons">
-        <a href="../login/index.html">Login</a>
-        <a href="../signup/index.html">Sign Up</a>
+    </header>
+
+    <section class="hero">
+      <div class="hero-inner">
+        <div class="hero-copy">
+          <div class="eyebrow"><i class="fas fa-seedling"></i> Built at Florida State University</div>
+          <h1>About The Spear Exchange</h1>
+          <p>
+            The Spear Exchange is a student-focused marketplace built to make campus buying, selling, and short-term housing discovery feel more trustworthy, more organized, and easier to use.
+          </p>
+        </div>
+        <div class="hero-metrics">
+          <div class="metric-card">
+            <div class="metric-value">2025</div>
+            <div class="metric-label">Project launched as an FSU-first marketplace concept</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-value">2</div>
+            <div class="metric-label">Builders shaping the product, flow, and systems</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-value">Students</div>
+            <div class="metric-label">Focused on campus affordability, trust, and usability</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-value">SE</div>
+            <div class="metric-label">Marketplace, messaging, and sublease discovery in one place</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="container">
+      <div class="section-grid">
+        <div>
+          <div class="card">
+            <h2>Our Mission</h2>
+            <p>
+              We are building a trusted and affordable marketplace for Florida State University students, designed to strengthen campus connections while making everyday items, creative products, and sublease opportunities easier to find and navigate.
+            </p>
+            <div class="mission-points">
+              <div class="mission-point">
+                <i class="fas fa-shield-alt"></i>
+                <div>
+                  <strong>Trust first</strong>
+                  The experience should feel more reliable and transparent than a scattered mix of student group posts.
+                </div>
+              </div>
+              <div class="mission-point">
+                <i class="fas fa-bolt"></i>
+                <div>
+                  <strong>Faster decisions</strong>
+                  Listings, messages, and sublease details should help students understand what matters without extra friction.
+                </div>
+              </div>
+              <div class="mission-point">
+                <i class="fas fa-users"></i>
+                <div>
+                  <strong>Built for Seminoles</strong>
+                  The platform is intentionally shaped around the practical needs of FSU students living, studying, and trading on campus.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h2>What We’re Building</h2>
+            <p>
+              The Spear Exchange is evolving into a single student marketplace where regular items, 3D printed FSU-inspired products, and subleases all live inside one cleaner flow. The goal is not just to list things, but to make campus commerce easier to browse, compare, and act on.
+            </p>
+            <div class="pill-list">
+              <span class="pill">Marketplace Listings</span>
+              <span class="pill">3D Printed FSU Items</span>
+              <span class="pill">Sublease Discovery</span>
+              <span class="pill">Student Messaging</span>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="card">
+            <h2>Meet the Team</h2>
+            <p>
+              The current product direction is being shaped by two FSU students bringing together technical systems thinking, workflow design, and a practical understanding of how campus users actually search, compare, and communicate.
+            </p>
+            <div class="team-card">
+              <div class="team-member">
+                <div class="team-avatar" aria-hidden="true">LP</div>
+                <a href="https://lennypaz.com/" target="_blank" class="name-button">Lenny Paz</a>
+                <div class="team-role">Information Technology Student</div>
+                <p class="team-bio">
+                  Lenny is an FSU Information Technology student focused on networking and cybersecurity. He brings a systems-oriented perspective to The Spear Exchange, with an emphasis on secure, reliable tools and practical student-first product building.
+                </p>
+                <div class="team-links">
+                  <a href="https://lennypaz.com/" target="_blank" class="linkedin-button" aria-label="Lenny Paz website"><i class="fas fa-globe"></i></a>
+                  <a href="https://www.linkedin.com/in/lennypaz/" target="_blank" class="linkedin-button" aria-label="Lenny Paz LinkedIn"><i class="fab fa-linkedin"></i></a>
+                </div>
+              </div>
+              <div class="team-member">
+                <div class="team-avatar" aria-hidden="true">JJ</div>
+                <a href="https://www.johnjimenez.me/" target="_blank" class="name-button">John Jimenez</a>
+                <div class="team-role">Data &amp; Automation Analyst</div>
+                <p class="team-bio">
+                  John is an FSU IT student whose work centers on reporting, workflow automation, and process improvement. He brings an operations-focused perspective to The Spear Exchange, helping shape clearer marketplace flows, stronger organization, and scalable student-facing systems.
+                </p>
+                <div class="team-links">
+                  <a href="https://www.johnjimenez.me/" target="_blank" class="linkedin-button" aria-label="John Jimenez website"><i class="fas fa-globe"></i></a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h2>Join Our Community</h2>
+            <p>
+              Whether you are clearing out your dorm, posting a sublease, or testing a new 3D printed design idea, The Spear Exchange is being built to give FSU students a cleaner home for campus commerce.
+            </p>
+            <div class="cta-buttons">
+              <a href="../listings/" class="btn-secondary">Start Shopping</a>
+              <a href="../create-listing/" class="btn-secondary">Sell Your Items</a>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-  </header>
 
-  <!-- Rest of the content remains unchanged -->
-
-
-  <section class="hero">
-    <h1>About The Spear Exchange</h1>
-    <p>Connecting FSU students through safe, affordable, and convenient marketplace experiences since 2025.</p>
-  </section>
-
-  <div class="container">
-    <div class="card">
-      <h2 style="text-align: center;">Our Mission</h2>
+    <footer class="footer">
+      <h3>Questions About The Spear Exchange?</h3>
+      <p>We're here to help! Reach out to our team for any questions or support.</p>
       <p>
-        To create a trusted, secure, and affordable marketplace exclusively for Florida State University students, fostering community connections while making essential items accessible to all Seminoles.
+        <i class="fas fa-envelope"></i> support@spearexchange.fsu.edu
+        &nbsp;&nbsp;
+        <i class="fas fa-phone"></i> (850) 555-SPEAR
       </p>
-    </div>
-
-    <div class="card">
-      <h2 style="text-align: center;">Meet Our Team</h2>
-      <p>The passionate FSU students behind The Spear Exchange, working to make campus commerce safer and more accessible for everyone.</p>
-      <div class="team-card">
-        <div class="team-member">
-          <img src="https://randomuser.me/api/portraits/lego/1.jpg" alt="Maksym Brailovskyi" />
-          <a href="https://www.linkedin.com/in/maksymbr/" target="_blank" class="name-button">Maksym Brailovskyi</a>
-          <br />
-          <a href="https://www.linkedin.com/in/maksymbr/" target="_blank" class="linkedin-button"><i class="fab fa-linkedin"></i></a>
-        </div>
-        <div class="team-member">
-          <img src="https://randomuser.me/api/portraits/lego/2.jpg" alt="Jose Mon" />
-          <a href="https://www.linkedin.com/in/josemon-it" target="_blank" class="name-button">Jose Mon</a>
-          <br />
-          <a href="https://www.linkedin.com/in/josemon-it" target="_blank" class="linkedin-button"><i class="fab fa-linkedin"></i></a>
-        </div>
-        <div class="team-member">
-          <img src="https://randomuser.me/api/portraits/lego/3.jpg" alt="Lenny Paz" />
-          <a href="https://www.linkedin.com/in/lennypaz/" target="_blank" class="name-button">Lenny Paz</a>
-          <br />
-          <a href="https://www.linkedin.com/in/lennypaz/" target="_blank" class="linkedin-button"><i class="fab fa-linkedin"></i></a>
-        </div>
-        <div class="team-member">
-          <img src="https://randomuser.me/api/portraits/lego/4.jpg" alt="Zaheen Rahman" />
-          <a href="https://www.linkedin.com/in/zaheen-rahman/" target="_blank" class="name-button">Zaheen Rahman</a>
-          <br />
-          <a href="https://www.linkedin.com/in/zaheen-rahman/" target="_blank" class="linkedin-button"><i class="fab fa-linkedin"></i></a>
-        </div>
-        <div class="team-member">
-          <img src="https://randomuser.me/api/portraits/lego/5.jpg" alt="Javin Vance" />
-          <a href="https://www.linkedin.com/in/javin-vance/" target="_blank" class="name-button">Javin Vance</a>
-          <br />
-          <a href="https://www.linkedin.com/in/javin-vance/" target="_blank" class="linkedin-button"><i class="fab fa-linkedin"></i></a>
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <h2 style="text-align: center;">Join Our Community</h2>
-      <p>Ready to start buying and selling with fellow Seminoles? Join thousands of FSU students who trust The Spear Exchange for safe, affordable transactions.</p>
-      <div class="cta-buttons">
-        <a href="../listings/index.html" class="btn-secondary">Start Shopping</a>
-        <a href="../create-listing/index.html" class="btn-secondary">Sell Your Items</a>
-      </div>
-    </div>
+    </footer>
   </div>
-
-  <footer class="footer">
-    <h3>Questions About The Spear Exchange?</h3>
-    <p>We're here to help! Reach out to our team for any questions or support.</p>
-    <p>
-      <i class="fas fa-envelope"></i> support@spearexchange.fsu.edu
-      &nbsp;&nbsp;
-      <i class="fas fa-phone"></i> (850) 555-SPEAR
-    </p>
-  </footer>
 </body>
 </html>
