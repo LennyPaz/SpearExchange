@@ -1,6 +1,273 @@
 import bcrypt from 'bcryptjs';
 export { ChatRoom } from './chat-room.js';
 
+const DEFAULT_WORKER_URL = 'https://spear-exchange.lenny-paz123.workers.dev';
+const DEFAULT_FRONTEND_URL = 'https://lennypaz.github.io/SpearExchange';
+const DEFAULT_ALLOWED_ORIGINS = [
+  'http://localhost:3000',
+  'http://127.0.0.1:3000',
+  'http://localhost:8000',
+  'http://127.0.0.1:8000'
+];
+const LISTING_TYPE_GOODS = 'goods';
+const LISTING_TYPE_SUBLEASE = 'sublease';
+const PRICE_PERIOD_ONE_TIME = 'one_time';
+const PRICE_PERIOD_MONTHLY = 'monthly';
+const CATEGORY_3D_PRINTS = '3d-printed-fsu-items';
+const CATEGORY_SUBLEASE = 'sublease';
+
+function trimTrailingSlash(value) {
+  return value ? value.replace(/\/+$/, '') : value;
+}
+
+function getWorkerBaseUrl(env) {
+  return trimTrailingSlash(env.PRODUCTION_URL || DEFAULT_WORKER_URL);
+}
+
+function getFrontendBaseUrl(env) {
+  return trimTrailingSlash(env.FRONTEND_URL || DEFAULT_FRONTEND_URL);
+}
+
+function getFrontendOrigin(env) {
+  return new URL(getFrontendBaseUrl(env)).origin;
+}
+
+function getAllowedOrigins(env) {
+  const origins = new Set(DEFAULT_ALLOWED_ORIGINS);
+  origins.add(getFrontendOrigin(env));
+
+  if (env.ALLOWED_ORIGINS) {
+    for (const origin of env.ALLOWED_ORIGINS.split(',').map(item => item.trim()).filter(Boolean)) {
+      origins.add(origin);
+    }
+  }
+
+  return origins;
+}
+
+function getCorsHeaders(request, env) {
+  const requestOrigin = request.headers.get('Origin');
+  const allowedOrigins = getAllowedOrigins(env);
+  const allowOrigin = requestOrigin && allowedOrigins.has(requestOrigin)
+    ? requestOrigin
+    : getFrontendOrigin(env);
+
+  return {
+    'Access-Control-Allow-Origin': allowOrigin,
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization, Cookie',
+    'Access-Control-Allow-Credentials': 'true',
+    'Access-Control-Expose-Headers': 'Set-Cookie',
+    'Vary': 'Origin'
+  };
+}
+
+function buildFrontendRedirect(env, path, params = {}) {
+  const redirectUrl = new URL(`${getFrontendBaseUrl(env)}${path}`);
+
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== '') {
+      redirectUrl.searchParams.set(key, String(value));
+    }
+  });
+
+  return new Response(
+    `<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0;url=${redirectUrl.toString()}"></head></html>`,
+    { headers: { 'Content-Type': 'text/html' } }
+  );
+}
+
+function parseBooleanFlag(value, defaultValue = false) {
+  if (value === undefined || value === null || value === '') {
+    return defaultValue;
+  }
+
+  if (typeof value === 'boolean') {
+    return value;
+  }
+
+  if (typeof value === 'number') {
+    return value !== 0;
+  }
+
+  const normalized = String(value).trim().toLowerCase();
+  return ['1', 'true', 'yes', 'on'].includes(normalized);
+}
+
+function parseNullableNumber(value) {
+  if (value === undefined || value === null || value === '') {
+    return null;
+  }
+
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function normalizeListingType(value) {
+  return value === LISTING_TYPE_SUBLEASE ? LISTING_TYPE_SUBLEASE : LISTING_TYPE_GOODS;
+}
+
+function isValidListingType(value) {
+  return value === LISTING_TYPE_GOODS || value === LISTING_TYPE_SUBLEASE;
+}
+
+function normalizePricePeriod(value, listingType) {
+  if (listingType === LISTING_TYPE_SUBLEASE) {
+    return PRICE_PERIOD_MONTHLY;
+  }
+
+  return value === PRICE_PERIOD_MONTHLY ? PRICE_PERIOD_MONTHLY : PRICE_PERIOD_ONE_TIME;
+}
+
+function isValidPricePeriod(value) {
+  return value === PRICE_PERIOD_ONE_TIME || value === PRICE_PERIOD_MONTHLY;
+}
+
+function normalizeCategory(value, listingType) {
+  if (listingType === LISTING_TYPE_SUBLEASE) {
+    return CATEGORY_SUBLEASE;
+  }
+
+  return String(value || '').trim().toLowerCase();
+}
+
+function serializeImageUrls(imageUrls) {
+  if (Array.isArray(imageUrls)) {
+    return JSON.stringify(imageUrls);
+  }
+
+  if (typeof imageUrls === 'string' && imageUrls.trim()) {
+    return imageUrls;
+  }
+
+  return JSON.stringify([]);
+}
+
+function parseImageUrls(value) {
+  if (!value) {
+    return [];
+  }
+
+  if (Array.isArray(value)) {
+    return value;
+  }
+
+  try {
+    const parsed = JSON.parse(value);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function formatListingRecord(record) {
+  if (!record) {
+    return record;
+  }
+
+  return {
+    ...record,
+    image_urls: parseImageUrls(record.image_urls),
+    listing_type: record.listing_type || LISTING_TYPE_GOODS,
+    price_period: record.price_period || PRICE_PERIOD_ONE_TIME,
+    negotiable: Boolean(record.negotiable),
+    furnished: Boolean(record.furnished),
+    utilities_included: Boolean(record.utilities_included),
+    parking_available: Boolean(record.parking_available),
+    pet_friendly: Boolean(record.pet_friendly),
+    roommates_allowed: Boolean(record.roommates_allowed)
+  };
+}
+
+function buildListingPayload(body, options = {}) {
+  const partial = options.partial === true;
+  const rawListingType = body.listing_type;
+  if (rawListingType !== undefined && rawListingType !== null && rawListingType !== '' && !isValidListingType(rawListingType)) {
+    return { error: 'Invalid listing_type. Expected goods or sublease.' };
+  }
+
+  const listingType = normalizeListingType(body.listing_type);
+  if (
+    body.price_period !== undefined &&
+    body.price_period !== null &&
+    body.price_period !== '' &&
+    !isValidPricePeriod(body.price_period)
+  ) {
+    return { error: 'Invalid price_period. Expected one_time or monthly.' };
+  }
+
+  const pricePeriod = normalizePricePeriod(body.price_period, listingType);
+  const category = normalizeCategory(body.category, listingType);
+
+  const payload = {
+    title: body.title?.trim() || '',
+    description: body.description?.trim() || '',
+    price: parseNullableNumber(body.price),
+    category,
+    condition: listingType === LISTING_TYPE_SUBLEASE ? 'n/a' : (body.condition?.trim() || ''),
+    listing_type: listingType,
+    price_period: pricePeriod,
+    negotiable: parseBooleanFlag(body.negotiable),
+    contact_method: body.contact_method?.trim() || '',
+    phone_number: body.phone_number?.trim() || '',
+    image_urls: serializeImageUrls(body.imageUrls ?? body.image_urls),
+    location: body.location?.trim() || '',
+    availability_start: body.availability_start || null,
+    availability_end: body.availability_end || null,
+    housing_type: listingType === LISTING_TYPE_SUBLEASE ? (body.housing_type?.trim() || '') : null,
+    bedrooms: listingType === LISTING_TYPE_SUBLEASE ? parseNullableNumber(body.bedrooms) : null,
+    bathrooms: listingType === LISTING_TYPE_SUBLEASE ? parseNullableNumber(body.bathrooms) : null,
+    furnished: listingType === LISTING_TYPE_SUBLEASE ? parseBooleanFlag(body.furnished) : false,
+    utilities_included: listingType === LISTING_TYPE_SUBLEASE ? parseBooleanFlag(body.utilities_included) : false,
+    parking_available: listingType === LISTING_TYPE_SUBLEASE ? parseBooleanFlag(body.parking_available) : false,
+    pet_friendly: listingType === LISTING_TYPE_SUBLEASE ? parseBooleanFlag(body.pet_friendly) : false,
+    roommates_allowed: listingType === LISTING_TYPE_SUBLEASE ? parseBooleanFlag(body.roommates_allowed, true) : false,
+    lease_transfer_fee: listingType === LISTING_TYPE_SUBLEASE ? parseNullableNumber(body.lease_transfer_fee) : null,
+    address_text: listingType === LISTING_TYPE_SUBLEASE ? (body.address_text?.trim() || '') : null,
+    sublease_notes: listingType === LISTING_TYPE_SUBLEASE ? (body.sublease_notes?.trim() || '') : null
+  };
+
+  if (!partial) {
+    const missingFields = [];
+
+    if (!payload.title) missingFields.push('title');
+    if (!payload.description) missingFields.push('description');
+    if (payload.price === null) missingFields.push('price');
+    if (!payload.category) missingFields.push('category');
+    if (!payload.contact_method) missingFields.push('contact_method');
+
+    if (payload.listing_type === LISTING_TYPE_GOODS && !payload.condition) {
+      missingFields.push('condition');
+    }
+
+    if (payload.listing_type === LISTING_TYPE_SUBLEASE) {
+      if (!payload.availability_start) missingFields.push('availability_start');
+      if (!payload.availability_end) missingFields.push('availability_end');
+      if (!payload.housing_type) missingFields.push('housing_type');
+      if (!payload.address_text) missingFields.push('address_text');
+    }
+
+    if (missingFields.length) {
+      return { error: `Missing required fields: ${missingFields.join(', ')}` };
+    }
+  }
+
+  if (payload.price !== null && payload.price < 0) {
+    return { error: 'Price must be zero or greater' };
+  }
+
+  if (
+    payload.listing_type === LISTING_TYPE_SUBLEASE &&
+    payload.availability_start &&
+    payload.availability_end &&
+    new Date(payload.availability_start) > new Date(payload.availability_end)
+  ) {
+    return { error: 'Availability end must be after availability start' };
+  }
+
+  return { payload };
+}
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -54,14 +321,7 @@ export default {
 };
 
 async function handleAPI(request, env, url) {
-  const corsHeaders = {
-    'Access-Control-Allow-Origin': 'https://lennypaz.github.io',
-	'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-	'Access-Control-Allow-Headers': 'Content-Type, Authorization, Cookie',
-	'Access-Control-Allow-Credentials': 'true',
-	'Access-Control-Expose-Headers': 'Set-Cookie',
-	'Vary': 'Origin'
-  };
+  const corsHeaders = getCorsHeaders(request, env);
 
   if (request.method === 'OPTIONS') {
     return new Response(null, { 
@@ -277,6 +537,11 @@ async function getUserFromSession(request, env) {
 // Authentication functions
 async function verifyCaptcha(token, env) {
   try {
+    if (!env.TURNSTILE_SECRET_KEY) {
+      console.error('TURNSTILE_SECRET_KEY is not configured');
+      return false;
+    }
+
     const response = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -292,7 +557,12 @@ async function verifyCaptcha(token, env) {
 
 async function sendVerificationEmail(email, token, env) {
   try {
-    const baseUrl = env.PRODUCTION_URL || 'https://spear-exchange.lenny-paz123.workers.dev';
+    if (!env.RESEND_API_KEY) {
+      console.error('RESEND_API_KEY is not configured');
+      return false;
+    }
+
+    const baseUrl = getWorkerBaseUrl(env);
     const verificationUrl = `${baseUrl}/verify?token=${token}`;
     
     const emailHtml = `
@@ -466,10 +736,10 @@ async function handleEmailVerification(request, env, url) {
     const token = url.searchParams.get('token');
     
     if (!token) {
-      return new Response(`
-        <!DOCTYPE html>
-        <html><head><meta http-equiv="refresh" content="0;url=https://lennypaz.github.io/SpearExchange/verify/?status=invalid&message=Missing verification token"></head></html>
-      `, { headers: { 'Content-Type': 'text/html' } });
+      return buildFrontendRedirect(env, '/verify/', {
+        status: 'invalid',
+        message: 'Missing verification token'
+      });
     }
     
     const user = await env.DB.prepare(
@@ -477,34 +747,34 @@ async function handleEmailVerification(request, env, url) {
     ).bind(token).first();
     
     if (!user) {
-      return new Response(`
-        <!DOCTYPE html>
-        <html><head><meta http-equiv="refresh" content="0;url=https://lennypaz.github.io/SpearExchange/verify/?status=expired&message=This verification link is invalid or has expired"></head></html>
-      `, { headers: { 'Content-Type': 'text/html' } });
+      return buildFrontendRedirect(env, '/verify/', {
+        status: 'expired',
+        message: 'This verification link is invalid or has expired'
+      });
     }
     
     if (user.is_verified) {
-      return new Response(`
-        <!DOCTYPE html>
-        <html><head><meta http-equiv="refresh" content="0;url=https://lennypaz.github.io/SpearExchange/verify/?status=already_verified&message=Your email is already verified"></head></html>
-      `, { headers: { 'Content-Type': 'text/html' } });
+      return buildFrontendRedirect(env, '/verify/', {
+        status: 'already_verified',
+        message: 'Your email is already verified'
+      });
     }
     
     await env.DB.prepare(
       'UPDATE users SET is_verified = 1, verification_token = NULL WHERE id = ?'
     ).bind(user.id).run();
     
-    return new Response(`
-      <!DOCTYPE html>
-      <html><head><meta http-equiv="refresh" content="0;url=https://lennypaz.github.io/SpearExchange/verify/?status=success&message=Your email has been verified successfully!"></head></html>
-    `, { headers: { 'Content-Type': 'text/html' } });
+    return buildFrontendRedirect(env, '/verify/', {
+      status: 'success',
+      message: 'Your email has been verified successfully!'
+    });
     
   } catch (error) {
     console.error('Email verification error:', error);
-    return new Response(`
-      <!DOCTYPE html>
-      <html><head><meta http-equiv="refresh" content="0;url=https://lennypaz.github.io/SpearExchange/verify/?status=error&message=An error occurred during verification"></head></html>
-    `, { headers: { 'Content-Type': 'text/html' } });
+    return buildFrontendRedirect(env, '/verify/', {
+      status: 'error',
+      message: 'An error occurred during verification'
+    });
   }
 }
 
@@ -723,55 +993,72 @@ async function handleLogout(request, env, corsHeaders) {
 }
 
 // Listings functions
-	async function handleGetListings(request, env, corsHeaders) {
-	  try {
-		const url = new URL(request.url);
-		const category = url.searchParams.get('category');
-		const search = url.searchParams.get('search');
-		const limit = parseInt(url.searchParams.get('limit')) || 20;
-		const offset = parseInt(url.searchParams.get('offset')) || 0;
-		
-		let query = `
-		  SELECT l.*, u.profile_name as seller_name, u.email as seller_email 
-		  FROM listings l 
-		  JOIN users u ON l.user_id = u.id 
-		  WHERE l.status = 'active'
-		`;
-		const params = [];
-		
-		if (category) {
-		  query += ' AND l.category = ?';
-		  params.push(category);
-		}
-		
-		if (search) {
-		  query += ' AND (l.title LIKE ? OR l.description LIKE ?)';
-		  params.push(`%${search}%`, `%${search}%`);
-		}
-		
-		query += ' ORDER BY l.created_at DESC LIMIT ? OFFSET ?';
-		params.push(limit, offset);
-		
-		const listings = await env.DB.prepare(query).bind(...params).all();
-		
-		return new Response(JSON.stringify({ 
-		  listings: listings.results || [],
-		  total: listings.results?.length || 0
-		}), {
-		  headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-		});
-		
-	  } catch (error) {
-		console.error('Get listings error:', error);
-		return new Response(JSON.stringify({ 
-		  error: 'Failed to fetch listings',
-		  details: error.message 
-		}), {
-		  status: 500,
-		  headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-		});
-	  }
-	}
+async function handleGetListings(request, env, corsHeaders) {
+  try {
+    const url = new URL(request.url);
+    const category = url.searchParams.get('category')?.trim().toLowerCase();
+    const search = url.searchParams.get('search')?.trim();
+    const rawListingType = url.searchParams.get('listing_type')?.trim();
+    const hasListingTypeFilter = url.searchParams.has('listing_type');
+    const listingType = rawListingType ? rawListingType.toLowerCase() : null;
+    const limit = parseInt(url.searchParams.get('limit')) || 20;
+    const offset = parseInt(url.searchParams.get('offset')) || 0;
+
+    if (hasListingTypeFilter && !isValidListingType(listingType)) {
+      return new Response(JSON.stringify({
+        error: 'Invalid listing_type filter. Expected goods or sublease.'
+      }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    let query = `
+      SELECT l.*, u.profile_name as seller_name, u.email as seller_email
+      FROM listings l
+      JOIN users u ON l.user_id = u.id
+      WHERE l.status = 'active'
+    `;
+    const params = [];
+
+    if (category) {
+      query += ' AND l.category = ?';
+      params.push(category);
+    }
+
+    if (hasListingTypeFilter) {
+      query += ' AND l.listing_type = ?';
+      params.push(listingType);
+    }
+
+    if (search) {
+      query += ' AND (l.title LIKE ? OR l.description LIKE ? OR l.location LIKE ? OR l.address_text LIKE ? OR l.sublease_notes LIKE ?)';
+      params.push(`%${search}%`, `%${search}%`, `%${search}%`, `%${search}%`, `%${search}%`);
+    }
+
+    query += ' ORDER BY l.created_at DESC LIMIT ? OFFSET ?';
+    params.push(limit, offset);
+
+    const listings = await env.DB.prepare(query).bind(...params).all();
+    const formattedListings = (listings.results || []).map(formatListingRecord);
+
+    return new Response(JSON.stringify({
+      listings: formattedListings,
+      total: formattedListings.length
+    }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    });
+  } catch (error) {
+    console.error('Get listings error:', error);
+    return new Response(JSON.stringify({
+      error: 'Failed to fetch listings',
+      details: error.message
+    }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    });
+  }
+}
 
 async function handleCreateListing(request, env, corsHeaders) {
   try {
@@ -783,44 +1070,71 @@ async function handleCreateListing(request, env, corsHeaders) {
       });
     }
     
-    const { title, description, price, category, condition, negotiable, contact_method, phone_number, imageUrls, location } = await request.json();
-    
-    if (!title || !description || !price || !category || !condition || !contact_method) {
-      return new Response(JSON.stringify({ error: 'Title, description, price, category, condition, and contact method are required' }), {
+    const body = await request.json();
+    const { payload, error } = buildListingPayload(body);
+
+    if (error) {
+      return new Response(JSON.stringify({ error }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
     }
-    
+
     const result = await env.DB.prepare(
-      'INSERT INTO listings (user_id, title, description, price, category, condition, negotiable, contact_method, phone_number, image_urls, location, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+      `INSERT INTO listings (
+        user_id, title, description, price, category, condition, listing_type, price_period,
+        negotiable, contact_method, phone_number, image_urls, location, availability_start,
+        availability_end, housing_type, bedrooms, bathrooms, furnished, utilities_included,
+        parking_available, pet_friendly, roommates_allowed, lease_transfer_fee, address_text,
+        sublease_notes, status
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     ).bind(
-      user.user_id, 
-      title, 
-      description, 
-      parseFloat(price), 
-      category.toLowerCase(), // Convert to lowercase
-      condition,
-      negotiable ? 1 : 0, // Convert boolean to integer
-      contact_method,
-      phone_number || '',
-      JSON.stringify(imageUrls || []), 
-      location || '',
+      user.user_id,
+      payload.title,
+      payload.description,
+      payload.price,
+      payload.category,
+      payload.condition,
+      payload.listing_type,
+      payload.price_period,
+      payload.negotiable ? 1 : 0,
+      payload.contact_method,
+      payload.phone_number,
+      payload.image_urls,
+      payload.location,
+      payload.availability_start,
+      payload.availability_end,
+      payload.housing_type,
+      payload.bedrooms,
+      payload.bathrooms,
+      payload.furnished ? 1 : 0,
+      payload.utilities_included ? 1 : 0,
+      payload.parking_available ? 1 : 0,
+      payload.pet_friendly ? 1 : 0,
+      payload.roommates_allowed ? 1 : 0,
+      payload.lease_transfer_fee,
+      payload.address_text,
+      payload.sublease_notes,
       'active'
     ).run();
-    
-    return new Response(JSON.stringify({ 
+
+    return new Response(JSON.stringify({
       message: 'Listing created successfully',
-      id: result.meta.last_row_id
+      id: result.meta.last_row_id,
+      listing: formatListingRecord({
+        id: result.meta.last_row_id,
+        user_id: user.user_id,
+        status: 'active',
+        ...payload
+      })
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     });
-    
   } catch (error) {
     console.error('Create listing error:', error);
-    return new Response(JSON.stringify({ 
+    return new Response(JSON.stringify({
       error: 'Failed to create listing',
-      details: error.message 
+      details: error.message
     }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -844,16 +1158,7 @@ async function handleGetListing(listingId, env, corsHeaders) {
       });
     }
     
-    // Parse image URLs
-    if (listing.image_urls) {
-      try {
-        listing.image_urls = JSON.parse(listing.image_urls);
-      } catch (e) {
-        listing.image_urls = [];
-      }
-    }
-    
-    return new Response(JSON.stringify({ listing }), {
+    return new Response(JSON.stringify({ listing: formatListingRecord(listing) }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     });
     
@@ -879,7 +1184,7 @@ async function handleUpdateListing(listingId, request, env, corsHeaders) {
     }
     
     const listing = await env.DB.prepare(
-      'SELECT user_id FROM listings WHERE id = ?'
+      'SELECT * FROM listings WHERE id = ?'
     ).bind(listingId).first();
     
     if (!listing) {
@@ -896,29 +1201,68 @@ async function handleUpdateListing(listingId, request, env, corsHeaders) {
       });
     }
     
-    const { title, description, price, category, condition, negotiable, contact_method, phone_number, imageUrls, location, status } = await request.json();
-    
+    const body = await request.json();
+    const mergedBody = {
+      ...listing,
+      ...body,
+      imageUrls: body.imageUrls ?? parseImageUrls(listing.image_urls)
+    };
+    const { payload, error } = buildListingPayload(mergedBody);
+
+    if (error) {
+      return new Response(JSON.stringify({ error }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    const nextStatus = body.status || listing.status;
+
     await env.DB.prepare(`
       UPDATE listings 
-      SET title = ?, description = ?, price = ?, category = ?, condition = ?, negotiable = ?, contact_method = ?, phone_number = ?, image_urls = ?, location = ?, status = ?, updated_at = datetime('now')
+      SET title = ?, description = ?, price = ?, category = ?, condition = ?, listing_type = ?, price_period = ?,
+          negotiable = ?, contact_method = ?, phone_number = ?, image_urls = ?, location = ?, availability_start = ?,
+          availability_end = ?, housing_type = ?, bedrooms = ?, bathrooms = ?, furnished = ?, utilities_included = ?,
+          parking_available = ?, pet_friendly = ?, roommates_allowed = ?, lease_transfer_fee = ?, address_text = ?,
+          sublease_notes = ?, status = ?, updated_at = datetime('now')
       WHERE id = ?
     `).bind(
-      title || listing.title,
-      description || listing.description,
-      price !== undefined ? parseFloat(price) : listing.price,
-      category || listing.category,
-      condition || listing.condition,
-      negotiable !== undefined ? (negotiable ? 1 : 0) : listing.negotiable,
-      contact_method || listing.contact_method,
-      phone_number || listing.phone_number,
-      JSON.stringify(imageUrls || []),
-      location || listing.location,
-      status || listing.status,
+      payload.title,
+      payload.description,
+      payload.price,
+      payload.category,
+      payload.condition,
+      payload.listing_type,
+      payload.price_period,
+      payload.negotiable ? 1 : 0,
+      payload.contact_method,
+      payload.phone_number,
+      payload.image_urls,
+      payload.location,
+      payload.availability_start,
+      payload.availability_end,
+      payload.housing_type,
+      payload.bedrooms,
+      payload.bathrooms,
+      payload.furnished ? 1 : 0,
+      payload.utilities_included ? 1 : 0,
+      payload.parking_available ? 1 : 0,
+      payload.pet_friendly ? 1 : 0,
+      payload.roommates_allowed ? 1 : 0,
+      payload.lease_transfer_fee,
+      payload.address_text,
+      payload.sublease_notes,
+      nextStatus,
       listingId
     ).run();
-    
-    return new Response(JSON.stringify({ 
-      message: 'Listing updated successfully' 
+
+    return new Response(JSON.stringify({
+      message: 'Listing updated successfully',
+      listing: formatListingRecord({
+        ...listing,
+        ...payload,
+        status: nextStatus
+      })
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     });
@@ -1052,8 +1396,10 @@ async function handleSendMessage(request, env, corsHeaders) {
     }
     
     const { listing_id, receiver_id, message } = await request.json();
+    const listingId = Number(listing_id);
+    const receiverId = Number(receiver_id);
     
-    if (!listing_id || !receiver_id || !message || message.trim().length === 0) {
+    if (!listingId || !receiverId || !message || message.trim().length === 0) {
       return new Response(JSON.stringify({ error: 'Listing ID, receiver ID, and message are required' }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -1071,7 +1417,7 @@ async function handleSendMessage(request, env, corsHeaders) {
     // Verify listing exists and get listing info
     const listing = await env.DB.prepare(
       'SELECT id, user_id as seller_id, title FROM listings WHERE id = ? AND status = "active"'
-    ).bind(listing_id).first();
+    ).bind(listingId).first();
     
     if (!listing) {
       return new Response(JSON.stringify({ error: 'Listing not found or no longer active' }), {
@@ -1083,7 +1429,7 @@ async function handleSendMessage(request, env, corsHeaders) {
     // Verify receiver exists and is different from sender
     const receiver = await env.DB.prepare(
       'SELECT id FROM users WHERE id = ?'
-    ).bind(receiver_id).first();
+    ).bind(receiverId).first();
     
     if (!receiver) {
       return new Response(JSON.stringify({ error: 'Receiver not found' }), {
@@ -1093,7 +1439,7 @@ async function handleSendMessage(request, env, corsHeaders) {
     }
     
     // Prevent users from messaging themselves
-    if (user.user_id === receiver_id) {
+    if (user.user_id === receiverId) {
       return new Response(JSON.stringify({ error: 'Cannot send messages to yourself' }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -1101,21 +1447,21 @@ async function handleSendMessage(request, env, corsHeaders) {
     }
     
     // Determine buyer and seller IDs
-    const buyerId = user.user_id === listing.seller_id ? receiver_id : user.user_id;
+    const buyerId = user.user_id === listing.seller_id ? receiverId : user.user_id;
     const sellerId = listing.seller_id;
     
     // Find or create conversation
     let conversation = await env.DB.prepare(`
       SELECT id FROM conversations 
       WHERE listing_id = ? AND buyer_id = ? AND seller_id = ?
-    `).bind(listing_id, buyerId, sellerId).first();
+    `).bind(listingId, buyerId, sellerId).first();
     
     if (!conversation) {
       // Create new conversation
       const conversationResult = await env.DB.prepare(`
         INSERT INTO conversations (listing_id, buyer_id, seller_id, last_message_preview, last_message_at)
         VALUES (?, ?, ?, ?, datetime('now'))
-      `).bind(listing_id, buyerId, sellerId, message.substring(0, 100)).run();
+      `).bind(listingId, buyerId, sellerId, message.substring(0, 100)).run();
       
       conversation = { id: conversationResult.meta.last_row_id };
     } else {
@@ -1258,7 +1604,7 @@ async function handleGetFavorites(request, env, corsHeaders) {
     `).bind(user.user_id).all();
     
     return new Response(JSON.stringify({ 
-      favorites: favorites.results || []
+      favorites: (favorites.results || []).map(formatListingRecord)
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     });
@@ -1315,7 +1661,7 @@ async function handleGetUserProfile(userId, env, corsHeaders) {
 async function handleGetUserListings(userId, env, corsHeaders) {
   try {
     const stmt = env.DB.prepare(`
-      SELECT id, title, price, image_urls, created_at, status, category, condition
+      SELECT id, title, price, image_urls, created_at, status, category, condition, listing_type, price_period, availability_start, availability_end, housing_type, location
       FROM listings 
       WHERE user_id = ? AND status = 'active'
       ORDER BY created_at DESC
@@ -1324,7 +1670,7 @@ async function handleGetUserListings(userId, env, corsHeaders) {
     const { results } = await stmt.bind(userId).all();
     
     return new Response(JSON.stringify({
-      listings: results || []
+      listings: (results || []).map(formatListingRecord)
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     });
@@ -1502,10 +1848,10 @@ async function handleVerifyResetToken(request, env, url) {
     const token = url.searchParams.get('token');
     
     if (!token) {
-      return new Response(`
-        <!DOCTYPE html>
-        <html><head><meta http-equiv="refresh" content="0;url=https://lennypaz.github.io/SpearExchange/reset-password/?status=invalid&message=Missing reset token"></head></html>
-      `, { headers: { 'Content-Type': 'text/html' } });
+      return buildFrontendRedirect(env, '/reset-password/', {
+        status: 'invalid',
+        message: 'Missing reset token'
+      });
     }
     
     const user = await env.DB.prepare(
@@ -1513,10 +1859,10 @@ async function handleVerifyResetToken(request, env, url) {
     ).bind(token).first();
     
     if (!user) {
-      return new Response(`
-        <!DOCTYPE html>
-        <html><head><meta http-equiv="refresh" content="0;url=https://lennypaz.github.io/SpearExchange/reset-password/?status=invalid&message=Invalid or expired reset token"></head></html>
-      `, { headers: { 'Content-Type': 'text/html' } });
+      return buildFrontendRedirect(env, '/reset-password/', {
+        status: 'invalid',
+        message: 'Invalid or expired reset token'
+      });
     }
     
     // Check if token is expired
@@ -1529,24 +1875,24 @@ async function handleVerifyResetToken(request, env, url) {
         'UPDATE users SET reset_token = NULL, reset_token_expires = NULL WHERE id = ?'
       ).bind(user.id).run();
       
-      return new Response(`
-        <!DOCTYPE html>
-        <html><head><meta http-equiv="refresh" content="0;url=https://lennypaz.github.io/SpearExchange/reset-password/?status=expired&message=Reset token has expired. Please request a new one."></head></html>
-      `, { headers: { 'Content-Type': 'text/html' } });
+      return buildFrontendRedirect(env, '/reset-password/', {
+        status: 'expired',
+        message: 'Reset token has expired. Please request a new one.'
+      });
     }
     
     // Token is valid, redirect to reset form with token
-    return new Response(`
-      <!DOCTYPE html>
-      <html><head><meta http-equiv="refresh" content="0;url=https://lennypaz.github.io/SpearExchange/reset-password/?token=${token}&email=${encodeURIComponent(user.email)}"></head></html>
-    `, { headers: { 'Content-Type': 'text/html' } });
+    return buildFrontendRedirect(env, '/reset-password/', {
+      token,
+      email: user.email
+    });
     
   } catch (error) {
     console.error('Reset token verification error:', error);
-    return new Response(`
-      <!DOCTYPE html>
-      <html><head><meta http-equiv="refresh" content="0;url=https://lennypaz.github.io/SpearExchange/reset-password/?status=error&message=An error occurred during verification"></head></html>
-    `, { headers: { 'Content-Type': 'text/html' } });
+    return buildFrontendRedirect(env, '/reset-password/', {
+      status: 'error',
+      message: 'An error occurred during verification'
+    });
   }
 }
 
@@ -1637,7 +1983,12 @@ async function handleResetPassword(request, env, corsHeaders) {
 
 async function sendPasswordResetEmail(email, token, env) {
   try {
-    const baseUrl = env.PRODUCTION_URL || 'https://spear-exchange.lenny-paz123.workers.dev';
+    if (!env.RESEND_API_KEY) {
+      console.error('RESEND_API_KEY is not configured');
+      return false;
+    }
+
+    const baseUrl = getWorkerBaseUrl(env);
     const resetUrl = `${baseUrl}/verify-reset?token=${token}`;
     
     const emailHtml = `
@@ -1737,6 +2088,11 @@ async function sendPasswordResetEmail(email, token, env) {
 
 async function sendPasswordResetConfirmationEmail(email, env) {
   try {
+    if (!env.RESEND_API_KEY) {
+      console.error('RESEND_API_KEY is not configured');
+      return;
+    }
+
     const emailHtml = `
       <!DOCTYPE html>
       <html>
@@ -1840,6 +2196,13 @@ async function handleGetConversations(request, env, corsHeaders) {
         l.title as listing_title,
         l.price as listing_price,
         l.image_urls as listing_image_urls,
+        l.listing_type as listing_type,
+        l.price_period as listing_price_period,
+        l.category as listing_category,
+        l.availability_start as listing_availability_start,
+        l.availability_end as listing_availability_end,
+        l.housing_type as listing_housing_type,
+        l.address_text as listing_address_text,
         l.status as listing_status,
         buyer.profile_name as buyer_name,
         seller.profile_name as seller_name,
@@ -1883,7 +2246,14 @@ async function handleGetConversations(request, env, corsHeaders) {
           title: conv.listing_title,
           price: conv.listing_price,
           image_url: imageUrls[0] || null,
-          status: conv.listing_status
+          status: conv.listing_status,
+          listing_type: conv.listing_type || LISTING_TYPE_GOODS,
+          price_period: conv.listing_price_period || PRICE_PERIOD_ONE_TIME,
+          category: conv.listing_category,
+          availability_start: conv.listing_availability_start,
+          availability_end: conv.listing_availability_end,
+          housing_type: conv.listing_housing_type,
+          address_text: conv.listing_address_text
         },
         other_user: {
           id: otherUserId,
@@ -1961,7 +2331,9 @@ async function handleGetConversationMessages(conversationId, request, env, corsH
     
     // Get listing info for context
     const listing = await env.DB.prepare(`
-      SELECT l.id, l.title, l.price, l.image_urls, l.status, u.profile_name as seller_name
+      SELECT l.id, l.title, l.price, l.image_urls, l.status, l.listing_type, l.price_period, l.category,
+             l.availability_start, l.availability_end, l.housing_type, l.address_text,
+             u.profile_name as seller_name
       FROM listings l
       JOIN users u ON l.user_id = u.id
       WHERE l.id = ?
@@ -1985,6 +2357,13 @@ async function handleGetConversationMessages(conversationId, request, env, corsH
         price: listing?.price,
         image_url: imageUrls[0] || null,
         status: listing?.status,
+        listing_type: listing?.listing_type || LISTING_TYPE_GOODS,
+        price_period: listing?.price_period || PRICE_PERIOD_ONE_TIME,
+        category: listing?.category,
+        availability_start: listing?.availability_start,
+        availability_end: listing?.availability_end,
+        housing_type: listing?.housing_type,
+        address_text: listing?.address_text,
         seller_name: listing?.seller_name
       }
     }), {

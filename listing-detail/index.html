@@ -731,6 +731,13 @@
             gap: 0.5rem;
         }
 
+        .price-context {
+            color: var(--text-light);
+            font-size: 0.98rem;
+            line-height: 1.6;
+            margin-top: 0.9rem;
+        }
+
         /* Enhanced Seller Card */
         .seller-header {
             display: flex;
@@ -1595,22 +1602,10 @@
                     </div>
 
                     <div class="listing-details">
-                        <div class="details-grid">
+                        <div class="details-grid" id="listing-details-grid">
                             <div class="detail-item">
-                                <span class="detail-label">Condition</span>
-                                <span id="listing-condition" class="detail-value">Loading...</span>
-                            </div>
-                            <div class="detail-item">
-                                <span class="detail-label">Price Negotiable</span>
-                                <span id="listing-negotiable" class="detail-value">Loading...</span>
-                            </div>
-                            <div class="detail-item">
-                                <span class="detail-label">Contact Method</span>
-                                <span id="listing-contact-method" class="detail-value">Loading...</span>
-                            </div>
-                            <div class="detail-item">
-                                <span class="detail-label">Status</span>
-                                <span id="listing-status" class="detail-value">Loading...</span>
+                                <span class="detail-label">Loading</span>
+                                <span class="detail-value">Preparing listing details...</span>
                             </div>
                         </div>
                     </div>
@@ -1641,6 +1636,7 @@
                         <i class="fas fa-handshake"></i>
                         Price is negotiable
                     </div>
+                    <div id="price-context" class="price-context"></div>
                 </div>
 
                 <!-- Seller Card -->
@@ -1723,7 +1719,7 @@
         <div class="comments-section" id="comments-section">
             <div class="comments-header">
                 <h2 class="comments-title">Messages &amp; Questions</h2>
-                <span class="comments-count">Ask questions or make offers</span>
+                <span class="comments-count" id="comments-copy">Ask questions or make offers</span>
             </div>
 
             <div class="comment-form">
@@ -1749,6 +1745,7 @@
         </div>
     </main>
 
+    <script src="../demo-listings.js"></script>
     <script>
         // Global variables
         let currentListing = null;
@@ -1764,6 +1761,8 @@
 
         // API Configuration
         const API_BASE_URL = 'https://spear-exchange.lenny-paz123.workers.dev';
+        const findDemoListingById = window.findDemoListingById || (() => null);
+        const getDemoListingsByUserId = window.getDemoListingsByUserId || (() => []);
 
         // Check authentication and update user info
         async function checkAuthentication() {
@@ -1815,56 +1814,66 @@
                 
             } catch (error) {
                 console.error('💥 Error loading listing:', error);
+                const demoListing = findDemoListingById(listingId);
+                if (demoListing) {
+                    currentListing = demoListing;
+                    displayListing(demoListing);
+                    return;
+                }
                 showError();
             }
         }
 
         // Display listing data
         function displayListing(listing) {
+            const normalizedListing = normalizeListing(listing);
             // Update page title and meta
-            document.title = `${listing.title || 'Listing'} - The Spear Exchange`;
+            document.title = `${normalizedListing.title || 'Listing'} - The Spear Exchange`;
             
             // Update breadcrumb with proper navigation links
             const categoryElement = document.getElementById('breadcrumb-category');
-            const categoryName = capitalizeFirstLetter(listing.category) || 'General';
+            const categoryName = getBreadcrumbLabel(normalizedListing);
             categoryElement.textContent = categoryName;
             
             // Make breadcrumb category link back to filtered listings
-            if (listing.category) {
-                categoryElement.href = `../listings/?category=${listing.category}`;
+            if (normalizedListing.listing_type === 'sublease') {
+                categoryElement.href = '../listings/?type=sublease';
+            } else if (normalizedListing.category) {
+                categoryElement.href = `../listings/?category=${normalizedListing.category}`;
             } else {
                 categoryElement.href = '../listings/';
             }
             
-            document.getElementById('breadcrumb-title').textContent = listing.title || 'Listing';
+            document.getElementById('breadcrumb-title').textContent = normalizedListing.title || 'Listing';
 
             // Main listing info
-            document.getElementById('listing-title').textContent = listing.title || 'No title';
-            document.getElementById('listing-category').textContent = capitalizeFirstLetter(listing.category) || 'General';
-            document.getElementById('listing-location').textContent = listing.location || 'Location not specified';
-            document.getElementById('listing-date').textContent = formatDate(listing.created_at);
-            document.getElementById('listing-description').textContent = listing.description || 'No description provided';
+            document.getElementById('listing-title').textContent = normalizedListing.title || 'No title';
+            document.getElementById('listing-category').textContent = getListingCategoryLabel(normalizedListing);
+            document.getElementById('listing-location').textContent = getListingLocation(normalizedListing);
+            document.getElementById('listing-date').textContent = formatDate(normalizedListing.created_at);
+            document.getElementById('listing-description').textContent = normalizedListing.description || 'No description provided';
 
             // Price
-            document.getElementById('listing-price').textContent = formatPrice(listing.price);
-            if (listing.negotiable) {
+            document.getElementById('listing-price').textContent = formatListingPrice(normalizedListing);
+            document.getElementById('price-context').textContent = getPriceContext(normalizedListing);
+            if (normalizedListing.negotiable) {
                 document.getElementById('price-negotiable-text').style.display = 'inline-flex';
+            } else {
+                document.getElementById('price-negotiable-text').style.display = 'none';
             }
 
-            // Details - with proper capitalization
-            document.getElementById('listing-condition').textContent = capitalizeFirstLetter(listing.condition) || 'Not specified';
-            document.getElementById('listing-negotiable').textContent = listing.negotiable ? 'Yes' : 'No';
-            document.getElementById('listing-contact-method').textContent = formatContactMethod(listing.contact_method);
-            document.getElementById('listing-status').textContent = capitalizeFirstLetter(listing.status) || 'Active';
+            // Details
+            document.getElementById('listing-details-grid').innerHTML = buildDetailsMarkup(normalizedListing);
+            updateMessagePrompt(normalizedListing);
 
             // Images
             let imageUrls = [];
-            if (listing.image_urls) {
-                if (Array.isArray(listing.image_urls)) {
-                    imageUrls = listing.image_urls;
-                } else if (typeof listing.image_urls === 'string') {
+            if (normalizedListing.image_urls) {
+                if (Array.isArray(normalizedListing.image_urls)) {
+                    imageUrls = normalizedListing.image_urls;
+                } else if (typeof normalizedListing.image_urls === 'string') {
                     try {
-                        imageUrls = JSON.parse(listing.image_urls);
+                        imageUrls = JSON.parse(normalizedListing.image_urls);
                     } catch (e) {
                         imageUrls = [];
                     }
@@ -1873,12 +1882,12 @@
             setupImageGallery(imageUrls);
 
             // Seller info
-            const sellerName = listing.seller?.profile_name || listing.seller_name || 'Anonymous';
-            const sellerBio = listing.seller?.bio || 'No bio available';
-            const isVerified = listing.seller?.is_verified || listing.seller_verified || false;
-            const memberSince = listing.seller?.member_since || listing.seller_created_at || listing.created_at;
-            const avatarUrl = listing.seller?.avatar_url || '';
-            const stats = listing.seller?.stats || {};
+            const sellerName = normalizedListing.seller?.profile_name || normalizedListing.seller_name || 'Anonymous';
+            const sellerBio = normalizedListing.seller?.bio || 'No bio available';
+            const isVerified = normalizedListing.seller?.is_verified || normalizedListing.seller_verified || false;
+            const memberSince = normalizedListing.seller?.member_since || normalizedListing.seller_created_at || normalizedListing.created_at;
+            const avatarUrl = normalizedListing.seller?.avatar_url || '';
+            const stats = normalizedListing.seller?.stats || {};
             
             document.getElementById('seller-name').textContent = sellerName;
             document.getElementById('seller-bio').textContent = sellerBio;
@@ -1904,8 +1913,8 @@
             let contactHTML = '';
             
             // Show email if contact method includes email - Use seller_email from API
-            if (listing.contact_method === 'email' || listing.contact_method === 'both') {
-                const email = listing.seller_email || 'Email not provided';
+            if (normalizedListing.contact_method === 'email' || normalizedListing.contact_method === 'both') {
+                const email = normalizedListing.seller_email || 'Email not provided';
                 contactHTML += `
                     <div class="contact-item">
                         <i class="fas fa-envelope"></i>
@@ -1921,8 +1930,8 @@
             }
             
             // Show phone if contact method includes phone - Use seller_phone from API
-            if (listing.contact_method === 'phone' || listing.contact_method === 'both') {
-                const phone = listing.seller_phone || 'Phone not provided';
+            if (normalizedListing.contact_method === 'phone' || normalizedListing.contact_method === 'both') {
+                const phone = normalizedListing.seller_phone || 'Phone not provided';
                 const formattedPhone = formatPhoneNumber(phone);
                 contactHTML += `
                     <div class="contact-item" onclick="window.location.href='tel:${phone}'" style="cursor: pointer;">
@@ -1973,11 +1982,17 @@
             }
             
             // Load other listings from same seller
-            loadOtherListings(listing.user_id, listing.id);
+            loadOtherListings(normalizedListing.user_id, normalizedListing.id);
         }
 
         // Load other listings from the same seller
         async function loadOtherListings(userId, currentListingId) {
+            if (currentListing && currentListing.is_demo) {
+                const otherDemoListings = getDemoListingsByUserId(userId, currentListingId).slice(0, 2);
+                renderOtherListings(otherDemoListings);
+                return;
+            }
+
             try {
                 const response = await fetch(`${API_BASE_URL}/api/users/${userId}/listings`, {
                     credentials: 'include'
@@ -1993,36 +2008,43 @@
                     document.querySelector('.seller-stats .stat-item:nth-child(1) .stat-value').textContent = totalListings;
                     
                     // Display other listings if available
-                    const miniPortfolio = document.querySelector('.mini-portfolio');
-                    if (otherListings.length > 0) {
-                        let otherListingsHTML = '<h4>Other listings by this seller</h4>';
-                        otherListings.forEach(otherListing => {
-                            const imageUrl = otherListing.image_urls ? 
-                                (Array.isArray(otherListing.image_urls) ? otherListing.image_urls[0] : 
-                                 JSON.parse(otherListing.image_urls || '[]')[0]) : null;
-                            
-                            otherListingsHTML += `
-                                <div class="mini-listing" onclick="window.location.href='?id=${otherListing.id}'">
-                                    <img class="mini-listing-image" 
-                                         src="${imageUrl || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0yMCAyMEg0MFY0MEgyMFYyMFoiIGZpbGw9IiM5Q0EzQUYiLz4KPHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAyMCAyMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4PSIyMCIgeT0iMjAiPgo8cGF0aCBkPSJNMTUgMkg1QTMgMyAwIDAgMCAyIDVWMTVBMyAzIDAgMCAwIDUgMThIMTVBMyAzIDAgMCAwIDE4IDE1VjVBMyAzIDAgMCAwIDE1IDJaIiBzdHJva2U9IiM5Q0EzQUYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+Cjxwb2x5bGluZSBwb2ludHM9IjksOSAxMCw5IDEwLDEwIDksMTAiIHN0cm9rZT0iIzlDQTNBRiIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KPC9zdmc+Cjwvc3ZnPgo='}" 
-                                         alt="${escapeHtml(otherListing.title)}">
-                                    <div class="mini-listing-info">
-                                        <div class="mini-listing-title">${escapeHtml(otherListing.title)}</div>
-                                        <div class="mini-listing-price">${formatPrice(otherListing.price)}</div>
-                                    </div>
-                                </div>
-                            `;
-                        });
-                        miniPortfolio.innerHTML = otherListingsHTML;
-                        miniPortfolio.style.display = 'block';
-                    } else {
-                        miniPortfolio.style.display = 'none';
-                    }
+                    renderOtherListings(otherListings);
                 } else {
                     console.log('Could not load other listings');
                 }
             } catch (error) {
                 console.error('Error loading other listings:', error);
+            }
+        }
+
+        function renderOtherListings(otherListings) {
+            const miniPortfolio = document.querySelector('.mini-portfolio');
+            if (otherListings.length > 0) {
+                let otherListingsHTML = '<h4>Other listings by this seller</h4>';
+                otherListings.forEach(otherListing => {
+                    const normalizedListing = normalizeListing(otherListing);
+                    const imageUrl = normalizedListing.image_urls
+                        ? (Array.isArray(normalizedListing.image_urls)
+                            ? normalizedListing.image_urls[0]
+                            : JSON.parse(normalizedListing.image_urls || '[]')[0])
+                        : null;
+
+                    otherListingsHTML += `
+                        <div class="mini-listing" onclick="window.location.href='?id=${normalizedListing.id}'">
+                            <img class="mini-listing-image"
+                                 src="${imageUrl || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0yMCAyMEg0MFY0MEgyMFYyMFoiIGZpbGw9IiM5Q0EzQUYiLz4KPHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAyMCAyMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4PSIyMCIgeT0iMjAiPgo8cGF0aCBkPSJNMTUgMkg1QTMgMyAwIDAgMCAyIDVWMTVBMyAzIDAgMCAwIDUgMThIMTVBMyAzIDAgMCAwIDE4IDE1VjVBMyAzIDAgMCAwIDE1IDJaIiBzdHJva2U9IiM5Q0EzQUYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+Cjxwb2x5bGluZSBwb2ludHM9IjksOSAxMCw5IDEwLDEwIDksMTAiIHN0cm9rZT0iIzlDQTNBRiIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KPC9zdmc+Cjwvc3ZnPgo='}"
+                                 alt="${escapeHtml(normalizedListing.title)}">
+                            <div class="mini-listing-info">
+                                <div class="mini-listing-title">${escapeHtml(normalizedListing.title)}</div>
+                                <div class="mini-listing-price">${formatListingPrice(normalizedListing)}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+                miniPortfolio.innerHTML = otherListingsHTML;
+                miniPortfolio.style.display = 'block';
+            } else {
+                miniPortfolio.style.display = 'none';
             }
         }
         function setupImageGallery(imageUrls) {
@@ -2224,6 +2246,13 @@
                 return;
             }
 
+            if (currentListing.is_demo) {
+                showSuccessMessage('This is a showcase listing. Live messaging will work once a real listing is posted through the backend.');
+                textarea.value = '';
+                updateCharacterCount();
+                return;
+            }
+
             // Check if user is trying to message their own listing
             if (currentUser.id === currentListing.user_id) {
                 alert('You cannot send messages to your own listing. Use the edit function to update your listing instead.');
@@ -2332,6 +2361,170 @@
         }
 
         // Utility functions
+        function isSubleaseCategory(category) {
+            return category === 'sublease' || category === 'subleases';
+        }
+
+        function normalizeListing(listing) {
+            return {
+                ...listing,
+                listing_type: listing.listing_type || (isSubleaseCategory(listing.category) ? 'sublease' : 'goods'),
+                category: listing.category || 'other',
+                price: Number(listing.price) || 0,
+                address_text: listing.address_text || '',
+                housing_type: listing.housing_type || '',
+                sublease_notes: listing.sublease_notes || ''
+            };
+        }
+
+        function formatCategoryLabel(category) {
+            if (!category) return 'General';
+            const labels = {
+                electronics: 'Electronics',
+                textbooks: 'Textbooks',
+                furniture: 'Furniture',
+                clothing: 'Clothing',
+                sports: 'Sports & Recreation',
+                services: 'Services',
+                other: 'Other',
+                sublease: 'Subleases',
+                subleases: 'Subleases',
+                '3d-printed-fsu-items': '3D Printed FSU Items'
+            };
+            return labels[category] || category.split('-').map(capitalizeFirstLetter).join(' ');
+        }
+
+        function formatHousingType(housingType) {
+            if (!housingType) return 'Housing';
+            return housingType.split('-').map(capitalizeFirstLetter).join(' ');
+        }
+
+        function getListingCategoryLabel(listing) {
+            if (listing.listing_type === 'sublease') {
+                return `${formatHousingType(listing.housing_type)} Sublease`;
+            }
+            return formatCategoryLabel(listing.category);
+        }
+
+        function getBreadcrumbLabel(listing) {
+            return listing.listing_type === 'sublease' ? 'Subleases' : getListingCategoryLabel(listing);
+        }
+
+        function getListingLocation(listing) {
+            if (listing.listing_type === 'sublease') {
+                return listing.address_text || listing.location || 'Near campus';
+            }
+            return listing.location || 'Location not specified';
+        }
+
+        function formatAvailabilityRange(startDate, endDate) {
+            if (!startDate && !endDate) return 'Availability not specified';
+            const formatter = date =>
+                new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
+            if (startDate && endDate) {
+                return `${formatter(startDate)} - ${formatter(endDate)}`;
+            }
+
+            if (startDate) {
+                return `Available from ${formatter(startDate)}`;
+            }
+
+            return `Available until ${formatter(endDate)}`;
+        }
+
+        function formatListingPrice(listing) {
+            const formatted = new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD'
+            }).format(Number(listing.price) || 0);
+
+            return listing.listing_type === 'sublease' || listing.price_period === 'monthly'
+                ? `${formatted}/month`
+                : formatted;
+        }
+
+        function getPriceContext(listing) {
+            if (listing.listing_type === 'sublease') {
+                const parts = [formatAvailabilityRange(listing.availability_start, listing.availability_end)];
+                if (listing.lease_transfer_fee !== null && listing.lease_transfer_fee !== undefined && listing.lease_transfer_fee !== '') {
+                    parts.push(`Lease transfer fee: ${formatCurrency(listing.lease_transfer_fee)}`);
+                }
+                return parts.join(' • ');
+            }
+
+            if (listing.category === '3d-printed-fsu-items') {
+                return '3D printed FSU item. Coordinate pickup and customization details directly with the seller.';
+            }
+
+            return listing.location ? `Pickup around ${listing.location}` : 'Coordinate pickup directly with the seller';
+        }
+
+        function formatCurrency(price) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD'
+            }).format(Number(price) || 0);
+        }
+
+        function formatBoolean(value) {
+            return value ? 'Yes' : 'No';
+        }
+
+        function buildDetailItem(label, value) {
+            return `
+                <div class="detail-item">
+                    <span class="detail-label">${escapeHtml(label)}</span>
+                    <span class="detail-value">${escapeHtml(value)}</span>
+                </div>
+            `;
+        }
+
+        function buildDetailsMarkup(listing) {
+            if (listing.listing_type === 'sublease') {
+                return [
+                    buildDetailItem('Housing Type', formatHousingType(listing.housing_type)),
+                    buildDetailItem('Bedrooms', listing.bedrooms !== null && listing.bedrooms !== undefined && listing.bedrooms !== '' ? String(listing.bedrooms) : 'Not specified'),
+                    buildDetailItem('Bathrooms', listing.bathrooms !== null && listing.bathrooms !== undefined && listing.bathrooms !== '' ? String(listing.bathrooms) : 'Not specified'),
+                    buildDetailItem('Availability', formatAvailabilityRange(listing.availability_start, listing.availability_end)),
+                    buildDetailItem('Furnished', formatBoolean(listing.furnished)),
+                    buildDetailItem('Utilities Included', formatBoolean(listing.utilities_included)),
+                    buildDetailItem('Parking Available', formatBoolean(listing.parking_available)),
+                    buildDetailItem('Pet Friendly', formatBoolean(listing.pet_friendly)),
+                    buildDetailItem('Roommates Allowed', formatBoolean(listing.roommates_allowed)),
+                    buildDetailItem('Contact Method', formatContactMethod(listing.contact_method)),
+                    buildDetailItem('Status', capitalizeFirstLetter(listing.status) || 'Active')
+                ].join('');
+            }
+
+            return [
+                buildDetailItem('Condition', capitalizeFirstLetter(listing.condition) || 'Not specified'),
+                buildDetailItem('Price Negotiable', listing.negotiable ? 'Yes' : 'No'),
+                buildDetailItem('Contact Method', formatContactMethod(listing.contact_method)),
+                buildDetailItem('Status', capitalizeFirstLetter(listing.status) || 'Active')
+            ].join('');
+        }
+
+        function updateMessagePrompt(listing) {
+            const textarea = document.getElementById('comment-textarea');
+            const commentsCopy = document.getElementById('comments-copy');
+
+            if (listing.listing_type === 'sublease') {
+                textarea.placeholder = "Hi! I'm interested in your sublease. Is it still available? I'd love to know more about rent, dates, and roommate details.";
+                commentsCopy.textContent = 'Ask about rent, dates, roommates, or move-in details';
+                return;
+            }
+
+            if (listing.category === '3d-printed-fsu-items') {
+                textarea.placeholder = "Hi! I'm interested in your 3D printed FSU item. Is this still available, and are there any pickup or design details I should know?";
+                commentsCopy.textContent = 'Ask questions, request details, or make an offer';
+                return;
+            }
+
+            textarea.placeholder = "Hi! I'm interested in your listing. Is this still available? I can meet at the Student Union.";
+            commentsCopy.textContent = 'Ask questions or make offers';
+        }
+
         function escapeHtml(text) {
             if (!text) return '';
             const div = document.createElement('div');
@@ -2360,11 +2553,8 @@
         }
 
         function formatPrice(price) {
-            if (!price) return 'Free';
-            return new Intl.NumberFormat('en-US', {
-                style: 'currency',
-                currency: 'USD'
-            }).format(price);
+            if (price === null || price === undefined || price === '') return 'Free';
+            return formatCurrency(price);
         }
 
         function formatDate(dateString) {

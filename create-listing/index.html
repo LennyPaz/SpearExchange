@@ -489,6 +489,13 @@
             display: none;
         }
 
+        .field-help {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            line-height: 1.5;
+        }
+
         .character-count {
             font-size: 0.875rem;
             color: var(--text-light);
@@ -693,6 +700,31 @@
 
         .checkbox-single a:hover {
             text-decoration: underline;
+        }
+
+        .sublease-panel {
+            margin-bottom: 2rem;
+            padding: 1.75rem;
+            border-radius: 14px;
+            background: linear-gradient(180deg, rgba(139, 38, 53, 0.04), rgba(245, 158, 11, 0.04));
+            border: 1px solid rgba(139, 38, 53, 0.12);
+        }
+
+        .sublease-panel-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .sublease-panel-title {
+            color: var(--text-dark);
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 0.4rem;
+        }
+
+        .sublease-panel-copy {
+            color: var(--text-light);
+            font-size: 0.95rem;
+            line-height: 1.6;
         }
 
         .form-actions {
@@ -1083,7 +1115,7 @@
         <!-- Page Header -->
         <div class="page-header">
             <h1 class="page-title">Create a New Listing</h1>
-            <p class="page-subtitle">Share what you're selling with your fellow Seminoles</p>
+            <p class="page-subtitle" id="page-subtitle">Share what you're selling with your fellow Seminoles</p>
         </div>
 
         <!-- Form Container -->
@@ -1091,14 +1123,24 @@
             <form id="listing-form">
                 <!-- Title -->
                 <div class="form-group">
-                    <label for="title">Item Title <span class="required">*</span></label>
+                    <label for="title" id="title-label">Item Title <span class="required">*</span></label>
                     <input type="text" id="title" class="form-input" placeholder="e.g., MacBook Pro 13-inch, Calculus Textbook" maxlength="100" required>
                     <div class="character-count"><span id="title-count">0</span>/100</div>
                     <div class="error-message" id="title-error">Please enter a title</div>
                 </div>
 
-                <!-- Category and Condition Row -->
+                <!-- Listing Type and Category -->
                 <div class="form-row">
+                    <div class="form-group">
+                        <label for="listing_type">Listing Type <span class="required">*</span></label>
+                        <select id="listing_type" class="form-input form-select" required>
+                            <option value="goods">Marketplace Item</option>
+                            <option value="sublease">Sublease</option>
+                        </select>
+                        <p class="field-help" id="listing-type-help">Choose whether you are posting a standard marketplace item or a housing sublease.</p>
+                        <div class="error-message" id="listing_type-error">Please select a listing type</div>
+                    </div>
+
                     <div class="form-group">
                         <label for="category">Category <span class="required">*</span></label>
                         <select id="category" class="form-input form-select" required>
@@ -1108,13 +1150,18 @@
                             <option value="furniture">Furniture</option>
                             <option value="clothing">Clothing</option>
                             <option value="sports">Sports &amp; Recreation</option>
+                            <option value="3d-printed-fsu-items">3D Printed FSU Items</option>
                             <option value="services">Services</option>
+                            <option value="sublease" id="sublease-category-option">Subleases</option>
                             <option value="other">Other</option>
                         </select>
                         <div class="error-message" id="category-error">Please select a category</div>
                     </div>
+                </div>
 
-                    <div class="form-group">
+                <!-- Condition and Price -->
+                <div class="form-row">
+                    <div class="form-group" id="condition-group">
                         <label for="condition">Condition <span class="required">*</span></label>
                         <select id="condition" class="form-input form-select" required>
                             <option value="">Select condition</option>
@@ -1126,27 +1173,127 @@
                         </select>
                         <div class="error-message" id="condition-error">Please select a condition</div>
                     </div>
-                </div>
 
-                <!-- Price -->
-                <div class="form-group">
-                    <label for="price">Price <span class="required">*</span></label>
-                    <input type="number" id="price" class="form-input" placeholder="0.00" min="0" step="0.01" required>
-                    <div class="checkbox-group price-negotiable-group" style="margin-top: 1rem;">
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="negotiable">
-                            <label for="negotiable">Price is negotiable</label>
+                    <div class="form-group">
+                        <label for="price" id="price-label">Price <span class="required">*</span></label>
+                        <input type="number" id="price" class="form-input" placeholder="0.00" min="0" step="0.01" required>
+                        <p class="field-help" id="price-help">Set a one-time asking price for your item.</p>
+                        <div class="checkbox-group price-negotiable-group" id="negotiable-group" style="margin-top: 1rem;">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="negotiable">
+                                <label for="negotiable">Price is negotiable</label>
+                            </div>
                         </div>
+                        <div class="error-message" id="price-error">Please enter a valid price</div>
                     </div>
-                    <div class="error-message" id="price-error">Please enter a valid price</div>
                 </div>
 
                 <!-- Description -->
                 <div class="form-group">
-                    <label for="description">Description <span class="required">*</span></label>
+                    <label for="description" id="description-label">Description <span class="required">*</span></label>
                     <textarea id="description" class="form-input form-textarea" placeholder="Provide a detailed description of your item, including any wear, damage, or special features..." maxlength="1000" required></textarea>
                     <div class="character-count"><span id="description-count">0</span>/1000</div>
                     <div class="error-message" id="description-error">Please enter a description</div>
+                </div>
+
+                <!-- Sublease Details -->
+                <div id="sublease-fields" class="sublease-panel" style="display: none;">
+                    <div class="sublease-panel-header">
+                        <div class="sublease-panel-title">Sublease Details</div>
+                        <p class="sublease-panel-copy">Subleases are shown with monthly rent, housing facts, and availability dates so renters can compare options quickly.</p>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="housing_type">Housing Type <span class="required">*</span></label>
+                            <select id="housing_type" class="form-input form-select">
+                                <option value="">Select housing type</option>
+                                <option value="apartment">Apartment</option>
+                                <option value="house">House</option>
+                                <option value="townhome">Townhome</option>
+                                <option value="studio">Studio</option>
+                                <option value="private-room">Private Room</option>
+                                <option value="shared-room">Shared Room</option>
+                            </select>
+                            <div class="error-message" id="housing_type-error">Please select a housing type</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="address_text">Neighborhood / Address <span class="required">*</span></label>
+                            <input type="text" id="address_text" class="form-input" placeholder="e.g., Stadium Centre, Gaines Street, West Pensacola" maxlength="120">
+                            <div class="character-count"><span id="address_text-count">0</span>/120</div>
+                            <div class="error-message" id="address_text-error">Please enter the location for this sublease</div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="bedrooms">Bedrooms <span class="required">*</span></label>
+                            <input type="number" id="bedrooms" class="form-input" placeholder="e.g., 1" min="0" max="20" step="1">
+                            <div class="error-message" id="bedrooms-error">Please enter the bedroom count</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="bathrooms">Bathrooms <span class="required">*</span></label>
+                            <input type="number" id="bathrooms" class="form-input" placeholder="e.g., 1.5" min="0" max="20" step="0.5">
+                            <div class="error-message" id="bathrooms-error">Please enter the bathroom count</div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="availability_start">Available From <span class="required">*</span></label>
+                            <input type="date" id="availability_start" class="form-input">
+                            <div class="error-message" id="availability_start-error">Please select a start date</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="availability_end">Available Until <span class="required">*</span></label>
+                            <input type="date" id="availability_end" class="form-input">
+                            <div class="error-message" id="availability_end-error">Please select an end date</div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="lease_transfer_fee">Lease Transfer Fee</label>
+                            <input type="number" id="lease_transfer_fee" class="form-input" placeholder="0.00" min="0" step="0.01">
+                            <p class="field-help">Leave blank if there is no lease transfer or reassignment fee.</p>
+                            <div class="error-message" id="lease_transfer_fee-error">Please enter a valid transfer fee</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Housing Features</label>
+                            <div class="checkbox-group">
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="furnished">
+                                    <label for="furnished">Furnished</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="utilities_included">
+                                    <label for="utilities_included">Utilities Included</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="parking_available">
+                                    <label for="parking_available">Parking Available</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="pet_friendly">
+                                    <label for="pet_friendly">Pet Friendly</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="roommates_allowed">
+                                    <label for="roommates_allowed">Roommates Allowed</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="sublease_notes">Sublease Notes</label>
+                        <textarea id="sublease_notes" class="form-input form-textarea" placeholder="Share lease dates, roommate situation, parking notes, furniture details, or anything a renter should know..." maxlength="600"></textarea>
+                        <div class="character-count"><span id="sublease_notes-count">0</span>/600</div>
+                    </div>
                 </div>
 
                 <!-- Images -->
@@ -1179,8 +1326,8 @@
                 </div>
 
                 <!-- Location -->
-                <div class="form-group">
-                    <label for="location">Pickup Location</label>
+                <div class="form-group" id="location-group">
+                    <label for="location" id="location-label">Pickup Location</label>
                     <input type="text" id="location" class="form-input" placeholder="e.g., Dirac Library, Student Union, Off Campus" maxlength="50">
                     <div class="character-count"><span id="location-count">0</span>/50</div>
                 </div>
@@ -1225,7 +1372,7 @@
                     <label for="terms">
                         I agree to the <a href="../terms/" target="_blank">Terms of Service</a> and 
                         <a href="../community-guidelines/" target="_blank">Community Guidelines</a>. 
-                        I confirm that this listing is accurate and that I'm authorized to sell this item.
+                        <span id="terms-copy">I confirm that this listing is accurate and that I'm authorized to post it.</span>
                     </label>
                 </div>
 
@@ -1266,12 +1413,15 @@
         let uploadedImages = [];
         let createdListingId = null;
         const maxImages = 5;
+        const GOODS_LISTING_TYPE = 'goods';
+        const SUBLEASE_LISTING_TYPE = 'sublease';
 
         // Initialize the page
         document.addEventListener('DOMContentLoaded', async () => {
             await checkAuthentication();
             setupEventListeners();
             initializeImageUpload();
+            applyListingTypeUI();
         });
 
         // Initialize image upload functionality
@@ -1464,6 +1614,97 @@
             }
         }
 
+        function isSubleaseListing() {
+            return document.getElementById('listing_type').value === SUBLEASE_LISTING_TYPE;
+        }
+
+        function togglePhoneField() {
+            const phoneGroup = document.getElementById('phone-group');
+            const phoneInput = document.getElementById('phone');
+            const selectedContact = document.querySelector('input[name="contact"]:checked');
+
+            if (selectedContact && (selectedContact.value === 'phone' || selectedContact.value === 'both')) {
+                phoneGroup.style.display = 'block';
+                phoneInput.required = true;
+            } else {
+                phoneGroup.style.display = 'none';
+                phoneInput.required = false;
+                phoneInput.value = '';
+            }
+        }
+
+        function applyListingTypeUI() {
+            const isSublease = isSubleaseListing();
+            const categoryField = document.getElementById('category');
+            const subleaseCategoryOption = document.getElementById('sublease-category-option');
+            const conditionField = document.getElementById('condition');
+            const conditionGroup = document.getElementById('condition-group');
+            const subleaseFields = document.getElementById('sublease-fields');
+            const negotiableGroup = document.getElementById('negotiable-group');
+            const locationGroup = document.getElementById('location-group');
+            const titleField = document.getElementById('title');
+            const descriptionField = document.getElementById('description');
+
+            document.getElementById('page-subtitle').textContent = isSublease
+                ? 'Share your sublease with renters looking for a place near campus'
+                : "Share what you're selling with your fellow Seminoles";
+            document.getElementById('title-label').innerHTML = isSublease
+                ? 'Sublease Title <span class="required">*</span>'
+                : 'Item Title <span class="required">*</span>';
+            titleField.placeholder = isSublease
+                ? 'e.g., Furnished room at Stadium Centre for Summer'
+                : 'e.g., MacBook Pro 13-inch, Calculus Textbook';
+
+            document.getElementById('price-label').innerHTML = isSublease
+                ? 'Monthly Rent <span class="required">*</span>'
+                : 'Price <span class="required">*</span>';
+            document.getElementById('price-help').textContent = isSublease
+                ? 'Sublease prices are shown per month.'
+                : 'Set a one-time asking price for your item.';
+            document.getElementById('price').placeholder = isSublease ? '950.00' : '0.00';
+
+            document.getElementById('description-label').innerHTML = isSublease
+                ? 'Sublease Description <span class="required">*</span>'
+                : 'Description <span class="required">*</span>';
+            descriptionField.placeholder = isSublease
+                ? 'Describe the unit, roommate setup, lease timing, utilities, parking, and anything renters should know.'
+                : 'Provide a detailed description of your item, including any wear, damage, or special features...';
+
+            document.getElementById('listing-type-help').textContent = isSublease
+                ? 'Subleases use monthly rent, housing facts, and availability dates in browse and detail views.'
+                : 'Marketplace items use the standard category, condition, and one-time price flow.';
+            document.getElementById('terms-copy').textContent = isSublease
+                ? "I confirm that this sublease post is accurate and that I'm authorized to advertise it."
+                : "I confirm that this listing is accurate and that I'm authorized to sell or share it.";
+
+            conditionGroup.style.display = isSublease ? 'none' : 'block';
+            conditionField.required = !isSublease;
+            if (isSublease) {
+                conditionField.value = '';
+                clearFieldError(conditionField);
+            }
+
+            subleaseFields.style.display = isSublease ? 'block' : 'none';
+            locationGroup.style.display = isSublease ? 'none' : 'block';
+            negotiableGroup.style.display = isSublease ? 'none' : 'flex';
+            if (isSublease) {
+                document.getElementById('negotiable').checked = false;
+                categoryField.value = 'sublease';
+            } else if (categoryField.value === 'sublease' || categoryField.value === 'subleases') {
+                categoryField.value = '';
+            }
+
+            subleaseCategoryOption.disabled = !isSublease;
+            subleaseCategoryOption.hidden = !isSublease;
+            categoryField.disabled = isSublease;
+            document.getElementById('housing_type').required = isSublease;
+            document.getElementById('bedrooms').required = isSublease;
+            document.getElementById('bathrooms').required = isSublease;
+            document.getElementById('availability_start').required = isSublease;
+            document.getElementById('availability_end').required = isSublease;
+            document.getElementById('address_text').required = isSublease;
+        }
+
         // Check authentication
         async function checkAuthentication() {
             try {
@@ -1494,6 +1735,9 @@
             document.getElementById('title').addEventListener('input', updateCharacterCount);
             document.getElementById('description').addEventListener('input', updateCharacterCount);
             document.getElementById('location').addEventListener('input', updateCharacterCount);
+            document.getElementById('address_text').addEventListener('input', updateCharacterCount);
+            document.getElementById('sublease_notes').addEventListener('input', updateCharacterCount);
+            document.getElementById('listing_type').addEventListener('change', applyListingTypeUI);
 
             // Ensure textareas have proper keyboard navigation
             const textareas = document.querySelectorAll('textarea');
@@ -1514,24 +1758,7 @@
                 });
             });
 
-            // Toggle phone field visibility
-        // Toggle phone field visibility
-        function togglePhoneField() {
-            const phoneGroup = document.getElementById('phone-group');
-            const phoneInput = document.getElementById('phone');
-            const selectedContact = document.querySelector('input[name="contact"]:checked');
-            
-            if (selectedContact && (selectedContact.value === 'phone' || selectedContact.value === 'both')) {
-                phoneGroup.style.display = 'block';
-                phoneInput.required = true;
-            } else {
-                phoneGroup.style.display = 'none';
-                phoneInput.required = false;
-                phoneInput.value = ''; // Clear phone when hidden
-            }
-        }
-
-        // Phone number formatting
+            // Phone number formatting
             document.getElementById('phone').addEventListener('input', formatPhoneNumber);
 
             // Contact method change handler
@@ -1609,6 +1836,13 @@
                         return false;
                     }
                     break;
+
+                case 'listing_type':
+                    if (!value) {
+                        showFieldError(field, 'Please select a listing type');
+                        return false;
+                    }
+                    break;
                     
                 case 'category':
                     if (!value) {
@@ -1618,6 +1852,9 @@
                     break;
                     
                 case 'condition':
+                    if (isSubleaseListing()) {
+                        break;
+                    }
                     if (!value) {
                         showFieldError(field, 'Please select a condition');
                         return false;
@@ -1637,6 +1874,69 @@
                     if (price > 10000) {
                         showFieldError(field, 'Price seems too high. Please verify.');
                         return false;
+                    }
+                    break;
+
+                case 'housing_type':
+                    if (isSubleaseListing() && !value) {
+                        showFieldError(field, 'Please select a housing type');
+                        return false;
+                    }
+                    break;
+
+                case 'bedrooms':
+                case 'bathrooms':
+                    if (isSubleaseListing()) {
+                        const roomCount = parseFloat(value);
+                        if (!value || isNaN(roomCount) || roomCount < 0) {
+                            showFieldError(field, `Please enter a valid ${fieldName.replace('_', ' ')}`);
+                            return false;
+                        }
+                    }
+                    break;
+
+                case 'address_text':
+                    if (isSubleaseListing()) {
+                        if (!value) {
+                            showFieldError(field, 'Please enter the location for this sublease');
+                            return false;
+                        }
+                        if (value.length < 3) {
+                            showFieldError(field, 'Location must be at least 3 characters');
+                            return false;
+                        }
+                    }
+                    break;
+
+                case 'availability_start':
+                    if (isSubleaseListing() && !value) {
+                        showFieldError(field, 'Please select when the sublease starts');
+                        return false;
+                    }
+                    break;
+
+                case 'availability_end':
+                    if (isSubleaseListing()) {
+                        if (!value) {
+                            showFieldError(field, 'Please select when the sublease ends');
+                            return false;
+                        }
+
+                        const startValue = document.getElementById('availability_start').value;
+                        if (startValue && new Date(value) < new Date(startValue)) {
+                            showFieldError(field, 'End date must be after the start date');
+                            return false;
+                        }
+                    }
+                    break;
+
+                case 'lease_transfer_fee':
+                    if (value) {
+                        const fee = parseFloat(value);
+                        if (isNaN(fee) || fee < 0) {
+                            showFieldError(field, 'Please enter a valid transfer fee');
+                            return false;
+                        }
                     }
                     break;
                     
@@ -1688,7 +1988,9 @@
             let isValid = true;
             
             // Validate required fields
-            const requiredFields = ['title', 'category', 'condition', 'price', 'description'];
+            const requiredFields = isSubleaseListing()
+                ? ['title', 'listing_type', 'category', 'price', 'description', 'housing_type', 'bedrooms', 'bathrooms', 'availability_start', 'availability_end', 'address_text']
+                : ['title', 'listing_type', 'category', 'condition', 'price', 'description'];
             requiredFields.forEach(fieldId => {
                 const field = document.getElementById(fieldId);
                 if (!validateField({ target: field })) {
@@ -1732,6 +2034,42 @@
             return isValid;
         }
 
+        function buildListingPayload() {
+            const listingType = document.getElementById('listing_type').value;
+            const isSublease = listingType === SUBLEASE_LISTING_TYPE;
+            const selectedContactMethod = document.querySelector('input[name="contact"]:checked').value;
+
+            return {
+                title: document.getElementById('title').value.trim(),
+                listing_type: listingType,
+                category: isSublease ? 'sublease' : document.getElementById('category').value,
+                condition: isSublease ? null : document.getElementById('condition').value,
+                price: parseFloat(document.getElementById('price').value),
+                price_period: isSublease ? 'monthly' : 'one_time',
+                description: document.getElementById('description').value.trim(),
+                location: isSublease ? '' : document.getElementById('location').value.trim(),
+                negotiable: isSublease ? false : document.getElementById('negotiable').checked,
+                contact_method: selectedContactMethod,
+                phone_number: selectedContactMethod === 'email' ? '' : document.getElementById('phone').value.trim(),
+                imageUrls: uploadedImages.map(img => img.url),
+                availability_start: isSublease ? (document.getElementById('availability_start').value || null) : null,
+                availability_end: isSublease ? (document.getElementById('availability_end').value || null) : null,
+                housing_type: isSublease ? (document.getElementById('housing_type').value || null) : null,
+                bedrooms: isSublease ? parseFloat(document.getElementById('bedrooms').value) : null,
+                bathrooms: isSublease ? parseFloat(document.getElementById('bathrooms').value) : null,
+                furnished: isSublease ? document.getElementById('furnished').checked : false,
+                utilities_included: isSublease ? document.getElementById('utilities_included').checked : false,
+                parking_available: isSublease ? document.getElementById('parking_available').checked : false,
+                pet_friendly: isSublease ? document.getElementById('pet_friendly').checked : false,
+                roommates_allowed: isSublease ? document.getElementById('roommates_allowed').checked : false,
+                lease_transfer_fee: isSublease && document.getElementById('lease_transfer_fee').value
+                    ? parseFloat(document.getElementById('lease_transfer_fee').value)
+                    : null,
+                address_text: isSublease ? document.getElementById('address_text').value.trim() : '',
+                sublease_notes: isSublease ? document.getElementById('sublease_notes').value.trim() : ''
+            };
+        }
+
         // Form submission
         async function handleSubmit(event) {
             event.preventDefault();
@@ -1745,18 +2083,7 @@
             
             try {
                 // Prepare form data
-                const formData = {
-                    title: document.getElementById('title').value.trim(),
-                    category: document.getElementById('category').value,
-                    condition: document.getElementById('condition').value,
-                    price: parseFloat(document.getElementById('price').value),
-                    description: document.getElementById('description').value.trim(),
-                    location: document.getElementById('location').value.trim(),
-                    negotiable: document.getElementById('negotiable').checked,
-                    contact_method: document.querySelector('input[name="contact"]:checked').value,
-                    phone_number: document.querySelector('input[name="contact"]:checked').value === 'email' ? '' : document.getElementById('phone').value.trim(),
-                    imageUrls: uploadedImages.map(img => img.url)
-                };
+                const formData = buildListingPayload();
                 
                 console.log('Submitting listing:', formData);
                 
@@ -1796,6 +2123,7 @@
                 // Here you would save the draft to localStorage or API
                 const draftData = {
                     title: document.getElementById('title').value,
+                    listing_type: document.getElementById('listing_type').value,
                     category: document.getElementById('category').value,
                     condition: document.getElementById('condition').value,
                     price: document.getElementById('price').value,
@@ -1803,6 +2131,20 @@
                     location: document.getElementById('location').value,
                     negotiable: document.getElementById('negotiable').checked,
                     contact_method: document.querySelector('input[name="contact"]:checked')?.value,
+                    phone_number: document.getElementById('phone').value,
+                    availability_start: document.getElementById('availability_start').value,
+                    availability_end: document.getElementById('availability_end').value,
+                    housing_type: document.getElementById('housing_type').value,
+                    bedrooms: document.getElementById('bedrooms').value,
+                    bathrooms: document.getElementById('bathrooms').value,
+                    lease_transfer_fee: document.getElementById('lease_transfer_fee').value,
+                    address_text: document.getElementById('address_text').value,
+                    furnished: document.getElementById('furnished').checked,
+                    utilities_included: document.getElementById('utilities_included').checked,
+                    parking_available: document.getElementById('parking_available').checked,
+                    pet_friendly: document.getElementById('pet_friendly').checked,
+                    roommates_allowed: document.getElementById('roommates_allowed').checked,
+                    sublease_notes: document.getElementById('sublease_notes').value,
                     saved_at: new Date().toISOString()
                 };
                 
@@ -1843,6 +2185,8 @@
             document.getElementById('success-modal').classList.remove('show');
             document.getElementById('listing-form').reset();
             uploadedImages = [];
+            createdListingId = null;
+            localStorage.removeItem('listing_draft');
             document.getElementById('image-preview-container').innerHTML = '';
             updateImageUploadUI();
             
@@ -1850,6 +2194,11 @@
             document.getElementById('title-count').textContent = '0';
             document.getElementById('description-count').textContent = '0';
             document.getElementById('location-count').textContent = '0';
+            document.getElementById('address_text-count').textContent = '0';
+            document.getElementById('sublease_notes-count').textContent = '0';
+            document.getElementById('listing_type').value = GOODS_LISTING_TYPE;
+            applyListingTypeUI();
+            togglePhoneField();
             
             // Clear validation states
             document.querySelectorAll('.form-input').forEach(input => {
@@ -1932,22 +2281,45 @@
                     // Ask user if they want to restore draft
                     if (confirm('You have a saved draft. Would you like to restore it?')) {
                         document.getElementById('title').value = draftData.title || '';
-                        document.getElementById('category').value = draftData.category || '';
+                        document.getElementById('listing_type').value = draftData.listing_type || GOODS_LISTING_TYPE;
+                        applyListingTypeUI();
+                        document.getElementById('category').value = (draftData.listing_type || GOODS_LISTING_TYPE) === SUBLEASE_LISTING_TYPE
+                            ? 'sublease'
+                            : (draftData.category || '');
                         document.getElementById('condition').value = draftData.condition || '';
                         document.getElementById('price').value = draftData.price || '';
                         document.getElementById('description').value = draftData.description || '';
                         document.getElementById('location').value = draftData.location || '';
                         document.getElementById('negotiable').checked = draftData.negotiable || false;
+                        document.getElementById('phone').value = draftData.phone_number || '';
+                        document.getElementById('availability_start').value = draftData.availability_start || '';
+                        document.getElementById('availability_end').value = draftData.availability_end || '';
+                        document.getElementById('housing_type').value = draftData.housing_type || '';
+                        document.getElementById('bedrooms').value = draftData.bedrooms || '';
+                        document.getElementById('bathrooms').value = draftData.bathrooms || '';
+                        document.getElementById('lease_transfer_fee').value = draftData.lease_transfer_fee || '';
+                        document.getElementById('address_text').value = draftData.address_text || '';
+                        document.getElementById('furnished').checked = draftData.furnished || false;
+                        document.getElementById('utilities_included').checked = draftData.utilities_included || false;
+                        document.getElementById('parking_available').checked = draftData.parking_available || false;
+                        document.getElementById('pet_friendly').checked = draftData.pet_friendly || false;
+                        document.getElementById('roommates_allowed').checked = draftData.roommates_allowed || false;
+                        document.getElementById('sublease_notes').value = draftData.sublease_notes || '';
                         
                         if (draftData.contact_method) {
                             const contactRadio = document.querySelector(`input[name="contact"][value="${draftData.contact_method}"]`);
                             if (contactRadio) contactRadio.checked = true;
                         }
+
+                        togglePhoneField();
                         
                         // Update character counts
                         updateCharacterCount({ target: document.getElementById('title') });
                         updateCharacterCount({ target: document.getElementById('description') });
                         updateCharacterCount({ target: document.getElementById('location') });
+                        updateCharacterCount({ target: document.getElementById('address_text') });
+                        updateCharacterCount({ target: document.getElementById('sublease_notes') });
+                        applyListingTypeUI();
                     } else {
                         localStorage.removeItem('listing_draft');
                     }

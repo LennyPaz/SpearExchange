@@ -321,6 +321,35 @@
             animation: fadeInUp 0.8s ease-out 0.4s both;
         }
 
+        .hero-discovery {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 0.85rem;
+            margin-top: 1.5rem;
+            animation: fadeInUp 0.8s ease-out 0.55s both;
+        }
+
+        .hero-discovery-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.65rem;
+            padding: 0.75rem 1rem;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.24);
+            background: rgba(255, 255, 255, 0.12);
+            color: white;
+            font-weight: 700;
+            text-decoration: none;
+            backdrop-filter: blur(10px);
+            transition: var(--transition);
+        }
+
+        .hero-discovery-btn:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
         .btn-hero {
             padding: 1rem 2rem;
             font-size: 1.1rem;
@@ -374,6 +403,39 @@
             grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 2rem;
             margin-bottom: 3rem;
+        }
+
+        .featured-entry-card .listing-image {
+            height: 180px;
+            flex-direction: column;
+            text-align: center;
+            gap: 0.75rem;
+        }
+
+        .listing-kicker {
+            color: var(--primary-color);
+            font-size: 0.82rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .listing-summary {
+            color: var(--text-light);
+            line-height: 1.6;
+            margin-top: 0.35rem;
+        }
+
+        .entry-card-actions {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+
+        .entry-card-actions .btn {
+            flex: 1 1 150px;
+            justify-content: center;
         }
 
         .listing-card {
@@ -1211,6 +1273,20 @@
                     List Your Items
                 </button>
             </div>
+            <div class="hero-discovery" aria-label="Quick marketplace paths">
+                <button class="hero-discovery-btn" onclick="handleBrowsePath('listings/?category=3d-printed-fsu-items')">
+                    <i class="fas fa-cube"></i>
+                    3D Printed FSU Items
+                </button>
+                <button class="hero-discovery-btn" onclick="handleBrowsePath('listings/?type=sublease')">
+                    <i class="fas fa-home"></i>
+                    Subleases Near Campus
+                </button>
+                <button class="hero-discovery-btn" onclick="handleBrowsePath('listings/')">
+                    <i class="fas fa-th-large"></i>
+                    Browse All Listings
+                </button>
+            </div>
         </div>
     </section>
 
@@ -1218,168 +1294,71 @@
     <section class="featured-section" id="featured">
         <div class="container">
             <div class="section-header">
-                <h2 class="section-title">Featured Listings</h2>
-                <p class="section-subtitle">Discover great deals from your fellow Seminoles</p>
+                <h2 class="section-title">Explore by Path</h2>
+                <p class="section-subtitle">Jump straight into 3D printed campus items, subleases near FSU, or the broader marketplace.</p>
             </div>
 
             <div class="listings-grid">
-                <!-- Listing 1 -->
-                <div class="listing-card" onclick="viewListing('macbook')">
+                <div class="listing-card featured-entry-card" onclick="handleBrowsePath('listings/?category=3d-printed-fsu-items')">
                     <div class="listing-image">
-                        <i class="fas fa-laptop"></i>
-                        <div class="listing-badge">Featured</div>
+                        <i class="fas fa-cube"></i>
+                        <div class="listing-badge">3D Prints</div>
                     </div>
                     <div class="listing-info">
-                        <h3 class="listing-title">MacBook Pro 13-inch (2022)</h3>
-                        <p class="listing-seller">
-                            <i class="fas fa-user-circle"></i>
-                            by Sarah M.
-                        </p>
-                        <div class="listing-price">$899</div>
-                        <div class="listing-actions">
-                            <button class="btn btn-primary btn-small" onclick="handleViewDetails('macbook')">View Details</button>
-                            <button class="btn btn-outline btn-small" onclick="handleMessage('macbook')">Message</button>
+                        <div class="listing-kicker">Featured discovery</div>
+                        <h3 class="listing-title">3D Printed FSU Items</h3>
+                        <p class="listing-summary">Browse generic showcase designs and real campus spirit pieces posted as normal marketplace items.</p>
+                        <div class="entry-card-actions">
+                            <button class="btn btn-primary btn-small" onclick="event.stopPropagation(); handleBrowsePath('listings/?category=3d-printed-fsu-items')">Browse 3D Items</button>
+                            <button class="btn btn-outline btn-small" onclick="event.stopPropagation(); handleCreateListing()">Post a Design</button>
                         </div>
                     </div>
                 </div>
 
-                <!-- Listing 2 -->
-                <div class="listing-card" onclick="viewListing('textbook')">
+                <div class="listing-card featured-entry-card" onclick="handleBrowsePath('listings/?type=sublease')">
                     <div class="listing-image">
-                        <i class="fas fa-book"></i>
-                        <div class="listing-badge">Great Deal</div>
+                        <i class="fas fa-home"></i>
+                        <div class="listing-badge">Subleases</div>
                     </div>
                     <div class="listing-info">
-                        <h3 class="listing-title">Calculus III Textbook</h3>
-                        <p class="listing-seller">
-                            <i class="fas fa-user-circle"></i>
-                            by Mike B.
-                        </p>
-                        <div class="listing-price">$45</div>
-                        <div class="listing-actions">
-                            <button class="btn btn-primary btn-small" onclick="handleViewDetails('textbook')">View Details</button>
-                            <button class="btn btn-outline btn-small" onclick="handleMessage('textbook')">Message</button>
+                        <div class="listing-kicker">Housing discovery</div>
+                        <h3 class="listing-title">Subleases Near Campus</h3>
+                        <p class="listing-summary">Find monthly listings with move-in dates, housing facts, and direct messaging built into the flow.</p>
+                        <div class="entry-card-actions">
+                            <button class="btn btn-primary btn-small" onclick="event.stopPropagation(); handleBrowsePath('listings/?type=sublease')">Browse Subleases</button>
+                            <button class="btn btn-outline btn-small" onclick="event.stopPropagation(); handleCreateListing()">Post a Sublease</button>
                         </div>
                     </div>
                 </div>
 
-                <!-- Listing 3 -->
-                <div class="listing-card" onclick="viewListing('fridge')">
+                <div class="listing-card featured-entry-card" onclick="handleBrowsePath('listings/')">
                     <div class="listing-image">
-                        <i class="fas fa-snowflake"></i>
-                        <div class="listing-badge">Like New</div>
+                        <i class="fas fa-search"></i>
+                        <div class="listing-badge">Browse all</div>
                     </div>
                     <div class="listing-info">
-                        <h3 class="listing-title">Dorm Mini Fridge</h3>
-                        <p class="listing-seller">
-                            <i class="fas fa-user-circle"></i>
-                            by Emma L.
-                        </p>
-                        <div class="listing-price">$120</div>
-                        <div class="listing-actions">
-                            <button class="btn btn-primary btn-small" onclick="handleViewDetails('fridge')">View Details</button>
-                            <button class="btn btn-outline btn-small" onclick="handleMessage('fridge')">Message</button>
+                        <div class="listing-kicker">Marketplace essentials</div>
+                        <h3 class="listing-title">Everything else on campus</h3>
+                        <p class="listing-summary">Textbooks, tech, furniture, and student-to-student listings with the normal marketplace browse flow.</p>
+                        <div class="entry-card-actions">
+                            <button class="btn btn-primary btn-small" onclick="event.stopPropagation(); handleBrowsePath('listings/')">Browse Listings</button>
+                            <button class="btn btn-outline btn-small" onclick="event.stopPropagation(); handleStartShopping()">Start Shopping</button>
                         </div>
                     </div>
                 </div>
 
-                <!-- Listing 4 -->
-                <div class="listing-card" onclick="viewListing('jersey')">
+                <div class="listing-card featured-entry-card" onclick="handleCreateListing()">
                     <div class="listing-image">
-                        <i class="fas fa-tshirt"></i>
-                        <div class="listing-badge">Popular</div>
+                        <i class="fas fa-plus"></i>
+                        <div class="listing-badge">Post now</div>
                     </div>
                     <div class="listing-info">
-                        <h3 class="listing-title">FSU Football Jersey #5</h3>
-                        <p class="listing-seller">
-                            <i class="fas fa-user-circle"></i>
-                            by Alex K.
-
-                        </p>
-                        <div class="listing-price">$35</div>
-                        <div class="listing-actions">
-                            <button class="btn btn-primary btn-small" onclick="handleViewDetails('jersey')">View Details</button>
-                            <button class="btn btn-outline btn-small" onclick="handleMessage('jersey')">Message</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Listing 5 -->
-                <div class="listing-card" onclick="viewListing('chair')">
-                    <div class="listing-image">
-                        <i class="fas fa-chair"></i>
-                        <div class="listing-badge">Trending</div>
-                    </div>
-                    <div class="listing-info">
-                        <h3 class="listing-title">Ergonomic Desk Chair</h3>
-                        <p class="listing-seller">
-                            <i class="fas fa-user-circle"></i>
-                            by Chris P.
-                        </p>
-                        <div class="listing-price">$180</div>
-                        <div class="listing-actions">
-                            <button class="btn btn-primary btn-small" onclick="handleViewDetails('chair')">View Details</button>
-                            <button class="btn btn-outline btn-small" onclick="handleMessage('chair')">Message</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Listing 6 -->
-                <div class="listing-card" onclick="viewListing('iphone')">
-                    <div class="listing-image">
-                        <i class="fas fa-mobile-alt"></i>
-                        <div class="listing-badge">Hot</div>
-                    </div>
-                    <div class="listing-info">
-                        <h3 class="listing-title">iPhone 14 Pro (128GB)</h3>
-                        <p class="listing-seller">
-                            <i class="fas fa-user-circle"></i>
-                            by Lisa W.
-                        </p>
-                        <div class="listing-price">$750</div>
-                        <div class="listing-actions">
-                            <button class="btn btn-primary btn-small" onclick="handleViewDetails('iphone')">View Details</button>
-                            <button class="btn btn-outline btn-small" onclick="handleMessage('iphone')">Message</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Listing 7 -->
-                <div class="listing-card" onclick="viewListing('bike')">
-                    <div class="listing-image">
-                        <i class="fas fa-bicycle"></i>
-                        <div class="listing-badge">Great Deal</div>
-                    </div>
-                    <div class="listing-info">
-                        <h3 class="listing-title">Campus Cruiser Bike</h3>
-                        <p class="listing-seller">
-                            <i class="fas fa-user-circle"></i>
-                            by Jordan R.
-                        </p>
-                        <div class="listing-price">$95</div>
-                        <div class="listing-actions">
-                            <button class="btn btn-primary btn-small" onclick="handleViewDetails('bike')">View Details</button>
-                            <button class="btn btn-outline btn-small" onclick="handleMessage('bike')">Message</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Listing 8 -->
-                <div class="listing-card" onclick="viewListing('keyboard')">
-                    <div class="listing-image">
-                        <i class="fas fa-keyboard"></i>
-                        <div class="listing-badge">New</div>
-                    </div>
-                    <div class="listing-info">
-                        <h3 class="listing-title">Mechanical Gaming Keyboard</h3>
-                        <p class="listing-seller">
-                            <i class="fas fa-user-circle"></i>
-                            by Taylor M.
-                        </p>
-                        <div class="listing-price">$85</div>
-                        <div class="listing-actions">
-                            <button class="btn btn-primary btn-small" onclick="handleViewDetails('keyboard')">View Details</button>
-                            <button class="btn btn-outline btn-small" onclick="handleMessage('keyboard')">Message</button>
+                        <div class="listing-kicker">Seller entry point</div>
+                        <h3 class="listing-title">List something today</h3>
+                        <p class="listing-summary">Use the same posting flow for regular items, 3D prints, and subleases without changing the marketplace design.</p>
+                        <div class="entry-card-actions">
+                            <button class="btn btn-primary btn-small" onclick="event.stopPropagation(); handleCreateListing()">Create Listing</button>
+                            <button class="btn btn-outline btn-small" onclick="event.stopPropagation(); handleViewMoreListings()">See More</button>
                         </div>
                     </div>
                 </div>
@@ -1388,7 +1367,7 @@
             <div class="view-more">
                 <button class="btn btn-primary btn-large" onclick="handleViewMoreListings()">
                     <i class="fas fa-arrow-right"></i>
-                    View More Listings
+                    Browse the Marketplace
                 </button>
             </div>
         </div>
@@ -1653,6 +1632,15 @@
                 window.location.href = 'listings/';
             } else {
                 window.location.href = 'login/?redirect=listings/';
+            }
+        }
+
+        // Handle direct marketplace discovery links from the homepage
+        function handleBrowsePath(path) {
+            if (isLoggedIn) {
+                window.location.href = path;
+            } else {
+                window.location.href = `login/?redirect=${encodeURIComponent(path)}`;
             }
         }
 

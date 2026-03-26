@@ -31,6 +31,6 @@ new_sqlite_classes = ["ChatRoom"]
 bucket = "src/public"
 
 [vars]
-TURNSTILE_SECRET_KEY = "0x4AAAAAABjmLFXlmwRbmpr0UXQLgLDpMLQ"
-RESEND_API_KEY = "re_UqY9LoGH_27oN7mcTtuPH7cv2w2AinPgE"
 PRODUCTION_URL = "https://spear-exchange.lenny-paz123.workers.dev"
+FRONTEND_URL = "https://lennypaz.github.io/SpearExchange"
+ALLOWED_ORIGINS = "https://lennypaz.github.io,http://localhost:8000,http://127.0.0.1:8000,http://localhost:3000,http://127.0.0.1:3000"
