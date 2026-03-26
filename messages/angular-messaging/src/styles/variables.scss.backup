@@ -1,0 +1,2 @@
+// This file forwards all variables from the partial
+@forward './_variables';

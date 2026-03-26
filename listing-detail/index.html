@@ -1,0 +1,2461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loading... - Spear Exchange</title>
+    <meta name="description" content="View detailed information about this listing on Spear Exchange">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #8B2635;
+            --primary-dark: #6B1B2A;
+            --accent-color: #FFD700;
+            --text-dark: #2C3E50;
+            --text-light: #5A6C7D;
+            --background-light: #F8FAFC;
+            --white: #FFFFFF;
+            --success-color: #10B981;
+            --warning-color: #F59E0B;
+            --error-color: #EF4444;
+            --shadow-light: 0 2px 10px rgba(0,0,0,0.08);
+            --shadow-medium: 0 8px 30px rgba(0,0,0,0.12);
+            --border-radius: 12px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            line-height: 1.6;
+            color: var(--text-dark);
+            background: var(--background-light);
+            min-height: 100vh;
+        }
+
+        /* Header - Match listings page exactly */
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(139, 38, 53, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow-light);
+        }
+
+        .nav {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--primary-color);
+        }
+
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.2rem;
+            box-shadow: var(--shadow-light);
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 500;
+            transition: var(--transition);
+            position: relative;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-color);
+        }
+
+        .nav-links a.active {
+            color: var(--primary-color);
+        }
+
+        .nav-links a.active::after {
+            content: '';
+            position: absolute;
+            bottom: -0.5rem;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--primary-color);
+            border-radius: 1px;
+        }
+
+        .create-listing-btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white !important;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            transition: var(--transition);
+            box-shadow: 0 2px 8px rgba(139, 38, 53, 0.2);
+        }
+
+        .create-listing-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(139, 38, 53, 0.3);
+            color: white !important;
+        }
+
+        /* Back button - match other nav buttons */
+        .back-btn {
+            background: none;
+            border: 1px solid rgba(139, 38, 53, 0.2);
+            color: var(--text-dark);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: var(--transition);
+            margin-left: 1rem;
+        }
+
+        .back-btn:hover {
+            background: rgba(139, 38, 53, 0.05);
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        /* User Menu */
+        .user-menu {
+            position: relative;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: var(--transition);
+        }
+
+        .user-profile:hover {
+            background: rgba(139, 38, 53, 0.05);
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .user-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border: 1px solid rgba(139, 38, 53, 0.1);
+            border-radius: 8px;
+            box-shadow: var(--shadow-medium);
+            min-width: 200px;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .user-dropdown.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-item {
+            display: block;
+            padding: 0.75rem 1rem;
+            color: var(--text-dark);
+            text-decoration: none;
+            transition: var(--transition);
+            border-bottom: 1px solid rgba(139, 38, 53, 0.05);
+        }
+
+        .dropdown-item:hover {
+            background: rgba(139, 38, 53, 0.05);
+            color: var(--primary-color);
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-item i {
+            width: 16px;
+            margin-right: 0.5rem;
+        }
+
+        /* Mobile menu */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-dark);
+            cursor: pointer;
+            font-size: 24px;
+            padding: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .mobile-menu-btn:hover {
+            color: var(--primary-color);
+        }
+
+        .mobile-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .mobile-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .mobile-sidebar {
+            position: fixed;
+            top: 0;
+            right: 0;
+            height: 100vh;
+            width: 320px;
+            background: var(--white);
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            overflow-y: auto;
+            box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+        }
+
+        .mobile-sidebar.open {
+            transform: translateX(0);
+        }
+
+        .mobile-sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(139, 38, 53, 0.1);
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+        }
+
+        .mobile-sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .mobile-sidebar-logo .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .mobile-sidebar-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .mobile-sidebar-subtitle {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .mobile-sidebar-nav {
+            padding: 1rem 0;
+        }
+
+        .mobile-nav-item {
+            display: block;
+            padding: 0.75rem 1.5rem;
+            color: var(--text-dark);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .mobile-nav-item:hover {
+            background: rgba(139, 38, 53, 0.05);
+            border-left-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .mobile-nav-item.active {
+            background: rgba(139, 38, 53, 0.1);
+            border-left-color: var(--primary-color);
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .mobile-nav-item i {
+            width: 20px;
+            margin-right: 0.75rem;
+        }
+
+        .mobile-sidebar-footer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 1.5rem;
+            border-top: 1px solid rgba(139, 38, 53, 0.1);
+            background: var(--background-light);
+        }
+
+        .mobile-user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .mobile-user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .mobile-user-details h4 {
+            font-size: 0.9rem;
+            margin: 0;
+            color: var(--text-dark);
+        }
+
+        .mobile-user-details p {
+            font-size: 0.8rem;
+            margin: 0;
+            color: var(--text-light);
+        }
+
+        .mobile-logout-btn {
+            width: 100%;
+            padding: 0.75rem;
+            background: none;
+            border: 1px solid rgba(139, 38, 53, 0.2);
+            color: var(--primary-color);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .mobile-logout-btn:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        /* Enhanced Visual Hierarchy and Spacing */
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2.5rem 1rem;
+        }
+
+        /* Improved Breadcrumb */
+        .breadcrumb {
+            margin-bottom: 2.5rem;
+        }
+
+        .breadcrumb nav {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.9rem;
+            color: var(--text-light);
+            background: var(--white);
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: var(--shadow-light);
+        }
+
+        .breadcrumb a {
+            color: var(--text-light);
+            text-decoration: none;
+            transition: var(--transition);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+        }
+
+        .breadcrumb a:hover {
+            color: var(--primary-color);
+            background: rgba(139, 38, 53, 0.05);
+        }
+
+        .breadcrumb-separator {
+            color: var(--text-light);
+            opacity: 0.5;
+        }
+
+        /* Enhanced Listing Container */
+        .listing-container {
+            display: grid;
+            grid-template-columns: 1fr 420px;
+            gap: 2.5rem;
+            margin-bottom: 3rem;
+        }
+
+        /* Enhanced Left Column */
+        .listing-main {
+            background: var(--white);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--shadow-light);
+            border: 1px solid rgba(139, 38, 53, 0.06);
+        }
+
+        /* Enhanced Image Gallery */
+        .image-gallery {
+            position: relative;
+            background: var(--background-light);
+        }
+
+        .main-image-container {
+            position: relative;
+            width: 100%;
+            height: 450px;
+            overflow: hidden;
+            background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+        }
+
+        .main-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+
+        .main-image:hover {
+            transform: scale(1.02);
+        }
+
+        /* Enhanced Image Counter */
+        .image-counter {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            backdrop-filter: blur(10px);
+        }
+
+        /* Enhanced Image Navigation */
+        .image-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            opacity: 0;
+            backdrop-filter: blur(10px);
+        }
+
+        .image-nav:hover {
+            background: rgba(0, 0, 0, 0.8);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .image-nav.prev {
+            left: 1.5rem;
+        }
+
+        .image-nav.next {
+            right: 1.5rem;
+        }
+
+        .main-image-container:hover .image-nav {
+            opacity: 1;
+        }
+
+        /* Enhanced Thumbnails */
+        .thumbnail-container {
+            padding: 1.5rem;
+            display: flex;
+            gap: 0.75rem;
+            overflow-x: auto;
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary-color) var(--background-light);
+        }
+
+        .thumbnail-container::-webkit-scrollbar {
+            height: 4px;
+        }
+
+        .thumbnail-container::-webkit-scrollbar-track {
+            background: var(--background-light);
+        }
+
+        .thumbnail-container::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 2px;
+        }
+
+        .thumbnail {
+            width: 90px;
+            height: 90px;
+            border-radius: 10px;
+            object-fit: cover;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: var(--transition);
+            flex-shrink: 0;
+        }
+
+        .thumbnail:hover {
+            border-color: var(--primary-color);
+            transform: scale(1.05);
+        }
+
+        .thumbnail.active {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(139, 38, 53, 0.2);
+        }
+
+        /* Enhanced Listing Info */
+        .listing-info {
+            padding: 2.5rem;
+        }
+
+        .listing-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: var(--text-dark);
+            line-height: 1.2;
+        }
+
+        .listing-meta {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--text-light);
+            font-size: 0.95rem;
+            padding: 0.5rem 1rem;
+            background: rgba(139, 38, 53, 0.05);
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        .meta-item i {
+            color: var(--primary-color);
+            font-size: 1.1rem;
+        }
+
+        .listing-description {
+            color: var(--text-dark);
+            line-height: 1.8;
+            margin-bottom: 2.5rem;
+            font-size: 1.05rem;
+        }
+
+        /* Enhanced Details Section */
+        .listing-details {
+            border-top: 2px solid rgba(139, 38, 53, 0.08);
+            padding-top: 2.5rem;
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: rgba(139, 38, 53, 0.02);
+            border-radius: 10px;
+            border: 1px solid rgba(139, 38, 53, 0.08);
+            transition: var(--transition);
+        }
+
+        .detail-item:hover {
+            background: rgba(139, 38, 53, 0.05);
+            border-color: rgba(139, 38, 53, 0.15);
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .detail-value {
+            font-weight: 700;
+            color: var(--text-dark);
+            font-size: 0.95rem;
+        }
+
+        /* Enhanced Sidebar */
+        .listing-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .sidebar-card {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: var(--shadow-light);
+            border: 1px solid rgba(139, 38, 53, 0.06);
+            transition: var(--transition);
+        }
+
+        .sidebar-card:hover {
+            box-shadow: var(--shadow-medium);
+            transform: translateY(-2px);
+        }
+
+        /* Enhanced Price Section */
+        .price-section {
+            text-align: center;
+            background: linear-gradient(135deg, rgba(139, 38, 53, 0.03), rgba(139, 38, 53, 0.01));
+        }
+
+        .price-main {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            margin-bottom: 0.75rem;
+            text-shadow: 0 2px 4px rgba(139, 38, 53, 0.1);
+        }
+
+        .price-negotiable {
+            color: var(--success-color);
+            font-size: 1rem;
+            font-weight: 600;
+            background: rgba(16, 185, 129, 0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Enhanced Seller Card */
+        .seller-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .seller-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: var(--background-light);
+            border: 3px solid rgba(139, 38, 53, 0.1);
+            flex-shrink: 0;
+        }
+
+        .seller-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .seller-info h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--text-dark);
+        }
+
+        .seller-status {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .seller-member-info {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            text-align: left;
+        }
+
+        .verified-badge {
+            color: var(--success-color);
+            background: rgba(16, 185, 129, 0.1);
+            padding: 0.4rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            white-space: nowrap;
+            flex-shrink: 0;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        /* Enhanced Seller Stats */
+        .seller-stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 1.5rem 0;
+            padding: 1.5rem 0;
+            border-top: 2px solid rgba(139, 38, 53, 0.08);
+            border-bottom: 2px solid rgba(139, 38, 53, 0.08);
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        /* Enhanced Rating Display */
+        .rating-display {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.25rem;
+        }
+
+        .rating-stars {
+            color: var(--accent-color);
+            font-size: 1.2rem;
+            text-shadow: 0 1px 2px rgba(255, 215, 0, 0.3);
+        }
+
+        .rating-text {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            font-weight: 500;
+        }        /* Enhanced Contact Section */
+        .contact-info {
+            margin-bottom: 1.5rem;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: rgba(139, 38, 53, 0.02);
+            border: 1px solid rgba(139, 38, 53, 0.08);
+            border-radius: 12px;
+            margin-bottom: 0.75rem;
+            transition: var(--transition);
+        }
+
+        .contact-item:hover {
+            border-color: var(--primary-color);
+            background: rgba(139, 38, 53, 0.05);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(139, 38, 53, 0.1);
+        }
+
+        .contact-item i {
+            color: var(--primary-color);
+            font-size: 1.2rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        .contact-item-content {
+            flex: 1;
+        }
+
+        .contact-item-label {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            margin-bottom: 0.25rem;
+            font-weight: 600;
+        }
+
+        .contact-item-value {
+            font-weight: 600;
+            color: var(--text-dark);
+            word-break: break-all;
+            font-size: 0.95rem;
+        }
+
+        .contact-item-action {
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 6px;
+            transition: var(--transition);
+        }
+
+        .contact-item-action:hover {
+            background: rgba(139, 38, 53, 0.1);
+            transform: scale(1.1);
+        }
+
+        /* Enhanced Mini Portfolio */
+        .mini-portfolio {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 2px solid rgba(139, 38, 53, 0.08);
+        }
+
+        .mini-portfolio h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 1rem;
+        }
+
+        .mini-listing {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem;
+            background: rgba(139, 38, 53, 0.02);
+            border-radius: 12px;
+            margin-bottom: 0.75rem;
+            transition: var(--transition);
+            cursor: pointer;
+            border: 1px solid rgba(139, 38, 53, 0.05);
+        }
+
+        .mini-listing:hover {
+            background: rgba(139, 38, 53, 0.05);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(139, 38, 53, 0.1);
+        }
+
+        .mini-listing-image {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            object-fit: cover;
+            background: rgba(139, 38, 53, 0.1);
+        }
+
+        .mini-listing-info {
+            flex: 1;
+        }
+
+        .mini-listing-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+            line-height: 1.3;
+        }
+
+        .mini-listing-price {
+            font-size: 0.85rem;
+            color: var(--primary-color);
+            font-weight: 700;
+        }
+
+        /* Enhanced Action Buttons */
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 1rem 1.5rem;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            font-size: 0.95rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            box-shadow: 0 4px 12px rgba(139, 38, 53, 0.2);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(139, 38, 53, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--white);
+            color: var(--text-dark);
+            border: 2px solid rgba(139, 38, 53, 0.1);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(139, 38, 53, 0.1);
+        }
+
+        .btn-icon {
+            background: none;
+            border: 2px solid rgba(139, 38, 53, 0.1);
+            color: var(--text-light);
+            width: 48px;
+            height: 48px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+        }
+
+        .btn-icon:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            transform: scale(1.1);
+        }
+
+        .btn-icon.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        /* Enhanced Comments Section */
+        .comments-section {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 2.5rem;
+            margin-top: 3rem;
+            box-shadow: var(--shadow-light);
+            border: 1px solid rgba(139, 38, 53, 0.06);
+        }
+
+        .comments-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 2px solid rgba(139, 38, 53, 0.08);
+        }
+
+        .comments-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .comments-count {
+            color: var(--text-light);
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .comment-form {
+            background: rgba(139, 38, 53, 0.02);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(139, 38, 53, 0.08);
+        }
+
+        .comment-textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 1.25rem;
+            border: 2px solid rgba(139, 38, 53, 0.1);
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            resize: vertical;
+            transition: var(--transition);
+            background: var(--white);
+            /* Ensure proper text selection and cursor navigation */
+            user-select: text;
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+        }
+
+        .comment-textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(139, 38, 53, 0.1);
+        }
+
+        .comment-form-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1.5rem;
+        }
+
+        .character-count {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        .comment-submit {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.95rem;
+            box-shadow: 0 4px 12px rgba(139, 38, 53, 0.2);
+        }
+
+        .comment-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(139, 38, 53, 0.3);
+        }
+
+        .comment-submit:disabled {
+            background: var(--text-light);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .comment-submit.sending {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .comment-submit.sending i {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Safety Tips Section */
+        .safety-tips {
+            margin-top: 2.5rem;
+            padding: 2rem;
+            background: rgba(16, 185, 129, 0.03);
+            border-radius: 12px;
+            border: 1px solid rgba(16, 185, 129, 0.1);
+        }
+
+        .safety-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--success-color);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .safety-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .safety-list li {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 0;
+            color: var(--text-dark);
+            font-size: 0.9rem;
+        }
+
+        .safety-list i {
+            color: var(--success-color);
+            font-size: 0.8rem;
+        }
+
+        /* Enhanced Mobile Responsiveness with proper hierarchy */
+        @media (max-width: 825px) {
+            .main-content {
+                padding: 1.5rem 1rem;
+            }
+
+            .breadcrumb nav {
+                padding: 0.75rem 1rem;
+                font-size: 0.85rem;
+            }
+
+            .listing-container {
+                display: flex;
+                flex-direction: column;
+                gap: 1.5rem;
+            }
+
+            /* Set order for proper mobile hierarchy: Price → Gallery → Seller → Contact */
+            .listing-sidebar .sidebar-card:first-child {
+                order: 1; /* Price section first */
+            }
+
+            .listing-main {
+                order: 2; /* Gallery second */
+            }
+
+            .listing-sidebar .sidebar-card:nth-child(2) {
+                order: 3; /* Seller info third */
+            }
+
+            .listing-sidebar .sidebar-card:nth-child(3) {
+                order: 4; /* Contact info fourth */
+            }
+
+            /* Remove the problematic order: -1 rule */
+            .listing-sidebar {
+                display: contents; /* Let its children be placed in the flex container directly */
+            }
+
+            .main-image-container {
+                height: 300px;
+            }
+
+            .listing-info {
+                padding: 1.5rem;
+            }
+
+            .listing-title {
+                font-size: 1.5rem;
+            }
+
+            .price-main {
+                font-size: 2.5rem;
+            }
+
+            .details-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar-card {
+                padding: 1.5rem;
+            }
+
+            .comments-section {
+                padding: 1.5rem;
+                order: 5; /* Comments section last */
+            }
+
+            .comment-form {
+                padding: 1.5rem;
+            }
+
+            .safety-tips {
+                padding: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-content {
+                padding: 1rem 0.5rem;
+            }
+
+            .listing-info {
+                padding: 1rem;
+            }
+
+            .sidebar-card {
+                padding: 1rem;
+            }
+
+            .comments-section {
+                padding: 1rem;
+            }
+
+            .comment-form {
+                padding: 1rem;
+            }
+
+            .seller-avatar {
+                width: 50px;
+                height: 50px;
+            }
+
+            .seller-info h3 {
+                font-size: 1.1rem;
+            }
+
+            .listing-title {
+                font-size: 1.25rem;
+            }
+
+            .price-main {
+                font-size: 2rem;
+            }
+        }
+
+        /* RESPONSIVE NAVIGATION - Progressive shrinking (from listings page) */
+        
+        /* Stage 1: 1154px - Remove extra spacing */
+        @media (max-width: 1154px) {
+            .nav {
+                padding: 1rem 1.5rem;
+            }
+            
+            .nav-links {
+                gap: 1.5rem;
+            }
+            
+            .nav-links a {
+                font-size: 0.9rem;
+                padding: 0.5rem 0.75rem;
+            }
+        }
+        
+        /* Stage 2: 1105px - Further compression */
+        @media (max-width: 1105px) {
+            .nav {
+                padding: 1rem;
+            }
+            
+            .nav-links {
+                gap: 1rem;
+            }
+            
+            .logo-text {
+                font-size: 1.3rem;
+            }
+        }
+        
+        /* Stage 3: 1060px - Smaller text */
+        @media (max-width: 1060px) {
+            .nav-links a {
+                font-size: 0.8rem;
+                padding: 0.4rem 0.6rem;
+            }
+            
+            .nav-links {
+                gap: 0.75rem;
+            }
+        }
+        
+        /* Stage 4: 950px - Ultra compression */
+        @media (max-width: 950px) {
+            .nav-links a {
+                font-size: 0.75rem;
+                padding: 0.3rem 0.5rem;
+            }
+
+            
+            .nav-links {
+                gap: 0.5rem;
+            }
+            
+            .logo-text {
+                font-size: 1.2rem;
+            }
+        }
+        
+        /* Stage 5: 880px - Final shrink before mobile */
+        @media (max-width: 880px) {
+            .nav-links a {
+                font-size: 0.7rem;
+                padding: 0.25rem 0.4rem;
+            }
+            
+            .nav-links {
+                gap: 0.25rem;
+            }
+        }
+
+        /* Mobile: 825px and below */
+        @media (max-width: 825px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .user-menu {
+                display: none;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .nav {
+                justify-content: space-between;
+                padding: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .nav {
+                padding: 1rem 0.5rem;
+            }
+
+            .main-content {
+                padding: 0.5rem;
+            }
+
+            .listing-info {
+                padding: 1rem;
+            }
+
+            .sidebar-card {
+                padding: 1rem;
+            }
+
+            .comments-section {
+                padding: 1rem;
+            }
+        }
+
+        /* Utility Classes */
+        .hidden {
+            display: none !important;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-muted {
+            color: var(--text-light);
+        }
+
+        .mb-0 { margin-bottom: 0; }
+        .mb-1 { margin-bottom: 0.5rem; }
+        .mb-2 { margin-bottom: 1rem; }
+        .mb-3 { margin-bottom: 1.5rem; }
+    </style>
+</head>
+<body>
+    <!-- Header - Match listings page exactly -->
+    <header class="header">
+        <nav class="nav">
+            <a href="../" class="logo">
+                <div class="logo-icon">SE</div>
+                <span class="logo-text">The Spear Exchange</span>
+            </a>
+            
+            <ul class="nav-links">
+                <li><a href="../">Home</a></li>
+                <li><a href="../listings/">Browse</a></li>
+                <li><a href="../messages/">Messages</a></li>
+                <li><a href="../my-listings/">My Listings</a></li>
+                <li><a href="../create-listing/" class="create-listing-btn">+ Create Listing</a></li>
+            </ul>
+
+            <div class="user-menu">
+                <div class="user-profile" onclick="toggleUserMenu()">
+                    <div class="user-avatar" id="user-avatar">T</div>
+                    <span id="user-name">Test User</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                
+                <div class="user-dropdown" id="user-dropdown">
+                    <a href="../my-listings/" class="dropdown-item">
+                        <i class="fas fa-list"></i>
+                        My Listings
+                    </a>
+                    <a href="../messages/" class="dropdown-item">
+                        <i class="fas fa-comments"></i>
+                        Messages
+                    </a>
+                    <a href="../profile/" class="dropdown-item">
+                        <i class="fas fa-user"></i>
+                        Profile Settings
+                    </a>
+                    <a href="#" class="dropdown-item" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Logout
+                    </a>
+                </div>
+            </div>
+
+            <button class="mobile-menu-btn" onclick="toggleMobileMenu()">
+                <i class="fas fa-bars"></i>
+            </button>
+        </nav>
+    </header>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-overlay" onclick="closeMobileMenu()"></div>
+    
+    <div class="mobile-sidebar" id="mobile-sidebar">
+        <div class="mobile-sidebar-header">
+            <div class="mobile-sidebar-logo">
+                <div class="logo-icon">SE</div>
+                <div>
+                    <div class="mobile-sidebar-title">The Spear Exchange</div>
+                    <div class="mobile-sidebar-subtitle">FSU Student Marketplace</div>
+                </div>
+            </div>
+        </div>
+        
+        <nav class="mobile-sidebar-nav">
+            <a href="../" class="mobile-nav-item">
+                <i class="fas fa-home"></i>
+                Home
+            </a>
+            <a href="../listings/" class="mobile-nav-item">
+                <i class="fas fa-search"></i>
+                Browse Listings
+            </a>
+            <a href="../messages/" class="mobile-nav-item">
+                <i class="fas fa-comments"></i>
+                Messages
+            </a>
+            <a href="../my-listings/" class="mobile-nav-item">
+                <i class="fas fa-list"></i>
+                My Listings
+            </a>
+            <a href="../create-listing/" class="mobile-nav-item">
+                <i class="fas fa-plus"></i>
+                Create Listing
+            </a>
+        </nav>
+        
+        <div class="mobile-sidebar-footer">
+            <div class="mobile-user-info">
+                <div class="mobile-user-avatar">T</div>
+                <div class="mobile-user-details">
+                    <h4>Test User</h4>
+                    <p>FSU Student</p>
+                </div>
+            </div>
+            <button class="mobile-logout-btn" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Breadcrumb -->
+        <div class="breadcrumb">
+            <nav>
+                <a href="../">Home</a>
+                <span class="breadcrumb-separator">/</span>
+                <a href="../listings/">Listings</a>
+                <span class="breadcrumb-separator">/</span>
+                <a href="../listings/" id="breadcrumb-category">Loading...</a>
+                <span class="breadcrumb-separator">/</span>
+                <span id="breadcrumb-title">Loading...</span>
+            </nav>
+        </div>
+
+        <!-- Listing Content -->
+        <div id="listing-content" class="listing-container">
+            <!-- Left Column -->
+            <div class="listing-main">
+                <!-- Image Gallery -->
+                <div class="image-gallery">
+                    <div class="main-image-container">
+                        <img id="main-image" class="main-image" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0xNzUgMTI1SDIyNVYxNzVIMTc1VjEyNVoiIGZpbGw9IiM5Q0EzQUYiLz4KPHN2ZyB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIHZpZXdCb3g9IjAgMCA1MCA1MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4PSIxNzUiIHk9IjEyNSI+CjxwYXRoIGQ9Ik0zNyA2SDEzQTcgNyAwIDAgMCA2IDEzVjM3QTcgNyAwIDAgMCAxMyA0NEgzN0E3IDcgMCAwIDAgNDQgMzdWMTNBNyA3IDAgMCAwIDM3IDZaTTIwIDEwSDMwVjE0SDIwVjEwWk0yNSAzOEM5IDM4IDkgMjQgOSAyNEM5IDI0IDkgMTggMTggMThIMzJDNDEgMTggNDEgMjQgNDEgMjRDNDEgMjQgNDEgMzggMjUgMzhaIiBmaWxsPSIjOUNBM0FGIi8+Cjwvc3ZnPgo8L3N2Zz4K" alt="Loading..." style="background: linear-gradient(135deg, #f8fafc, #e2e8f0);">
+                        <div id="image-counter" class="image-counter">0 / 0</div>
+                        <button class="image-nav prev" onclick="previousImage()" style="opacity: 0;">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button class="image-nav next" onclick="nextImage()" style="opacity: 0;">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                    <div id="thumbnail-container" class="thumbnail-container">
+                        <!-- Thumbnails will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Listing Info -->
+                <div class="listing-info">
+                    <h1 id="listing-title" class="listing-title">Loading...</h1>
+                    
+                    <div class="listing-meta">
+                        <div class="meta-item">
+                            <i class="fas fa-tag"></i>
+                            <span id="listing-category">Loading...</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span id="listing-location">Loading...</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-calendar"></i>
+                            <span id="listing-date">Loading...</span>
+                        </div>
+                    </div>
+
+                    <div id="listing-description" class="listing-description">
+                        Loading listing details...
+                    </div>
+
+                    <div class="listing-details">
+                        <div class="details-grid">
+                            <div class="detail-item">
+                                <span class="detail-label">Condition</span>
+                                <span id="listing-condition" class="detail-value">Loading...</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Price Negotiable</span>
+                                <span id="listing-negotiable" class="detail-value">Loading...</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Contact Method</span>
+                                <span id="listing-contact-method" class="detail-value">Loading...</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Status</span>
+                                <span id="listing-status" class="detail-value">Loading...</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Safety Tips Section -->
+                    <div class="safety-tips">
+                        <h3 class="safety-title">
+                            <i class="fas fa-shield-alt"></i>
+                            Safety Tips
+                        </h3>
+                        <ul class="safety-list">
+                            <li><i class="fas fa-check-circle"></i> Meet in public places on campus</li>
+                            <li><i class="fas fa-check-circle"></i> Inspect items before payment</li>
+                            <li><i class="fas fa-check-circle"></i> Use secure payment methods</li>
+                            <li><i class="fas fa-check-circle"></i> Trust your instincts</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column -->
+
+            <div class="listing-sidebar">
+                <!-- Price Section -->
+                <div class="sidebar-card price-section">
+                    <div id="listing-price" class="price-main">Loading...</div>
+                    <div id="price-negotiable-text" class="price-negotiable" style="display: none;">
+                        <i class="fas fa-handshake"></i>
+                        Price is negotiable
+                    </div>
+                </div>
+
+                <!-- Seller Card -->
+                <div class="sidebar-card">
+                    <div class="seller-header">
+                        <img id="seller-avatar" class="seller-avatar" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iMzAiIGZpbGw9IiNGM0Y0RjYiLz4KPHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4PSIxOCIgeT0iMTgiPgo8cGF0aCBkPSJNMjAgMjFWMTlBNCA0IDAgMCAwIDEyIDEzSDEyQTQgNCAwIDAgMCA0IDE5VjIxIiBzdHJva2U9IiM5Q0EzQUYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+CjxjaXJjbGUgY3g9IjEyIiBjeT0iNyIgcj0iNCIgc3Ryb2tlPSIjOUNBM0FGIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgo8L3N2Zz4KPC9zdmc+" alt="Seller Avatar">
+                        <div class="seller-info">
+                            <h3 id="seller-name">Loading...</h3>
+                            <div class="seller-status">
+                                <span id="seller-verified" class="verified-badge" style="display: none;">
+                                    <i class="fas fa-check-circle"></i>
+                                    Verified
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="seller-member-info">
+                        <span id="seller-member-since">Loading...</span>
+                    </div>
+                    
+                    <div id="seller-bio" class="mb-2">
+                        Loading seller information...
+                    </div>
+
+                    <div class="seller-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">0</div>
+                            <div class="stat-label">Listings</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">0</div>
+                            <div class="stat-label">Reviews</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">
+                                <div class="rating-display">
+                                    <span class="rating-stars">☆☆☆☆☆</span>
+                                </div>
+                            </div>
+                            <div class="stat-label">
+                                <div class="rating-text">No ratings yet</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mini Portfolio -->
+                    <div class="mini-portfolio" style="display: none;">
+                        <h4>Other listings by this seller</h4>
+                    </div>
+                </div>
+
+                <!-- Contact Section -->
+                <div class="sidebar-card">
+                    <h3 class="mb-2">Contact Seller</h3>
+                    
+                    <div id="contact-info" class="contact-info">
+                        <div style="text-align: center; color: var(--text-light); padding: 1rem;">
+                            <i class="fas fa-spinner fa-spin" style="font-size: 1.5rem; margin-bottom: 0.5rem;"></i>
+                            <p>Loading contact information...</p>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button class="btn btn-secondary" style="flex: 1;">
+                                <i class="fas fa-share"></i>
+                                Share
+                            </button>
+                            <button id="favorite-btn" class="btn-icon" onclick="toggleFavorite()">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Comments/Messages Section -->
+        <div class="comments-section" id="comments-section">
+            <div class="comments-header">
+                <h2 class="comments-title">Messages &amp; Questions</h2>
+                <span class="comments-count">Ask questions or make offers</span>
+            </div>
+
+            <div class="comment-form">
+                <textarea 
+                    class="comment-textarea" 
+                    placeholder="Hi! I'm interested in your listing. Is this still available? I can meet at the Student Union."
+                    maxlength="500"
+                    id="comment-textarea"
+                    oninput="updateCharacterCount()"
+                ></textarea>
+                <div class="comment-form-actions">
+                    <span class="character-count" id="character-count">0 / 500</span>
+                    <button class="comment-submit" onclick="submitComment()">
+                        <i class="fas fa-paper-plane"></i>
+                        Send Message
+                    </button>
+                </div>
+            </div>
+
+            <div class="comments-list" id="comments-list">
+                <!-- Messages will be populated here dynamically -->
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Global variables
+        let currentListing = null;
+        let currentImageIndex = 0;
+        let images = [];
+        let listingId = null;
+
+        // Extract listing ID from URL query parameter
+        function getListingIdFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('id');
+        }
+
+        // API Configuration
+        const API_BASE_URL = 'https://spear-exchange.lenny-paz123.workers.dev';
+
+        // Check authentication and update user info
+        async function checkAuthentication() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/me`, {
+                    credentials: 'include'
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const user = data.user;
+                    
+                    // Update header user info
+                    if (user.profile_name || user.name) {
+                        const userName = user.profile_name || user.name || 'User';
+                        document.getElementById('user-name').textContent = userName;
+                        document.getElementById('user-avatar').textContent = userName.charAt(0).toUpperCase();
+                    }
+                } else {
+                    console.log('Not authenticated, keeping default user display');
+                }
+            } catch (error) {
+                console.error('Auth check failed:', error);
+            }
+        }
+        async function loadListingDetails() {
+            try {
+                console.log('🔍 Loading listing with ID:', listingId);
+                const apiUrl = `${API_BASE_URL}/api/listings/${listingId}`;
+                console.log('🌐 Fetching from:', apiUrl);
+                
+                const response = await fetch(apiUrl, {
+                    credentials: 'include'
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                const data = await response.json();
+                const listing = data.listing || data;
+                
+                if (!listing || Object.keys(listing).length === 0) {
+                    throw new Error('Empty listing data received');
+                }
+                
+                currentListing = listing;
+                displayListing(listing);
+                
+            } catch (error) {
+                console.error('💥 Error loading listing:', error);
+                showError();
+            }
+        }
+
+        // Display listing data
+        function displayListing(listing) {
+            // Update page title and meta
+            document.title = `${listing.title || 'Listing'} - The Spear Exchange`;
+            
+            // Update breadcrumb with proper navigation links
+            const categoryElement = document.getElementById('breadcrumb-category');
+            const categoryName = capitalizeFirstLetter(listing.category) || 'General';
+            categoryElement.textContent = categoryName;
+            
+            // Make breadcrumb category link back to filtered listings
+            if (listing.category) {
+                categoryElement.href = `../listings/?category=${listing.category}`;
+            } else {
+                categoryElement.href = '../listings/';
+            }
+            
+            document.getElementById('breadcrumb-title').textContent = listing.title || 'Listing';
+
+            // Main listing info
+            document.getElementById('listing-title').textContent = listing.title || 'No title';
+            document.getElementById('listing-category').textContent = capitalizeFirstLetter(listing.category) || 'General';
+            document.getElementById('listing-location').textContent = listing.location || 'Location not specified';
+            document.getElementById('listing-date').textContent = formatDate(listing.created_at);
+            document.getElementById('listing-description').textContent = listing.description || 'No description provided';
+
+            // Price
+            document.getElementById('listing-price').textContent = formatPrice(listing.price);
+            if (listing.negotiable) {
+                document.getElementById('price-negotiable-text').style.display = 'inline-flex';
+            }
+
+            // Details - with proper capitalization
+            document.getElementById('listing-condition').textContent = capitalizeFirstLetter(listing.condition) || 'Not specified';
+            document.getElementById('listing-negotiable').textContent = listing.negotiable ? 'Yes' : 'No';
+            document.getElementById('listing-contact-method').textContent = formatContactMethod(listing.contact_method);
+            document.getElementById('listing-status').textContent = capitalizeFirstLetter(listing.status) || 'Active';
+
+            // Images
+            let imageUrls = [];
+            if (listing.image_urls) {
+                if (Array.isArray(listing.image_urls)) {
+                    imageUrls = listing.image_urls;
+                } else if (typeof listing.image_urls === 'string') {
+                    try {
+                        imageUrls = JSON.parse(listing.image_urls);
+                    } catch (e) {
+                        imageUrls = [];
+                    }
+                }
+            }
+            setupImageGallery(imageUrls);
+
+            // Seller info
+            const sellerName = listing.seller?.profile_name || listing.seller_name || 'Anonymous';
+            const sellerBio = listing.seller?.bio || 'No bio available';
+            const isVerified = listing.seller?.is_verified || listing.seller_verified || false;
+            const memberSince = listing.seller?.member_since || listing.seller_created_at || listing.created_at;
+            const avatarUrl = listing.seller?.avatar_url || '';
+            const stats = listing.seller?.stats || {};
+            
+            document.getElementById('seller-name').textContent = sellerName;
+            document.getElementById('seller-bio').textContent = sellerBio;
+            
+            if (avatarUrl) {
+                document.getElementById('seller-avatar').src = avatarUrl;
+            }
+            
+            // Show verified badge if user is verified
+            if (isVerified) {
+                document.getElementById('seller-verified').style.display = 'inline-flex';
+            } else {
+                document.getElementById('seller-verified').style.display = 'none';
+            }
+            
+            if (memberSince) {
+                document.getElementById('seller-member-since').textContent = 
+                    `Member since ${formatDate(memberSince)}`;
+            }
+
+            // Contact info - Use correct field names from API response
+            const contactInfo = document.getElementById('contact-info');
+            let contactHTML = '';
+            
+            // Show email if contact method includes email - Use seller_email from API
+            if (listing.contact_method === 'email' || listing.contact_method === 'both') {
+                const email = listing.seller_email || 'Email not provided';
+                contactHTML += `
+                    <div class="contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <div class="contact-item-content">
+                            <div class="contact-item-label">Email</div>
+                            <div class="contact-item-value">${escapeHtml(email)}</div>
+                        </div>
+                        <button class="contact-item-action" onclick="copyToClipboard('${escapeHtml(email)}')">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                `;
+            }
+            
+            // Show phone if contact method includes phone - Use seller_phone from API
+            if (listing.contact_method === 'phone' || listing.contact_method === 'both') {
+                const phone = listing.seller_phone || 'Phone not provided';
+                const formattedPhone = formatPhoneNumber(phone);
+                contactHTML += `
+                    <div class="contact-item" onclick="window.location.href='tel:${phone}'" style="cursor: pointer;">
+                        <i class="fas fa-phone"></i>
+                        <div class="contact-item-content">
+                            <div class="contact-item-label">Phone</div>
+                            <div class="contact-item-value">${escapeHtml(formattedPhone)}</div>
+                        </div>
+                        <button class="contact-item-action" onclick="event.stopPropagation(); copyToClipboard('${escapeHtml(formattedPhone)}')">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                `;
+            }
+            
+            // Fallback if no contact method specified
+            if (!contactHTML) {
+                contactHTML = `
+                    <div style="text-align: center; color: var(--text-light); padding: 1rem;">
+                        <i class="fas fa-info-circle" style="font-size: 1.5rem; margin-bottom: 0.5rem;"></i>
+                        <p>Contact information not available</p>
+                    </div>
+                `;
+            }
+            
+            contactInfo.innerHTML = contactHTML;
+            
+            // Update seller stats with proper rating display and fallbacks
+            if (stats.listings_count !== undefined) {
+                document.querySelector('.seller-stats .stat-item:nth-child(1) .stat-value').textContent = stats.listings_count;
+            } else {
+                document.querySelector('.seller-stats .stat-item:nth-child(1) .stat-value').textContent = '0';
+            }
+            
+            if (stats.reviews_count !== undefined) {
+                document.querySelector('.seller-stats .stat-item:nth-child(2) .stat-value').textContent = stats.reviews_count;
+            } else {
+                document.querySelector('.seller-stats .stat-item:nth-child(2) .stat-value').textContent = '0';
+            }
+            
+            if (stats.rating !== undefined && stats.rating > 0) {
+                const ratingStars = '★'.repeat(Math.floor(stats.rating)) + '☆'.repeat(5 - Math.floor(stats.rating));
+                document.querySelector('.rating-stars').textContent = ratingStars;
+                document.querySelector('.rating-text').textContent = `${stats.rating}/5 Rating`;
+            } else {
+                document.querySelector('.rating-stars').textContent = '☆☆☆☆☆';
+                document.querySelector('.rating-text').textContent = 'No ratings yet';
+            }
+            
+            // Load other listings from same seller
+            loadOtherListings(listing.user_id, listing.id);
+        }
+
+        // Load other listings from the same seller
+        async function loadOtherListings(userId, currentListingId) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/users/${userId}/listings`, {
+                    credentials: 'include'
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    const otherListings = data.listings ? 
+                        data.listings.filter(listing => listing.id !== currentListingId).slice(0, 2) : [];
+                    
+                    // Update seller stats with actual listing count
+                    const totalListings = data.listings ? data.listings.length : 0;
+                    document.querySelector('.seller-stats .stat-item:nth-child(1) .stat-value').textContent = totalListings;
+                    
+                    // Display other listings if available
+                    const miniPortfolio = document.querySelector('.mini-portfolio');
+                    if (otherListings.length > 0) {
+                        let otherListingsHTML = '<h4>Other listings by this seller</h4>';
+                        otherListings.forEach(otherListing => {
+                            const imageUrl = otherListing.image_urls ? 
+                                (Array.isArray(otherListing.image_urls) ? otherListing.image_urls[0] : 
+                                 JSON.parse(otherListing.image_urls || '[]')[0]) : null;
+                            
+                            otherListingsHTML += `
+                                <div class="mini-listing" onclick="window.location.href='?id=${otherListing.id}'">
+                                    <img class="mini-listing-image" 
+                                         src="${imageUrl || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0yMCAyMEg0MFY0MEgyMFYyMFoiIGZpbGw9IiM5Q0EzQUYiLz4KPHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAyMCAyMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4PSIyMCIgeT0iMjAiPgo8cGF0aCBkPSJNMTUgMkg1QTMgMyAwIDAgMCAyIDVWMTVBMyAzIDAgMCAwIDUgMThIMTVBMyAzIDAgMCAwIDE4IDE1VjVBMyAzIDAgMCAwIDE1IDJaIiBzdHJva2U9IiM5Q0EzQUYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+Cjxwb2x5bGluZSBwb2ludHM9IjksOSAxMCw5IDEwLDEwIDksMTAiIHN0cm9rZT0iIzlDQTNBRiIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KPC9zdmc+Cjwvc3ZnPgo='}" 
+                                         alt="${escapeHtml(otherListing.title)}">
+                                    <div class="mini-listing-info">
+                                        <div class="mini-listing-title">${escapeHtml(otherListing.title)}</div>
+                                        <div class="mini-listing-price">${formatPrice(otherListing.price)}</div>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                        miniPortfolio.innerHTML = otherListingsHTML;
+                        miniPortfolio.style.display = 'block';
+                    } else {
+                        miniPortfolio.style.display = 'none';
+                    }
+                } else {
+                    console.log('Could not load other listings');
+                }
+            } catch (error) {
+                console.error('Error loading other listings:', error);
+            }
+        }
+        function setupImageGallery(imageUrls) {
+            images = imageUrls && imageUrls.length > 0 ? imageUrls : [];
+            
+            const navButtons = document.querySelectorAll('.image-nav');
+            
+            if (images.length === 0) {
+                document.getElementById('main-image').style.display = 'none';
+                document.getElementById('image-counter').textContent = '0 / 0';
+                document.getElementById('thumbnail-container').innerHTML = '';
+                // Hide navigation arrows when no images
+                navButtons.forEach(btn => btn.style.opacity = '0');
+                return;
+            }
+
+            currentImageIndex = 0;
+            document.getElementById('main-image').src = images[0];
+            document.getElementById('main-image').style.display = 'block';
+            document.getElementById('image-counter').textContent = `1 / ${images.length}`;
+            
+            // Show navigation arrows only if more than 1 image
+            if (images.length > 1) {
+                navButtons.forEach(btn => btn.style.opacity = '1');
+            } else {
+                navButtons.forEach(btn => btn.style.opacity = '0');
+            }
+
+            const thumbnailContainer = document.getElementById('thumbnail-container');
+            thumbnailContainer.innerHTML = '';
+            
+            images.forEach((imageUrl, index) => {
+                const thumbnail = document.createElement('img');
+                thumbnail.className = 'thumbnail';
+                thumbnail.src = imageUrl;
+                thumbnail.alt = `Thumbnail ${index + 1}`;
+                thumbnail.onclick = () => showImage(index);
+                
+                if (index === 0) {
+                    thumbnail.classList.add('active');
+                }
+                
+                thumbnailContainer.appendChild(thumbnail);
+            });
+        }
+
+        // Image navigation
+        function showImage(index) {
+            if (index < 0 || index >= images.length) return;
+            
+            currentImageIndex = index;
+            document.getElementById('main-image').src = images[index];
+            document.getElementById('image-counter').textContent = `${index + 1} / ${images.length}`;
+            
+            document.querySelectorAll('.thumbnail').forEach((thumb, i) => {
+                thumb.classList.toggle('active', i === index);
+            });
+        }
+
+        function previousImage() {
+            if (images.length <= 1) return;
+            
+            if (currentImageIndex > 0) {
+                showImage(currentImageIndex - 1);
+            } else {
+                // Wrap to last image when at first image
+                showImage(images.length - 1);
+            }
+        }
+
+        function nextImage() {
+            if (images.length <= 1) return;
+            
+            if (currentImageIndex < images.length - 1) {
+                showImage(currentImageIndex + 1);
+            } else {
+                // Wrap to first image when at last image
+                showImage(0);
+            }
+        }
+
+        // Copy to clipboard function
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                const button = event.target.closest('.contact-item-action');
+                const originalIcon = button.innerHTML;
+                button.innerHTML = '<i class="fas fa-check"></i>';
+                setTimeout(() => {
+                    button.innerHTML = originalIcon;
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+            });
+        }
+
+        // User menu functions
+        function toggleUserMenu() {
+            const dropdown = document.getElementById('user-dropdown');
+            dropdown.classList.toggle('show');
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function closeDropdown(e) {
+                if (!e.target.closest('.user-menu')) {
+                    dropdown.classList.remove('show');
+                    document.removeEventListener('click', closeDropdown);
+                }
+            });
+        }
+
+        async function logout() {
+            // Close dropdown first
+            document.getElementById('user-dropdown').classList.remove('show');
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/logout`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                // Redirect to home page after logout attempt
+                window.location.href = '../';
+            } catch (error) {
+                console.error('Logout error:', error);
+                // Still redirect even if logout request fails
+                window.location.href = '../';
+            }
+        }
+
+        // Mobile menu functions
+        function toggleMobileMenu() {
+            const sidebar = document.getElementById('mobile-sidebar');
+            const overlay = document.querySelector('.mobile-overlay');
+            
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('active');
+            
+            document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : '';
+        }
+
+        function closeMobileMenu() {
+            const sidebar = document.getElementById('mobile-sidebar');
+            const overlay = document.querySelector('.mobile-overlay');
+            
+            sidebar.classList.remove('open');
+            overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // Comments section functions
+        function scrollToComments() {
+            document.getElementById('comments-section').scrollIntoView({ 
+                behavior: 'smooth' 
+            });
+        }
+
+        function updateCharacterCount() {
+            const textarea = document.getElementById('comment-textarea');
+            const counter = document.getElementById('character-count');
+            counter.textContent = `${textarea.value.length} / 500`;
+        }
+
+        // Phase 1 Messaging: Send message to listing owner
+        async function submitComment() {
+            const textarea = document.getElementById('comment-textarea');
+            const submitBtn = document.querySelector('.comment-submit');
+            const message = textarea.value.trim();
+            
+            if (!message) {
+                alert('Please enter a message');
+                return;
+            }
+
+            // Check if user is authenticated
+            let currentUser;
+            try {
+                const authResponse = await fetch(`${API_BASE_URL}/api/me`, {
+                    credentials: 'include'
+                });
+                
+                if (!authResponse.ok) {
+                    alert('Please log in to send messages');
+                    window.location.href = '../login/';
+                    return;
+                }
+                
+                const authData = await authResponse.json();
+                currentUser = authData.user;
+            } catch (error) {
+                alert('Please log in to send messages');
+                window.location.href = '../login/';
+                return;
+            }
+
+            if (!currentListing) {
+                alert('Listing information not available');
+                return;
+            }
+
+            // Check if user is trying to message their own listing
+            if (currentUser.id === currentListing.user_id) {
+                alert('You cannot send messages to your own listing. Use the edit function to update your listing instead.');
+                return;
+            }
+
+            // Disable button and show loading state
+            submitBtn.classList.add('sending');
+            submitBtn.disabled = true;
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+            
+            try {
+                const messageData = {
+                    listing_id: parseInt(listingId),
+                    receiver_id: currentListing.user_id, // Send to listing owner
+                    message: message
+                };
+
+                console.log('Sending message:', messageData);
+
+                const response = await fetch(`${API_BASE_URL}/api/messages`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify(messageData)
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    console.log('Message sent successfully:', result);
+                    
+                    // Success!
+                    textarea.value = '';
+                    updateCharacterCount();
+                    showSuccessMessage('Message sent successfully! The seller will be able to respond to you.');
+                } else {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Failed to send message');
+                }
+                
+            } catch (error) {
+                console.error('Error sending message:', error);
+                alert(`Failed to send message: ${error.message}`);
+            } finally {
+                // Re-enable button
+                submitBtn.classList.remove('sending');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
+        }
+
+        // Show success message
+        function showSuccessMessage(message) {
+            // Remove any existing success message
+            const existing = document.querySelector('.message-success');
+            if (existing) existing.remove();
+
+            const successDiv = document.createElement('div');
+            successDiv.className = 'message-success';
+            successDiv.style.cssText = `
+                background: #d1fae5;
+                border: 1px solid #10b981;
+                color: #065f46;
+                padding: 1rem;
+                border-radius: 8px;
+                margin: 1rem 0;
+                text-align: center;
+            `;
+            successDiv.innerHTML = `<i class="fas fa-check"></i> ${message}`;
+            
+            const commentForm = document.querySelector('.comment-form');
+            commentForm.appendChild(successDiv);
+            
+            // Remove after 5 seconds
+            setTimeout(() => {
+                successDiv.remove();
+            }, 5000);
+        }
+
+        function toggleFavorite() {
+            const btn = document.getElementById('favorite-btn');
+            btn.classList.toggle('active');
+            
+            // Show helpful message since favorites API may not be ready
+            if (btn.classList.contains('active')) {
+                console.log('Added to favorites (when favorites feature is implemented)');
+            } else {
+                console.log('Removed from favorites (when favorites feature is implemented)');
+            }
+            
+            // Placeholder for future API integration:
+            // try {
+            //     const response = await fetch(`${API_BASE_URL}/api/favorites/${listingId}`, {
+            //         method: 'POST',
+            //         credentials: 'include'
+            //     });
+            //     if (response.ok) {
+            //         // Handle success
+            //     }
+            // } catch (error) {
+            //     console.error('Error toggling favorite:', error);
+            // }
+        }
+
+        // Utility functions
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function formatPhoneNumber(phoneNumber) {
+            if (!phoneNumber) return phoneNumber;
+            
+            // Remove all non-digits
+            const cleaned = phoneNumber.replace(/\D/g, '');
+            
+            // Check if it's a valid US phone number (10 digits)
+            if (cleaned.length === 10) {
+                return `(${cleaned.slice(0, 3)})${cleaned.slice(3, 6)}-${cleaned.slice(6)}`;
+            }
+            
+            // If not 10 digits, return original
+            return phoneNumber;
+        }
+
+        function capitalizeFirstLetter(string) {
+            if (!string) return string;
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        }
+
+        function formatPrice(price) {
+            if (!price) return 'Free';
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD'
+            }).format(price);
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return 'Unknown';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        }
+
+        function formatContactMethod(method) {
+            switch (method) {
+                case 'email': return 'Email only';
+                case 'phone': return 'Phone only';
+                case 'both': return 'Email & Phone';
+                default: return 'Not specified';
+            }
+        }
+
+        function showError() {
+            document.querySelector('.main-content').innerHTML = `
+                <div style="text-align: center; padding: 4rem 2rem; color: var(--text-light);">
+                    <div style="font-size: 4rem; margin-bottom: 1rem; opacity: 0.5;">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <h2 style="font-size: 1.5rem; margin-bottom: 0.5rem; color: var(--text-dark);">Listing Not Found</h2>
+                    <p style="margin-bottom: 1.5rem;">The listing you're looking for doesn't exist or has been removed.</p>
+                    <a href="../listings/" style="
+                        background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+                        color: white;
+                        padding: 0.75rem 1.5rem;
+                        border-radius: 8px;
+                        text-decoration: none;
+                        display: inline-block;
+                        transition: var(--transition);
+                        box-shadow: 0 2px 8px rgba(139, 38, 53, 0.2);
+                    ">Browse All Listings</a>
+                </div>
+            `;
+        }
+
+        // Keyboard navigation for images
+        document.addEventListener('keydown', (e) => {
+            if (images.length <= 1) return;
+            
+            switch (e.key) {
+                case 'ArrowLeft':
+                    e.preventDefault();
+                    previousImage();
+                    break;
+                case 'ArrowRight':
+                    e.preventDefault();
+                    nextImage();
+                    break;
+            }
+        });
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', async () => {
+            listingId = getListingIdFromUrl();
+            
+            if (!listingId) {
+                showError();
+                return;
+            }
+
+            // Setup textarea keyboard navigation
+            const textarea = document.getElementById('comment-textarea');
+            if (textarea) {
+                // Allow normal arrow key navigation in textarea
+                textarea.addEventListener('keydown', function(e) {
+                    // Don't prevent default for navigation keys
+                    if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(e.key)) {
+                        e.stopPropagation(); // Stop event from bubbling up
+                        return true; // Allow default behavior
+                    }
+                });
+                
+                // Ensure focus and selection work properly
+                textarea.addEventListener('focus', function() {
+                    // Restore normal text selection behavior
+                    this.style.userSelect = 'text';
+                });
+            }
+
+            // Check authentication and load listing details
+            await checkAuthentication();
+            await loadListingDetails();
+        });
+    </script>
+</body>
+</html>

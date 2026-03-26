@@ -1,0 +1,46 @@
+<div class="conversations-list-container">
+  <div 
+    *ngFor="let conversation of filteredConversations; trackBy: trackByConversationId"
+    class="conversation-item"
+    [class.active]="conversation.id === selectedConversationId"
+    (click)="selectConversation(conversation)"
+    [attr.data-conversation-id]="conversation.id"
+  >
+    <div class="conversation-header">
+      <div class="conversation-listing">
+        <div class="listing-thumbnail">
+          <img 
+            *ngIf="getListingImage(conversation) as imageUrl"
+            [src]="imageUrl" 
+            [alt]="conversation.listing.title"
+            (error)="onImageError($event)"
+          />
+          <i *ngIf="!getListingImage(conversation)" class="fas fa-image"></i>
+        </div>
+        <div class="conversation-details">
+          <div class="listing-title">{{ conversation.listing.title }}</div>
+          <div class="other-user">
+            <i class="fas fa-user"></i>
+            {{ conversation.other_user.name }}
+            <i class="fas fa-check-circle verified-badge"></i>
+          </div>
+        </div>
+      </div>
+      <div class="conversation-time">{{ formatTime(conversation.last_message_at) }}</div>
+    </div>
+    
+    <div class="last-message">
+      {{ conversation.last_message_preview || 'No messages yet' }}
+    </div>
+    
+    <div class="conversation-meta">
+      <span class="user-role" [class.buyer]="conversation.other_user.role === 'buyer'"
+                               [class.seller]="conversation.other_user.role === 'seller'">
+        {{ conversation.other_user.role === 'buyer' ? 'Buyer' : 'Seller' }}
+      </span>
+      <span *ngIf="conversation.unread_count > 0" class="unread-count">
+        {{ conversation.unread_count > 99 ? '99+' : conversation.unread_count }}
+      </span>
+    </div>
+  </div>
+</div>

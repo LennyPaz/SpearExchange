@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - The Spear Exchange</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #8B2635;
+            --primary-dark: #6B1B2A;
+            --accent-color: #FFD700;
+            --text-dark: #2C3E50;
+            --text-light: #5A6C7D;
+            --background-light: #F8FAFC;
+            --surface: #FFFFFF;
+            --success-color: #10B981;
+            --warning-color: #F59E0B;
+            --error-color: #EF4444;
+            --shadow-light: 0 2px 10px rgba(0,0,0,0.08);
+            --shadow-medium: 0 8px 30px rgba(0,0,0,0.12);
+            --border-radius: 12px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            line-height: 1.6;
+            color: var(--text-dark);
+            background:
+                radial-gradient(circle at top left, rgba(255, 215, 0, 0.15), transparent 24%),
+                radial-gradient(circle at top right, rgba(139, 38, 53, 0.08), transparent 30%),
+                var(--background-light);
+            min-height: 100vh;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(139, 38, 53, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow-light);
+        }
+
+        .nav {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            gap: 1rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--primary-color);
+        }
+
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.2rem;
+            box-shadow: var(--shadow-light);
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            list-style: none;
+            flex-wrap: wrap;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 500;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: var(--primary-color);
+        }
+
+        .nav-links a.active::after {
+            content: '';
+            position: absolute;
+            bottom: -0.5rem;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--primary-color);
+            border-radius: 1px;
+        }
+
+        .user-menu {
+            position: relative;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: var(--transition);
+        }
+
+        .user-profile:hover {
+            background: rgba(139, 38, 53, 0.05);
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .user-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            box-shadow: var(--shadow-medium);
+            min-width: 220px;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: var(--transition);
+        }
+
+        .user-dropdown.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            width: 100%;
+            padding: 0.85rem 1rem;
+            color: var(--text-dark);
+            text-decoration: none;
+            transition: var(--transition);
+            border-bottom: 1px solid #F3F4F6;
+            background: none;
+            border-left: 0;
+            border-right: 0;
+            border-top: 0;
+            font: inherit;
+            cursor: pointer;
+        }
+
+        .dropdown-item:hover {
+            background: rgba(139, 38, 53, 0.05);
+            color: var(--primary-color);
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-dark);
+            cursor: pointer;
+            font-size: 24px;
+            padding: 0.5rem;
+            transition: var(--transition);
+        }
+
+        .mobile-menu-btn:hover {
+            color: var(--primary-color);
+        }
+
+        .mobile-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.55);
+            z-index: 999;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+
+        .mobile-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: min(320px, 88vw);
+            background: white;
+            z-index: 1000;
+            transform: translateX(100%);
+            transition: var(--transition);
+            box-shadow: var(--shadow-medium);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .mobile-menu.active {
+            transform: translateX(0);
+        }
+
+        .mobile-menu a {
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 600;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #EEF2F7;
+        }
+
+        .mobile-menu a.active {
+            color: var(--primary-color);
+        }
+
+        .page-shell {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .hero {
+            display: grid;
+            grid-template-columns: minmax(0, 1.25fr) minmax(320px, 0.75fr);
+            gap: 1.5rem;
+            align-items: start;
+        }
+
+        .hero-card,
+        .side-card,
+        .panel {
+            background: var(--surface);
+            border-radius: 20px;
+            box-shadow: var(--shadow-light);
+            border: 1px solid rgba(148, 163, 184, 0.16);
+            overflow: hidden;
+        }
+
+        .hero-card {
+            padding: 1.5rem;
+            background:
+                linear-gradient(160deg, rgba(139, 38, 53, 0.98), rgba(107, 27, 42, 0.98));
+            color: white;
+            position: relative;
+        }
+
+        .hero-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(circle at top right, rgba(255, 215, 0, 0.18), transparent 25%),
+                radial-gradient(circle at bottom left, rgba(255, 255, 255, 0.1), transparent 30%);
+            pointer-events: none;
+        }
+
+        .hero-inner {
+            position: relative;
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 1.25rem;
+            align-items: center;
+        }
+
+        .avatar-large {
+            width: 104px;
+            height: 104px;
+            border-radius: 28px;
+            background: linear-gradient(135deg, var(--accent-color), #F59E0B);
+            color: #3B2A00;
+            display: grid;
+            place-items: center;
+            font-size: 2rem;
+            font-weight: 900;
+            box-shadow: 0 16px 32px rgba(15, 23, 42, 0.18);
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            font-size: 0.78rem;
+            font-weight: 800;
+            color: rgba(255, 255, 255, 0.78);
+            margin-bottom: 0.75rem;
+        }
+
+        .hero-card h1 {
+            font-size: clamp(2rem, 4vw, 3.2rem);
+            line-height: 1.06;
+            margin-bottom: 0.45rem;
+        }
+
+        .hero-card p {
+            color: rgba(255, 255, 255, 0.9);
+            max-width: 58ch;
+        }
+
+        .hero-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-top: 1.2rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.55rem;
+            border: none;
+            border-radius: 999px;
+            padding: 0.82rem 1.05rem;
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-primary {
+            background: var(--accent-color);
+            color: #3B2A00;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.12);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-primary:hover,
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+        }
+
+        .hero-stats {
+            margin-top: 1.5rem;
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 0.75rem;
+        }
+
+        .stat {
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 0.9rem;
+        }
+
+        .stat strong {
+            display: block;
+            font-size: 1.6rem;
+            line-height: 1;
+        }
+
+        .stat span {
+            display: block;
+            margin-top: 0.3rem;
+            color: rgba(255, 255, 255, 0.78);
+            font-size: 0.83rem;
+        }
+
+        .sidebar {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .side-card {
+            padding: 1.25rem;
+        }
+
+        .side-card h2 {
+            font-size: 1.05rem;
+            margin-bottom: 0.35rem;
+        }
+
+        .side-card p {
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+
+        .badge-list {
+            display: grid;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .badge {
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+            padding: 0.85rem;
+            border-radius: 14px;
+            background: #F8FAFC;
+        }
+
+        .badge-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+        }
+
+        .badge strong {
+            display: block;
+            font-size: 0.95rem;
+        }
+
+        .badge span {
+            display: block;
+            color: var(--text-light);
+            font-size: 0.85rem;
+        }
+
+        .content-grid {
+            margin-top: 1.5rem;
+            display: grid;
+            grid-template-columns: minmax(0, 1.5fr) minmax(320px, 0.75fr);
+            gap: 1.5rem;
+            align-items: start;
+        }
+
+        .panel {
+            padding: 1.25rem;
+        }
+
+        .panel-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .panel-title {
+            font-size: 1.05rem;
+            font-weight: 800;
+        }
+
+        .panel-subtitle {
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+
+        .form-grid {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .input-row {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 1rem;
+        }
+
+        .field label {
+            display: block;
+            font-weight: 700;
+            margin-bottom: 0.45rem;
+        }
+
+        .field input,
+        .field select,
+        .field textarea {
+            width: 100%;
+            border: 1px solid #D7DFE8;
+            border-radius: 12px;
+            padding: 0.85rem 1rem;
+            font: inherit;
+            color: var(--text-dark);
+            background: white;
+            transition: var(--transition);
+        }
+
+        .field textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .field input:focus,
+        .field select:focus,
+        .field textarea:focus {
+            outline: none;
+            border-color: rgba(139, 38, 53, 0.35);
+            box-shadow: 0 0 0 3px rgba(139, 38, 53, 0.08);
+        }
+
+        .section-card {
+            margin-top: 1rem;
+            background: #F8FAFC;
+            border: 1px solid #E7EDF5;
+            border-radius: 16px;
+            padding: 1rem;
+        }
+
+        .checklist {
+            display: grid;
+            gap: 0.8rem;
+            margin-top: 0.9rem;
+        }
+
+        .check-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.7rem;
+            color: var(--text-dark);
+        }
+
+        .check-item i {
+            color: var(--success-color);
+            margin-top: 0.2rem;
+        }
+
+        .toggle-list {
+            display: grid;
+            gap: 0.75rem;
+            margin-top: 0.8rem;
+        }
+
+        .toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            padding: 0.85rem 0.95rem;
+            background: #F8FAFC;
+            border-radius: 14px;
+        }
+
+        .toggle-row strong {
+            display: block;
+        }
+
+        .toggle-row span {
+            display: block;
+            color: var(--text-light);
+            font-size: 0.85rem;
+        }
+
+        .switch {
+            position: relative;
+            width: 54px;
+            height: 32px;
+            flex-shrink: 0;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            inset: 0;
+            border-radius: 999px;
+            background: #CBD5E1;
+            transition: var(--transition);
+        }
+
+        .slider::before {
+            content: '';
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            top: 4px;
+            left: 4px;
+            background: white;
+            transition: var(--transition);
+            box-shadow: 0 4px 10px rgba(15, 23, 42, 0.15);
+        }
+
+        .switch input:checked + .slider {
+            background: var(--primary-color);
+        }
+
+        .switch input:checked + .slider::before {
+            transform: translateX(22px);
+        }
+
+        .action-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .action-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            border-radius: 999px;
+            padding: 0.7rem 0.95rem;
+            font-size: 0.9rem;
+            font-weight: 700;
+            text-decoration: none;
+            border: 1px solid #D9E2EC;
+            color: var(--text-dark);
+            background: white;
+            transition: var(--transition);
+        }
+
+        .action-link:hover {
+            border-color: rgba(139, 38, 53, 0.35);
+            color: var(--primary-color);
+            background: rgba(139, 38, 53, 0.04);
+        }
+
+        .save-banner {
+            margin-top: 1rem;
+            display: none;
+            align-items: center;
+            gap: 0.7rem;
+            padding: 0.85rem 1rem;
+            border-radius: 14px;
+            background: rgba(16, 185, 129, 0.12);
+            color: #047857;
+            font-weight: 700;
+        }
+
+        .footer {
+            max-width: 1400px;
+            margin: 2rem auto 0;
+            padding: 0 2rem 2rem;
+            color: var(--text-light);
+        }
+
+        .footer-card {
+            background: white;
+            border-radius: 18px;
+            padding: 1rem 1.25rem;
+            border: 1px solid rgba(148, 163, 184, 0.16);
+            box-shadow: var(--shadow-light);
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 0.75rem;
+        }
+
+        .footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        @media (max-width: 1100px) {
+            .hero,
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 760px) {
+            .nav-links,
+            .user-menu {
+                display: none;
+            }
+
+            .mobile-menu-btn {
+                display: inline-flex;
+            }
+
+            .page-shell {
+                padding: 1rem;
+            }
+
+            .hero-card,
+            .panel,
+            .side-card {
+                border-radius: 18px;
+            }
+
+            .hero-inner {
+                grid-template-columns: 1fr;
+                justify-items: start;
+            }
+
+            .hero-stats,
+            .input-row {
+                grid-template-columns: 1fr;
+            }
+
+            .footer {
+                padding: 0 1rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="nav">
+            <a href="../" class="logo">
+                <div class="logo-icon">SE</div>
+                <div class="logo-text">The Spear Exchange</div>
+            </a>
+
+            <nav class="nav-links" aria-label="Primary">
+                <a href="../">Home</a>
+                <a href="../listings/">Browse</a>
+                <a href="../messages/">Messages</a>
+                <a href="../my-listings/">My Listings</a>
+                <a href="../profile/" class="active">Profile</a>
+            </nav>
+
+            <div class="user-menu">
+                <div class="user-profile" id="userMenuButton" role="button" tabindex="0" aria-haspopup="true" aria-expanded="false">
+                    <div class="user-avatar" id="topAvatar">LP</div>
+                    <span id="topName">Lake Park</span>
+                    <i class="fas fa-chevron-down" aria-hidden="true"></i>
+                </div>
+                <div class="user-dropdown" id="userMenu">
+                    <a href="../messages/" class="dropdown-item"><i class="fas fa-comments"></i>Messages</a>
+                    <a href="../my-listings/" class="dropdown-item"><i class="fas fa-store"></i>My listings</a>
+                    <a href="../create-listing/" class="dropdown-item"><i class="fas fa-plus-circle"></i>Create listing</a>
+                    <a href="../login/" class="dropdown-item"><i class="fas fa-right-from-bracket"></i>Log out</a>
+                </div>
+            </div>
+
+            <button class="mobile-menu-btn" id="mobileMenuButton" aria-label="Open menu">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <div class="mobile-overlay" id="mobileOverlay"></div>
+    <aside class="mobile-menu" id="mobileMenu" aria-label="Mobile menu">
+        <a href="../">Home</a>
+        <a href="../listings/">Browse</a>
+        <a href="../messages/">Messages</a>
+        <a href="../my-listings/">My Listings</a>
+        <a href="../profile/" class="active">Profile</a>
+        <a href="../create-listing/">Create Listing</a>
+        <a href="../login/">Log out</a>
+    </aside>
+
+    <main class="page-shell">
+        <section class="hero">
+            <article class="hero-card">
+                <div class="eyebrow"><i class="fas fa-id-card"></i> Student account profile</div>
+                <div class="hero-inner">
+                    <div class="avatar-large" id="heroAvatar">LP</div>
+                    <div>
+                        <h1 id="heroName">Lake Park</h1>
+                        <p id="heroBio">
+                            Marketplace seller, FSU student, and frequent campus pickup coordinator.
+                            Keep your profile current so buyers can trust the person behind the listing.
+                        </p>
+                        <div class="hero-actions">
+                            <a href="../messages/" class="btn btn-primary"><i class="fas fa-comments"></i> Open messages</a>
+                            <a href="../create-listing/" class="btn btn-secondary"><i class="fas fa-plus"></i> Create listing</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat">
+                        <strong>4.9</strong>
+                        <span>Seller rating</span>
+                    </div>
+                    <div class="stat">
+                        <strong>27</strong>
+                        <span>Completed exchanges</span>
+                    </div>
+                    <div class="stat">
+                        <strong>2h</strong>
+                        <span>Average reply time</span>
+                    </div>
+                </div>
+            </article>
+
+            <aside class="sidebar">
+                <section class="side-card">
+                    <h2>Trust and safety</h2>
+                    <p>These cues help buyers know you are active, reachable, and campus-friendly.</p>
+                    <div class="badge-list">
+                        <div class="badge">
+                            <div class="badge-icon"><i class="fas fa-shield-heart"></i></div>
+                            <div>
+                                <strong>Public meetup preference</strong>
+                                <span>Library, student union, or other busy campus spaces.</span>
+                            </div>
+                        </div>
+                        <div class="badge">
+                            <div class="badge-icon"><i class="fas fa-circle-check"></i></div>
+                            <div>
+                                <strong>Email verified</strong>
+                                <span>Helps buyers trust your account.</span>
+                            </div>
+                        </div>
+                        <div class="badge">
+                            <div class="badge-icon"><i class="fas fa-clock"></i></div>
+                            <div>
+                                <strong>Fast response</strong>
+                                <span>Replies usually within the same day.</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="side-card">
+                    <h2>Quick actions</h2>
+                    <div class="badge-list">
+                        <div class="badge">
+                            <div class="badge-icon"><i class="fas fa-lock"></i></div>
+                            <div>
+                                <strong>Change password</strong>
+                                <span>Use a strong passphrase and update recovery options.</span>
+                            </div>
+                        </div>
+                        <div class="badge">
+                            <div class="badge-icon"><i class="fas fa-bell"></i></div>
+                            <div>
+                                <strong>Notification settings</strong>
+                                <span>Message alerts, listing updates, and reminder emails.</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </aside>
+        </section>
+
+        <section class="content-grid">
+            <article class="panel">
+                <div class="panel-header">
+                    <div>
+                        <div class="panel-title">Account details</div>
+                        <div class="panel-subtitle">Looks editable, but keeps everything local to the page.</div>
+                    </div>
+                    <button class="action-link" id="editToggle"><i class="fas fa-pen-to-square"></i> Edit profile</button>
+                </div>
+
+                <div class="form-grid">
+                    <div class="input-row">
+                        <div class="field">
+                            <label for="fullName">Full name</label>
+                            <input id="fullName" value="Lake Park" disabled>
+                        </div>
+                        <div class="field">
+                            <label for="displayName">Display name</label>
+                            <input id="displayName" value="Lake" disabled>
+                        </div>
+                    </div>
+
+                    <div class="input-row">
+                        <div class="field">
+                            <label for="email">Email</label>
+                            <input id="email" value="lake.park@fsu.edu" disabled>
+                        </div>
+                        <div class="field">
+                            <label for="major">Major</label>
+                            <input id="major" value="Computer Science" disabled>
+                        </div>
+                    </div>
+
+                    <div class="input-row">
+                        <div class="field">
+                            <label for="location">Campus location</label>
+                            <input id="location" value="Near Landis Green" disabled>
+                        </div>
+                        <div class="field">
+                            <label for="year">Year</label>
+                            <select id="year" disabled>
+                                <option>Freshman</option>
+                                <option selected>Junior</option>
+                                <option>Sophomore</option>
+                                <option>Senior</option>
+                                <option>Graduate</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label for="bio">Bio</label>
+                        <textarea id="bio" disabled>Marketplace seller, FSU student, and frequent campus pickup coordinator. Prefer public meetups and quick communication.</textarea>
+                    </div>
+
+                    <div class="section-card">
+                        <strong>Contact preferences</strong>
+                        <div class="toggle-list">
+                            <div class="toggle-row">
+                                <div>
+                                    <strong>Message alerts</strong>
+                                    <span>Receive browser and email notifications for new chats.</span>
+                                </div>
+                                <label class="switch">
+                                    <input type="checkbox" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <div class="toggle-row">
+                                <div>
+                                    <strong>Show phone number to buyers</strong>
+                                    <span>Only surface a number if you are comfortable with it.</span>
+                                </div>
+                                <label class="switch">
+                                    <input type="checkbox">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <div class="toggle-row">
+                                <div>
+                                    <strong>Campus meetup reminders</strong>
+                                    <span>Prompt you with safety tips before handoffs.</span>
+                                </div>
+                                <label class="switch">
+                                    <input type="checkbox" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="action-row">
+                        <button class="btn btn-primary" id="saveButton" type="button"><i class="fas fa-floppy-disk"></i> Save changes</button>
+                        <a href="../messages/" class="action-link"><i class="fas fa-comments"></i> Messages</a>
+                        <a href="../login/" class="action-link"><i class="fas fa-right-from-bracket"></i> Log out</a>
+                    </div>
+
+                    <div class="save-banner" id="saveBanner">
+                        <i class="fas fa-circle-check"></i>
+                        Profile saved locally for this session.
+                    </div>
+                </div>
+            </article>
+
+            <aside class="sidebar">
+                <section class="side-card">
+                    <h2>Verification and campus trust</h2>
+                    <p>These fields are designed to signal a legitimate, contactable seller.</p>
+                    <div class="badge-list">
+                        <div class="badge">
+                            <div class="badge-icon"><i class="fas fa-envelope-open-text"></i></div>
+                            <div>
+                                <strong>FSU email active</strong>
+                                <span>Use your school address for trust and recovery.</span>
+                            </div>
+                        </div>
+                        <div class="badge">
+                            <div class="badge-icon"><i class="fas fa-location-dot"></i></div>
+                            <div>
+                                <strong>Campus handoff zone</strong>
+                                <span>Meet in populated, well-lit areas during the day.</span>
+                            </div>
+                        </div>
+                        <div class="badge">
+                            <div class="badge-icon"><i class="fas fa-receipt"></i></div>
+                            <div>
+                                <strong>Clear payment terms</strong>
+                                <span>Agree on payment before you meet in person.</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="side-card">
+                    <h2>Privacy note</h2>
+                    <p>
+                        Keep sensitive details private. Share only the information needed to complete a safe exchange.
+                    </p>
+                    <div class="checklist">
+                        <div class="check-item"><i class="fas fa-check-circle"></i><span>Do not publish your home address.</span></div>
+                        <div class="check-item"><i class="fas fa-check-circle"></i><span>Use messages to confirm item condition and meetup time.</span></div>
+                        <div class="check-item"><i class="fas fa-check-circle"></i><span>Report suspicious behavior instead of moving off-platform.</span></div>
+                    </div>
+                </section>
+            </aside>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-card">
+            <div>The Spear Exchange profile center.</div>
+            <div><a href="../listings/">Browse listings</a> · <a href="../my-listings/">My listings</a> · <a href="../messages/">Messages</a></div>
+        </div>
+    </footer>
+
+    <script>
+        const userMenuButton = document.getElementById('userMenuButton');
+        const userMenu = document.getElementById('userMenu');
+        const mobileMenuButton = document.getElementById('mobileMenuButton');
+        const mobileOverlay = document.getElementById('mobileOverlay');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const editToggle = document.getElementById('editToggle');
+        const saveButton = document.getElementById('saveButton');
+        const saveBanner = document.getElementById('saveBanner');
+
+        const fields = ['fullName', 'displayName', 'email', 'major', 'location', 'year', 'bio'];
+        let editing = false;
+
+        function initials(name) {
+            return name.split(' ').slice(0, 2).map((part) => part[0]).join('').toUpperCase();
+        }
+
+        function syncPreview() {
+            const name = document.getElementById('fullName').value;
+            const bio = document.getElementById('bio').value;
+            const preview = initials(name || 'Lake Park');
+            document.getElementById('heroName').textContent = name || 'Lake Park';
+            document.getElementById('topName').textContent = name || 'Lake Park';
+            document.getElementById('heroBio').textContent = bio || 'Marketplace seller, FSU student, and frequent campus pickup coordinator.';
+            document.getElementById('heroAvatar').textContent = preview;
+            document.getElementById('topAvatar').textContent = preview;
+        }
+
+        function setEditing(nextState) {
+            editing = nextState;
+            fields.forEach((id) => {
+                document.getElementById(id).disabled = !editing;
+            });
+            editToggle.innerHTML = editing
+                ? '<i class="fas fa-xmark"></i> Cancel edit'
+                : '<i class="fas fa-pen-to-square"></i> Edit profile';
+        }
+
+        editToggle.addEventListener('click', () => {
+            setEditing(!editing);
+        });
+
+        saveButton.addEventListener('click', () => {
+            syncPreview();
+            saveBanner.style.display = 'flex';
+            setTimeout(() => {
+                saveBanner.style.display = 'none';
+            }, 2600);
+            setEditing(false);
+        });
+
+        fields.forEach((id) => {
+            document.getElementById(id).addEventListener('input', syncPreview);
+            document.getElementById(id).addEventListener('change', syncPreview);
+        });
+
+        userMenuButton.addEventListener('click', () => {
+            userMenu.classList.toggle('show');
+            userMenuButton.setAttribute('aria-expanded', userMenu.classList.contains('show') ? 'true' : 'false');
+        });
+
+        document.addEventListener('click', (event) => {
+            if (!userMenu.contains(event.target) && !userMenuButton.contains(event.target)) {
+                userMenu.classList.remove('show');
+                userMenuButton.setAttribute('aria-expanded', 'false');
+            }
+        });
+
+        function closeMobileMenu() {
+            mobileOverlay.classList.remove('active');
+            mobileMenu.classList.remove('active');
+        }
+
+        mobileMenuButton.addEventListener('click', () => {
+            mobileOverlay.classList.add('active');
+            mobileMenu.classList.add('active');
+        });
+
+        mobileOverlay.addEventListener('click', closeMobileMenu);
+        mobileMenu.querySelectorAll('a').forEach((link) => link.addEventListener('click', closeMobileMenu));
+
+        syncPreview();
+        setEditing(false);
+    </script>
+</body>
+</html>

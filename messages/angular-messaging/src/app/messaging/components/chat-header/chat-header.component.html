@@ -1,0 +1,26 @@
+<div class="chat-header" *ngIf="conversation">
+  <div class="chat-listing-info">
+    <div class="chat-listing-thumbnail">
+      <img 
+        *ngIf="getListingImage() as imageUrl"
+        [src]="imageUrl" 
+        [alt]="conversation.listing.title"
+        (error)="onImageError($event)"
+      />
+      <i *ngIf="!getListingImage()" class="fas fa-image"></i>
+    </div>
+    <div class="chat-listing-details">
+      <h2>{{ conversation.listing.title }}</h2>
+      <div class="chat-listing-price">{{ formatPrice(conversation.listing.price) }}</div>
+      <div class="chat-other-user">
+        <i class="fas fa-user"></i>
+        <span>{{ conversation.other_user.name }}</span>
+        <span class="user-role" 
+              [class.buyer]="otherUserRole === 'buyer'"
+              [class.seller]="otherUserRole === 'seller'">
+          {{ otherUserRole === 'buyer' ? 'Buyer' : 'Seller' }}
+        </span>
+      </div>
+    </div>
+  </div>
+</div>

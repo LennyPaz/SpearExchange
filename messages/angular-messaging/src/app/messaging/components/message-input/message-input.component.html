@@ -1,0 +1,21 @@
+<div class="message-input-area">
+  <div class="message-input-container">
+    <textarea 
+      #messageInput
+      class="message-input" 
+      [(ngModel)]="messageText"
+      (keypress)="onKeyPress($event)"
+      (input)="onInput()"
+      placeholder="Type your message..."
+      rows="1"
+    ></textarea>
+    <button 
+      class="send-button"
+      [disabled]="isSendDisabled"
+      (click)="sendMessage()"
+      type="button"
+    >
+      <i class="fas fa-paper-plane"></i>
+    </button>
+  </div>
+</div>

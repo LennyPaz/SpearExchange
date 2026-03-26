@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Terms of Use - The Spear Exchange</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  <style>
+    :root {
+      --primary-color: #8B2635;
+      --primary-dark: #6B1B2A;
+      --accent-color: #FFD700;
+      --text-dark: #2C3E50;
+      --text-light: #5A6C7D;
+      --background-light: #F8FAFC;
+      --white: #FFFFFF;
+      --shadow-light: 0 2px 10px rgba(0, 0, 0, 0.08);
+      --shadow-medium: 0 10px 30px rgba(0, 0, 0, 0.12);
+      --border-radius: 16px;
+      --transition: all 0.25s ease;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(139, 38, 53, 0.08), transparent 28%),
+        radial-gradient(circle at top right, rgba(255, 215, 0, 0.12), transparent 22%),
+        var(--background-light);
+      color: var(--text-dark);
+      line-height: 1.65;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .header {
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(10px);
+      padding: 1rem 2rem;
+      box-shadow: var(--shadow-light);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1200px;
+      margin: 0 auto;
+      gap: 1.5rem;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+      color: var(--primary-color);
+      font-weight: 800;
+      font-size: 1.15rem;
+      white-space: nowrap;
+    }
+
+    .logo-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+      color: var(--white);
+      box-shadow: var(--shadow-light);
+    }
+
+    .nav-links,
+    .auth-buttons {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      flex-wrap: wrap;
+    }
+
+    .nav-links a,
+    .auth-buttons a {
+      text-decoration: none;
+      font-weight: 600;
+      transition: var(--transition);
+    }
+
+    .nav-links a {
+      color: var(--text-dark);
+      position: relative;
+      padding-bottom: 0.15rem;
+    }
+
+    .nav-links a:hover,
+    .nav-links a.active {
+      color: var(--primary-color);
+    }
+
+    .nav-links a.active::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -0.35rem;
+      height: 2px;
+      border-radius: 999px;
+      background: var(--primary-color);
+    }
+
+    .auth-buttons a {
+      padding: 0.6rem 1rem;
+      border-radius: 999px;
+      border: 1.5px solid var(--primary-color);
+      color: var(--primary-color);
+    }
+
+    .auth-buttons a:hover {
+      background: var(--primary-color);
+      color: var(--white);
+    }
+
+    .hero {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 4rem 2rem 2rem;
+      display: grid;
+      grid-template-columns: 1.3fr 0.9fr;
+      gap: 2rem;
+      align-items: stretch;
+    }
+
+    .hero-copy,
+    .hero-panel,
+    .content-card,
+    .safety-card {
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(139, 38, 53, 0.08);
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow-light);
+    }
+
+    .hero-copy {
+      padding: 2.2rem;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.35rem 0.8rem;
+      border-radius: 999px;
+      background: rgba(139, 38, 53, 0.08);
+      color: var(--primary-color);
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+
+    h1 {
+      font-size: clamp(2.2rem, 4vw, 3.4rem);
+      line-height: 1.1;
+      margin-bottom: 1rem;
+    }
+
+    .lede {
+      color: var(--text-light);
+      font-size: 1.05rem;
+      max-width: 60ch;
+      margin-bottom: 1.5rem;
+    }
+
+    .meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.55rem 0.85rem;
+      border-radius: 999px;
+      background: rgba(255, 215, 0, 0.18);
+      color: #7a5f00;
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+
+    .hero-panel {
+      padding: 1.5rem;
+      display: grid;
+      gap: 1rem;
+      align-content: start;
+    }
+
+    .panel-stat {
+      padding: 1rem 1.1rem;
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(139, 38, 53, 0.08), rgba(255, 215, 0, 0.1));
+    }
+
+    .panel-stat strong {
+      display: block;
+      font-size: 1.1rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem 3rem;
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 1.5rem;
+    }
+
+    .content-stack {
+      display: grid;
+      gap: 1.25rem;
+    }
+
+    .content-card {
+      padding: 1.7rem;
+    }
+
+    .content-card h2 {
+      font-size: 1.4rem;
+      margin-bottom: 0.75rem;
+      color: var(--primary-dark);
+    }
+
+    .content-card h3 {
+      font-size: 1.05rem;
+      margin: 1rem 0 0.4rem;
+      color: var(--text-dark);
+    }
+
+    .content-card p,
+    .content-card li {
+      color: var(--text-light);
+    }
+
+    .content-card ul {
+      padding-left: 1.2rem;
+      display: grid;
+      gap: 0.5rem;
+      margin-top: 0.75rem;
+    }
+
+    .grid-two {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem;
+      margin-top: 0.75rem;
+    }
+
+    .mini-card {
+      padding: 1rem;
+      border-radius: 14px;
+      background: #fff;
+      border: 1px solid rgba(139, 38, 53, 0.08);
+    }
+
+    .mini-card i {
+      color: var(--primary-color);
+      margin-bottom: 0.5rem;
+      font-size: 1.1rem;
+    }
+
+    .sidebar {
+      display: grid;
+      gap: 1rem;
+      align-content: start;
+    }
+
+    .safety-card {
+      padding: 1.2rem;
+    }
+
+    .safety-card h3 {
+      margin-bottom: 0.5rem;
+      color: var(--primary-dark);
+      display: flex;
+      gap: 0.6rem;
+      align-items: center;
+    }
+
+    .safety-card ul {
+      padding-left: 1.1rem;
+      color: var(--text-light);
+      display: grid;
+      gap: 0.45rem;
+      margin-top: 0.75rem;
+    }
+
+    .footer {
+      background: linear-gradient(135deg, var(--primary-dark), #531521);
+      color: white;
+      text-align: center;
+      padding: 1.8rem;
+      margin-top: 2rem;
+    }
+
+    .footer a {
+      color: white;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    @media (max-width: 900px) {
+      .hero,
+      .container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .header,
+      .hero,
+      .container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+      }
+
+      .nav {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .nav-links,
+      .auth-buttons {
+        gap: 0.9rem;
+      }
+
+      .grid-two {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="nav">
+      <a href="../index.html" class="logo">
+        <div class="logo-icon">SE</div>
+        The Spear Exchange
+      </a>
+      <div class="nav-links">
+        <a href="../index.html">Home</a>
+        <a href="../listings/index.html">Browse</a>
+        <a href="../about/index.html">About Us</a>
+        <a href="../contact/index.html">Contact</a>
+      </div>
+      <div class="auth-buttons">
+        <a href="../login/index.html">Login</a>
+        <a href="../signup/index.html">Sign Up</a>
+      </div>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="hero-copy">
+      <div class="eyebrow"><i class="fas fa-file-contract"></i> Marketplace Terms</div>
+      <h1>Terms of Use for the FSU student marketplace</h1>
+      <p class="lede">
+        These terms explain how The Spear Exchange works, what we expect from users, and the safety rules that keep campus buying and selling practical, respectful, and low risk.
+      </p>
+      <div class="meta-row">
+        <span class="chip"><i class="fas fa-calendar-alt"></i> Last updated March 25, 2026</span>
+        <span class="chip"><i class="fas fa-graduation-cap"></i> Built for FSU students</span>
+      </div>
+    </div>
+    <div class="hero-panel">
+      <div class="panel-stat">
+        <strong>Account responsibility</strong>
+        Keep your login secure, use accurate details, and act as if anything posted from your account came from you.
+      </div>
+      <div class="panel-stat">
+        <strong>Marketplace scope</strong>
+        The Spear Exchange is a student marketplace, not a payment processor, shipping service, or guarantor of item condition.
+      </div>
+      <div class="panel-stat">
+        <strong>Safety first</strong>
+        Meet in public, verify items before paying, and report suspicious activity quickly.
+      </div>
+    </div>
+  </section>
+
+  <main class="container">
+    <div class="content-stack">
+      <section class="content-card">
+        <h2>1. Acceptance of these terms</h2>
+        <p>
+          By browsing, posting, messaging, or buying on The Spear Exchange, you agree to follow these terms and any updates we post later. If you do not agree, do not use the service.
+        </p>
+        <ul>
+          <li>You must be able to form a binding agreement in your own name or through a guardian where required by law.</li>
+          <li>You are responsible for checking these terms periodically because the marketplace can change.</li>
+          <li>Continuing to use the site after changes means you accept the updated version.</li>
+        </ul>
+      </section>
+
+      <section class="content-card">
+        <h2>2. Accounts and user conduct</h2>
+        <p>
+          Your account is personal. You should not share credentials, impersonate another person, or create multiple accounts to evade moderation or restrictions.
+        </p>
+        <div class="grid-two">
+          <div class="mini-card">
+            <i class="fas fa-user-shield"></i>
+            <h3>Keep it accurate</h3>
+            <p>Use a real email, correct contact details, and truthful profile information so buyers and sellers can reach you.</p>
+          </div>
+          <div class="mini-card">
+            <i class="fas fa-lock"></i>
+            <h3>Protect access</h3>
+            <p>Choose a strong password, log out on shared devices, and notify us if you suspect unauthorized account access.</p>
+          </div>
+        </div>
+        <ul>
+          <li>You may not use the site to harass, threaten, spam, scam, or mislead other users.</li>
+          <li>You may not scrape, reverse engineer, or interfere with the site or its messaging features.</li>
+          <li>You may not post content that is unlawful, discriminatory, abusive, or otherwise inappropriate for a campus community.</li>
+        </ul>
+      </section>
+
+      <section class="content-card">
+        <h2>3. Listings, transactions, and payments</h2>
+        <p>
+          Listings are user-generated. We do not guarantee that any item is available, authentic, safe, or exactly as described, and we do not act as the seller or buyer in your transaction.
+        </p>
+        <ul>
+          <li>Sellers must describe items honestly, include clear photos where possible, and disclose obvious damage, defects, or missing parts.</li>
+          <li>Prices, meet-up plans, and payment terms are between the users involved unless a separate site feature says otherwise.</li>
+          <li>Payment should be completed with caution. We recommend confirming the item in person before exchanging money or digital payment.</li>
+          <li>Digital goods, service promises, and off-platform arrangements are the responsibility of the users who make them.</li>
+        </ul>
+      </section>
+
+      <section class="content-card">
+        <h2>4. Prohibited conduct</h2>
+        <p>
+          To keep the marketplace usable for students, the following activity is not allowed:
+        </p>
+        <ul>
+          <li>Fraud, counterfeit goods, stolen items, or misrepresentation of ownership.</li>
+          <li>Weapons, illegal drugs, alcohol sales that violate law or campus policy, or other restricted items.</li>
+          <li>Harassment, hate speech, doxxing, stalking, or attempts to pressure another user.</li>
+          <li>Any attempt to bypass moderation, abuse reports, or create fake demand through fake accounts or bots.</li>
+        </ul>
+      </section>
+
+      <section class="content-card">
+        <h2>5. Disputes and safety</h2>
+        <p>
+          If a deal goes wrong, the best first step is direct communication. The Spear Exchange may review reports, remove content, or restrict accounts, but we do not promise to resolve every dispute.
+        </p>
+        <ul>
+          <li>Use public, well-lit campus areas for meetups whenever possible.</li>
+          <li>Inspect items before paying and keep receipts, messages, and screenshots when useful.</li>
+          <li>Report suspected fraud, harassment, unsafe conduct, or prohibited listings immediately.</li>
+          <li>If you believe a crime occurred, contact campus security or local law enforcement first.</li>
+        </ul>
+      </section>
+
+      <section class="content-card">
+        <h2>6. Disclaimer and limits</h2>
+        <p>
+          The Spear Exchange is provided on an "as is" and "as available" basis. To the extent allowed by law, we disclaim warranties about availability, accuracy, and transaction outcomes. We are not responsible for losses caused by user conduct, false listings, or meetups arranged through the platform.
+        </p>
+        <p style="margin-top: 0.75rem;">
+          This page is a practical marketplace summary and not legal advice. If you need legal guidance, consult a qualified professional.
+        </p>
+      </section>
+    </div>
+
+    <aside class="sidebar">
+      <section class="safety-card">
+        <h3><i class="fas fa-shield-alt"></i> Before you buy</h3>
+        <ul>
+          <li>Check the seller profile and listing details carefully.</li>
+          <li>Ask clarifying questions in messages before meeting.</li>
+          <li>Prefer public campus locations and daylight meetups.</li>
+        </ul>
+      </section>
+      <section class="safety-card">
+        <h3><i class="fas fa-bell"></i> Before you sell</h3>
+        <ul>
+          <li>Post accurate photos and descriptions.</li>
+          <li>Remove listings quickly when items are sold.</li>
+          <li>Never pressure buyers into unsafe meetups or rushed payments.</li>
+        </ul>
+      </section>
+      <section class="safety-card">
+        <h3><i class="fas fa-link"></i> Helpful links</h3>
+        <ul>
+          <li><a href="../listings/index.html">Browse listings</a></li>
+          <li><a href="../create-listing/index.html">Create a listing</a></li>
+          <li><a href="../contact/index.html">Contact support</a></li>
+        </ul>
+      </section>
+    </aside>
+  </main>
+
+  <footer class="footer">
+    <p>The Spear Exchange | <a href="../community-guidelines/index.html">Community Guidelines</a> | <a href="../contact/index.html">Contact</a></p>
+  </footer>
+</body>
+</html>

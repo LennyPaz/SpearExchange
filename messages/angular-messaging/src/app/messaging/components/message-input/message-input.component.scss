@@ -1,0 +1,120 @@
+@import '../../../../styles/_variables';
+
+.message-input-area {
+  padding: 1.5rem;
+  border-top: 1px solid rgba(229, 231, 235, 0.6);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, white 100%);
+  backdrop-filter: blur(10px);
+  min-height: 80px;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 10;
+}
+
+.message-input-container {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-end;
+}
+
+.message-input {
+  flex: 1;
+  min-height: 44px;
+  max-height: 120px;
+  padding: 0.75rem 1rem;
+  border: 2px solid #E5E7EB;
+  border-radius: 22px;
+  resize: none;
+  font-family: inherit;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  overflow-y: auto;
+  
+  // Hide scrollbar
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  
+  &:focus {
+    outline: none;
+    border-color: $primary-color;
+    box-shadow: 0 0 0 3px rgba($primary-color, 0.1), 0 4px 12px rgba(0, 0, 0, 0.08);
+    transform: translateY(-1px);
+  }
+  
+  &::placeholder {
+    color: $text-light;
+    opacity: 0.8;
+  }
+}
+
+.send-button {
+  width: 44px;
+  height: 44px;
+  background: linear-gradient(135deg, $primary-color, $primary-dark);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
+  box-shadow: 0 3px 12px rgba($primary-color, 0.3);
+  
+  i {
+    font-size: 1rem;
+    transition: transform 0.3s ease;
+  }
+  
+  &:hover:not(:disabled) {
+    background: linear-gradient(135deg, $primary-dark, #5A1420);
+    transform: scale(1.08) translateY(-1px);
+    box-shadow: 0 6px 20px rgba($primary-color, 0.4);
+    
+    i {
+      transform: translateX(2px);
+    }
+  }
+  
+  &:active:not(:disabled) {
+    transform: scale(0.95);
+    box-shadow: 0 2px 8px rgba($primary-color, 0.3);
+  }
+  
+  &:disabled {
+    background: #D1D5DB;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+    opacity: 0.6;
+  }
+}
+
+// Responsive
+@media (max-width: $tablet) {
+  .message-input-area {
+    padding: 1rem;
+  }
+  
+  .message-input {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: $mobile) {
+  .message-input-area {
+    padding: 0.75rem;
+  }
+  
+  .message-input-container {
+    gap: 0.75rem;
+  }
+}

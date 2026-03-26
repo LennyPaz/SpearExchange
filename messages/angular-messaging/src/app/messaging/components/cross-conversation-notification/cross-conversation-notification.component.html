@@ -1,0 +1,32 @@
+<div class="notifications-container">
+  <div 
+    *ngFor="let notification of notifications"
+    class="notification"
+    [attr.data-notification-id]="notification.id"
+    (click)="openConversation(notification)"
+  >
+    <div class="notification-content">
+      <div class="notification-icon">
+        <i class="fas fa-comment-dots"></i>
+      </div>
+      <div class="notification-body">
+        <div class="notification-header">
+          New message • {{ notification.listingTitle }}
+        </div>
+        <div class="notification-message">
+          <strong>{{ notification.senderName }}:</strong> 
+          {{ truncateMessage(notification.message) }}
+        </div>
+        <div class="notification-footer">
+          Click to view conversation
+        </div>
+      </div>
+      <button 
+        class="notification-close"
+        (click)="removeNotification(notification.id); $event.stopPropagation()"
+      >
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+  </div>
+</div>

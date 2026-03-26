@@ -1,0 +1,212 @@
+@import '../../../../styles/_variables';
+
+.conversations-list-container {
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-gutter: stable;
+  
+  // Custom scrollbar
+  &::-webkit-scrollbar {
+    width: 8px;
+    background: #f8f9fa;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: #f1f3f4;
+    border-radius: 4px;
+    margin: 4px;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: #c1c7cd;
+    border-radius: 4px;
+    border: 1px solid #e8eaed;
+    
+    &:hover {
+      background: #a0a6ac;
+    }
+    
+    &:active {
+      background: #8a9097;
+    }
+  }
+  
+  // Firefox scrollbar
+  scrollbar-width: thin;
+  scrollbar-color: #c1c7cd #f1f3f4;
+}
+
+.conversation-item {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid rgba(229, 231, 235, 0.6);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: #F9FAFB;
+  position: relative;
+  
+  &:hover {
+    background: rgba($primary-color, 0.04);
+    transform: translateX(2px);
+    box-shadow: 0 2px 8px rgba($primary-color, 0.08);
+  }
+  
+  &.active {
+    background: linear-gradient(90deg, rgba($primary-color, 0.08), rgba($primary-color, 0.04));
+    border-right: 4px solid $primary-color;
+    transform: translateX(2px);
+    box-shadow: 0 4px 12px rgba($primary-color, 0.12);
+    
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: linear-gradient(180deg, $primary-color, $primary-dark);
+    }
+  }
+}
+
+.conversation-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.5rem;
+}
+
+.conversation-listing {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.listing-thumbnail {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #F3F4F6, #E5E7EB);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $text-light;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+  overflow: hidden;
+  
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.conversation-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.listing-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: $text-dark;
+  margin-bottom: 0.25rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+}
+
+.other-user {
+  font-size: 0.8rem;
+  color: $text-light;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  
+  .verified-badge {
+    color: $success-color;
+    font-size: 0.7rem;
+  }
+}
+
+.conversation-time {
+  font-size: 0.75rem;
+  color: $text-light;
+  white-space: nowrap;
+}
+
+.last-message {
+  font-size: 0.85rem;
+  color: $text-light;
+  margin-bottom: 0.25rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.conversation-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.user-role {
+  font-size: 0.75rem;
+  padding: 0.125rem 0.5rem;
+  border-radius: 12px;
+  font-weight: 500;
+  
+  &.buyer {
+    background: rgba($success-color, 0.1);
+    color: $success-color;
+  }
+  
+  &.seller {
+    background: rgba($primary-color, 0.1);
+    color: $primary-color;
+  }
+}
+
+.unread-count {
+  background: linear-gradient(135deg, $primary-color, $primary-dark);
+  color: white;
+  border-radius: 50%;
+  min-width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0 4px;
+  box-shadow: 0 2px 8px rgba($primary-color, 0.3);
+  animation: unreadPulse 2s infinite;
+}
+
+@keyframes unreadPulse {
+  0%, 100% { 
+    transform: scale(1); 
+  }
+  50% { 
+    transform: scale(1.1); 
+  }
+}
+
+// Responsive
+@media (max-width: $tablet) {
+  .conversation-item {
+    padding: 0.75rem 1rem;
+  }
+  
+  .listing-title {
+    font-size: 0.85rem;
+  }
+  
+  .other-user {
+    font-size: 0.75rem;
+  }
+}

@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Community Guidelines - The Spear Exchange</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  <style>
+    :root {
+      --primary-color: #8B2635;
+      --primary-dark: #6B1B2A;
+      --accent-color: #FFD700;
+      --text-dark: #2C3E50;
+      --text-light: #5A6C7D;
+      --background-light: #F8FAFC;
+      --white: #FFFFFF;
+      --shadow-light: 0 2px 10px rgba(0, 0, 0, 0.08);
+      --shadow-medium: 0 10px 30px rgba(0, 0, 0, 0.12);
+      --border-radius: 16px;
+      --transition: all 0.25s ease;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background:
+        radial-gradient(circle at top right, rgba(139, 38, 53, 0.08), transparent 25%),
+        radial-gradient(circle at top left, rgba(255, 215, 0, 0.10), transparent 24%),
+        var(--background-light);
+      color: var(--text-dark);
+      line-height: 1.65;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .header {
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(10px);
+      padding: 1rem 2rem;
+      box-shadow: var(--shadow-light);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1200px;
+      margin: 0 auto;
+      gap: 1.5rem;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+      color: var(--primary-color);
+      font-weight: 800;
+      font-size: 1.15rem;
+      white-space: nowrap;
+    }
+
+    .logo-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+      color: var(--white);
+      box-shadow: var(--shadow-light);
+    }
+
+    .nav-links,
+    .auth-buttons {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      flex-wrap: wrap;
+    }
+
+    .nav-links a,
+    .auth-buttons a {
+      text-decoration: none;
+      font-weight: 600;
+      transition: var(--transition);
+    }
+
+    .nav-links a {
+      color: var(--text-dark);
+      position: relative;
+      padding-bottom: 0.15rem;
+    }
+
+    .nav-links a:hover,
+    .nav-links a.active {
+      color: var(--primary-color);
+    }
+
+    .nav-links a.active::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -0.35rem;
+      height: 2px;
+      border-radius: 999px;
+      background: var(--primary-color);
+    }
+
+    .auth-buttons a {
+      padding: 0.6rem 1rem;
+      border-radius: 999px;
+      border: 1.5px solid var(--primary-color);
+      color: var(--primary-color);
+    }
+
+    .auth-buttons a:hover {
+      background: var(--primary-color);
+      color: var(--white);
+    }
+
+    .hero {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 4rem 2rem 2rem;
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 2rem;
+      align-items: stretch;
+    }
+
+    .hero-copy,
+    .hero-panel,
+    .content-card,
+    .sidebar-card {
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(139, 38, 53, 0.08);
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow-light);
+    }
+
+    .hero-copy {
+      padding: 2.2rem;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.35rem 0.8rem;
+      border-radius: 999px;
+      background: rgba(139, 38, 53, 0.08);
+      color: var(--primary-color);
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+
+    h1 {
+      font-size: clamp(2.2rem, 4vw, 3.4rem);
+      line-height: 1.1;
+      margin-bottom: 1rem;
+    }
+
+    .lede {
+      color: var(--text-light);
+      font-size: 1.05rem;
+      max-width: 60ch;
+      margin-bottom: 1.5rem;
+    }
+
+    .hero-panel {
+      padding: 1.5rem;
+      display: grid;
+      gap: 1rem;
+      align-content: start;
+    }
+
+    .rule-chip {
+      display: flex;
+      gap: 0.85rem;
+      align-items: flex-start;
+      padding: 1rem;
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(139, 38, 53, 0.08), rgba(255, 215, 0, 0.1));
+    }
+
+    .rule-chip i {
+      margin-top: 0.2rem;
+      color: var(--primary-color);
+    }
+
+    .rule-chip strong {
+      display: block;
+      margin-bottom: 0.2rem;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem 3rem;
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 1.5rem;
+    }
+
+    .content-stack {
+      display: grid;
+      gap: 1.25rem;
+    }
+
+    .content-card {
+      padding: 1.7rem;
+    }
+
+    .content-card h2 {
+      font-size: 1.4rem;
+      margin-bottom: 0.75rem;
+      color: var(--primary-dark);
+    }
+
+    .content-card h3 {
+      font-size: 1.05rem;
+      margin: 1rem 0 0.4rem;
+      color: var(--text-dark);
+    }
+
+    .content-card p,
+    .content-card li {
+      color: var(--text-light);
+    }
+
+    .content-card ul {
+      padding-left: 1.2rem;
+      display: grid;
+      gap: 0.5rem;
+      margin-top: 0.75rem;
+    }
+
+    .grid-two {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem;
+      margin-top: 0.75rem;
+    }
+
+    .mini-card {
+      padding: 1rem;
+      border-radius: 14px;
+      background: #fff;
+      border: 1px solid rgba(139, 38, 53, 0.08);
+    }
+
+    .mini-card i {
+      color: var(--primary-color);
+      margin-bottom: 0.5rem;
+      font-size: 1.1rem;
+    }
+
+    .sidebar {
+      display: grid;
+      gap: 1rem;
+      align-content: start;
+    }
+
+    .sidebar-card {
+      padding: 1.2rem;
+    }
+
+    .sidebar-card h3 {
+      margin-bottom: 0.5rem;
+      color: var(--primary-dark);
+      display: flex;
+      gap: 0.6rem;
+      align-items: center;
+    }
+
+    .sidebar-card ul {
+      padding-left: 1.1rem;
+      color: var(--text-light);
+      display: grid;
+      gap: 0.45rem;
+      margin-top: 0.75rem;
+    }
+
+    .footer {
+      background: linear-gradient(135deg, var(--primary-dark), #531521);
+      color: white;
+      text-align: center;
+      padding: 1.8rem;
+      margin-top: 2rem;
+    }
+
+    .footer a {
+      color: white;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    @media (max-width: 900px) {
+      .hero,
+      .container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .header,
+      .hero,
+      .container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+      }
+
+      .nav {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .nav-links,
+      .auth-buttons {
+        gap: 0.9rem;
+      }
+
+      .grid-two {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="nav">
+      <a href="../index.html" class="logo">
+        <div class="logo-icon">SE</div>
+        The Spear Exchange
+      </a>
+      <div class="nav-links">
+        <a href="../index.html">Home</a>
+        <a href="../listings/index.html">Browse</a>
+        <a href="../about/index.html">About Us</a>
+        <a href="../contact/index.html">Contact</a>
+      </div>
+      <div class="auth-buttons">
+        <a href="../login/index.html">Login</a>
+        <a href="../signup/index.html">Sign Up</a>
+      </div>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="hero-copy">
+      <div class="eyebrow"><i class="fas fa-users"></i> Community Standards</div>
+      <h1>Community guidelines for a safer student marketplace</h1>
+      <p class="lede">
+        The Spear Exchange works best when people are respectful, honest, and careful during every conversation, listing, and meetup. These guidelines set the tone for the FSU community.
+      </p>
+      <div class="rule-chip">
+        <i class="fas fa-heart"></i>
+        <div>
+          <strong>Respect people first</strong>
+          Use clear, calm communication and assume good faith until the facts say otherwise.
+        </div>
+      </div>
+    </div>
+    <div class="hero-panel">
+      <div class="rule-chip">
+        <i class="fas fa-map-marker-alt"></i>
+        <div>
+          <strong>Meet safely</strong>
+          Prefer public campus spaces, daylight hours, and simple meetups.
+        </div>
+      </div>
+      <div class="rule-chip">
+        <i class="fas fa-clipboard-check"></i>
+        <div>
+          <strong>List honestly</strong>
+          Show the real condition, include clear photos, and disclose issues up front.
+        </div>
+      </div>
+      <div class="rule-chip">
+        <i class="fas fa-flag"></i>
+        <div>
+          <strong>Report problems</strong>
+          If something feels off, report it instead of escalating in chat.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <main class="container">
+    <div class="content-stack">
+      <section class="content-card">
+        <h2>1. Be respectful in every interaction</h2>
+        <p>
+          Use messages to clarify the deal, not to pressure, insult, or manipulate other users. Polite and direct communication keeps transactions fast and reduces misunderstandings.
+        </p>
+        <ul>
+          <li>Do not harass, threaten, shame, or repeatedly message someone after they have declined.</li>
+          <li>Do not use slurs, hateful language, or discriminatory behavior based on any protected characteristic.</li>
+          <li>Do not spam the same listing, price, or message to flood the platform.</li>
+        </ul>
+      </section>
+
+      <section class="content-card">
+        <h2>2. Keep the campus community safe</h2>
+        <p>
+          Safety matters more than convenience. If a meetup feels rushed, isolated, or confusing, slow it down or reschedule in a safer public space.
+        </p>
+        <div class="grid-two">
+          <div class="mini-card">
+            <i class="fas fa-university"></i>
+            <h3>Public meetups</h3>
+            <p>Choose campus or other public locations with people around and reasonable visibility.</p>
+          </div>
+          <div class="mini-card">
+            <i class="fas fa-clock"></i>
+            <h3>Reasonable timing</h3>
+            <p>Avoid late-night meetups or last-minute pressure that makes it harder to verify the item.</p>
+          </div>
+        </div>
+        <ul>
+          <li>Do not ask someone to come to a private residence if a safer public meetup is available.</li>
+          <li>Do not request unsafe payment methods or pressure anyone to ignore their own safety boundaries.</li>
+          <li>If you are uncomfortable, leave and report the situation rather than escalating it.</li>
+        </ul>
+      </section>
+
+      <section class="content-card">
+        <h2>3. Post listings that are truthful and complete</h2>
+        <p>
+          Buyers rely on the information you provide. Missing details create avoidable disputes, so be clear about condition, compatibility, and anything a buyer should know before meeting.
+        </p>
+        <ul>
+          <li>Use recent photos and avoid stock images or misleading screenshots.</li>
+          <li>State the condition honestly, including scratches, missing parts, functionality issues, or wear.</li>
+          <li>Remove or update listings promptly when the item is sold, unavailable, or no longer matches the description.</li>
+          <li>Do not post items you do not own or do not have permission to sell.</li>
+        </ul>
+      </section>
+
+      <section class="content-card">
+        <h2>4. Handle meetups and payments carefully</h2>
+        <p>
+          The cleanest transaction is simple: confirm the item, agree on the price, meet in public, verify the exchange, and keep a record of the messages if needed.
+        </p>
+        <ul>
+          <li>Inspect the item before you pay whenever possible.</li>
+          <li>Bring only the agreed amount and do not use surprise add-ons or bait-and-switch tactics.</li>
+          <li>Be cautious with digital payment requests, especially if the seller refuses any verification step.</li>
+          <li>Do not claim chargebacks, fake refunds, or failed transfers as a way to avoid paying fairly.</li>
+        </ul>
+      </section>
+
+      <section class="content-card">
+        <h2>5. Report suspicious or abusive behavior</h2>
+        <p>
+          Reporting protects the whole community. If you see a scam, a prohibited item, or a user acting aggressively, flag it early so it can be reviewed.
+        </p>
+        <ul>
+          <li>Report fake listings, stolen goods, scam attempts, or obvious impersonation.</li>
+          <li>Report harassment, stalking, threats, and attempts to move a deal into unsafe territory.</li>
+          <li>Keep screenshots or message records when they help explain what happened.</li>
+          <li>If the situation involves real-world danger, contact campus security or local authorities immediately.</li>
+        </ul>
+      </section>
+
+      <section class="content-card">
+        <h2>6. Consequences for violations</h2>
+        <p>
+          We may remove content, issue warnings, limit features, or suspend access when someone violates these guidelines or the Terms of Use. Severe or repeated abuse may be escalated to campus or law enforcement authorities when appropriate.
+        </p>
+        <p style="margin-top: 0.75rem;">
+          These guidelines are meant to support a practical student marketplace, not replace common sense or formal campus policies.
+        </p>
+      </section>
+    </div>
+
+    <aside class="sidebar">
+      <section class="sidebar-card">
+        <h3><i class="fas fa-thumbs-up"></i> Good habits</h3>
+        <ul>
+          <li>Answer questions clearly and on time.</li>
+          <li>Set expectations before meeting.</li>
+          <li>Update listings when the item changes or sells.</li>
+        </ul>
+      </section>
+      <section class="sidebar-card">
+        <h3><i class="fas fa-ban"></i> Not allowed</h3>
+        <ul>
+          <li>Fraud or misleading information.</li>
+          <li>Threats, harassment, or stalking.</li>
+          <li>Restricted, stolen, or illegal items.</li>
+        </ul>
+      </section>
+      <section class="sidebar-card">
+        <h3><i class="fas fa-link"></i> Helpful links</h3>
+        <ul>
+          <li><a href="../listings/index.html">Browse listings</a></li>
+          <li><a href="../create-listing/index.html">Create a listing</a></li>
+          <li><a href="../terms/index.html">Terms of Use</a></li>
+        </ul>
+      </section>
+    </aside>
+  </main>
+
+  <footer class="footer">
+    <p>The Spear Exchange | <a href="../terms/index.html">Terms of Use</a> | <a href="../contact/index.html">Contact</a></p>
+  </footer>
+</body>
+</html>

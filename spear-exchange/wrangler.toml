@@ -1,0 +1,36 @@
+name = "spear-exchange"
+main = "src/worker.js"
+compatibility_date = "2024-01-15"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "spear-exchange-db"
+database_id = "f7a4d49d-d690-47d8-8525-62ab971aaf9d"
+
+[[env.dev.d1_databases]]
+binding = "DB"
+database_name = "spear-exchange-dev"
+database_id = "d639edcf-2710-41c9-b1de-3549eaad084d"
+
+[[r2_buckets]]
+binding = "IMAGES_BUCKET"
+bucket_name = "spear-exchange-images"
+
+# Durable Object bindings
+[durable_objects]
+bindings = [
+  { name = "CHAT_ROOM", class_name = "ChatRoom" }
+]
+
+# Durable Object migrations for free plan
+[[migrations]]
+tag = "v2"
+new_sqlite_classes = ["ChatRoom"]
+
+[site]
+bucket = "src/public"
+
+[vars]
+TURNSTILE_SECRET_KEY = "0x4AAAAAABjmLFXlmwRbmpr0UXQLgLDpMLQ"
+RESEND_API_KEY = "re_UqY9LoGH_27oN7mcTtuPH7cv2w2AinPgE"
+PRODUCTION_URL = "https://spear-exchange.lenny-paz123.workers.dev"

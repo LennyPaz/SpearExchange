@@ -1,0 +1,239 @@
+<div class="messaging-container">
+  <!-- Header -->
+  <header class="header">
+    <nav class="nav">
+      <a href="/" class="logo">
+        <div class="logo-icon">SE</div>
+        <span class="logo-text">The Spear Exchange</span>
+      </a>
+      
+      <ul class="nav-links desktop-only">
+        <li><a href="/">Home</a></li>
+        <li><a href="/listings">Browse</a></li>
+        <li><a href="/messages" class="active">Messages</a></li>
+        <li><a href="/my-listings">My Listings</a></li>
+        <li><a href="/create-listing" class="browse-btn">+ Create Listing</a></li>
+      </ul>
+
+      <div class="user-menu desktop-only">
+        <div class="user-profile" (click)="toggleUserDropdown()">
+          <div class="user-avatar">{{ currentUserName?.charAt(0)?.toUpperCase() || 'U' }}</div>
+          <span>{{ currentUserName || 'User' }}</span>
+          <i class="fas fa-chevron-down"></i>
+        </div>
+        
+        <div class="user-dropdown" [class.show]="showUserDropdown">
+          <a href="/my-listings" class="dropdown-item">
+            <i class="fas fa-list"></i>
+            My Listings
+          </a>
+          <a href="/messages" class="dropdown-item">
+            <i class="fas fa-comments"></i>
+            Messages
+          </a>
+          <a href="/profile" class="dropdown-item">
+            <i class="fas fa-user"></i>
+            Profile Settings
+          </a>
+          <a href="#" class="dropdown-item" (click)="logout(); $event.preventDefault()">
+            <i class="fas fa-sign-out-alt"></i>
+            Logout
+          </a>
+        </div>
+      </div>
+
+      <button class="mobile-menu-btn mobile-only" (click)="toggleMobileMenu()">
+        <i class="fas fa-bars"></i>
+      </button>
+    </nav>
+  </header>
+
+  <!-- Mobile Menu -->
+  <div class="mobile-overlay" [class.active]="showMobileMenu" (click)="closeMobileMenu()"></div>
+  
+  <div class="mobile-sidebar" [class.open]="showMobileMenu">
+    <div class="mobile-sidebar-header">
+      <div class="mobile-sidebar-logo">
+        <div class="logo-icon">SE</div>
+        <div>
+          <div class="mobile-sidebar-title">The Spear Exchange</div>
+          <div class="mobile-sidebar-subtitle">FSU Student Marketplace</div>
+        </div>
+      </div>
+    </div>
+    
+    <nav class="mobile-sidebar-nav">
+      <a href="/" class="mobile-nav-item">
+        <i class="fas fa-home"></i>
+        Home
+      </a>
+      <a href="/listings" class="mobile-nav-item">
+        <i class="fas fa-search"></i>
+        Browse Listings
+      </a>
+      <a href="/messages" class="mobile-nav-item active">
+        <i class="fas fa-comments"></i>
+        Messages
+      </a>
+      <a href="/my-listings" class="mobile-nav-item">
+        <i class="fas fa-list"></i>
+        My Listings
+      </a>
+      <a href="/create-listing" class="mobile-nav-item">
+        <i class="fas fa-plus"></i>
+        Create Listing
+      </a>
+    </nav>
+    
+    <div class="mobile-sidebar-footer">
+      <div class="mobile-user-info">
+        <div class="mobile-user-avatar">{{ currentUserName?.charAt(0)?.toUpperCase() || 'T' }}</div>
+        <div class="mobile-user-details">
+          <h4>{{ currentUserName || 'Test User' }}</h4>
+          <p>FSU Student</p>
+        </div>
+      </div>
+      <button class="mobile-logout-btn" (click)="logout()">
+        <i class="fas fa-sign-out-alt"></i> Logout
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Page Header -->
+    <div class="page-header" *ngIf="!isMobile || !showMobileChat">
+      <h1 class="page-title">Messages</h1>
+      <p class="page-subtitle">Connect with fellow Seminoles about your listings</p>
+    </div>
+
+    <!-- Messages Container -->
+    <div class="messages-container" [class.mobile-view]="isMobile">
+      <!-- Conversations Sidebar -->
+      <div class="conversations-sidebar" 
+           [class.mobile-hidden]="isMobile && showMobileChat">
+        <div class="conversations-header">
+          <h2 class="conversations-title">Conversations</h2>
+          <div class="search-conversations">
+            <i class="fas fa-search"></i>
+            <input 
+              type="text" 
+              placeholder="Search conversations..."
+              [(ngModel)]="searchQuery"
+              (input)="onSearchChange(searchQuery)"
+            />
+          </div>
+        </div>
+        
+        <div class="conversations-list">
+          <!-- Loading state -->
+          <div class="loading" *ngIf="isLoading">
+            <div class="spinner"></div>
+            <span>Loading conversations...</span>
+          </div>
+          
+          <!-- Empty state -->
+          <div class="empty-conversations" *ngIf="!isLoading && conversations.length === 0">
+            <i class="fas fa-comments"></i>
+            <h3>No conversations yet</h3>
+            <p>Start messaging by showing interest in a listing!</p>
+            <a href="/listings" class="browse-btn">Browse Listings</a>
+          </div>
+          
+          <!-- Conversations List -->
+          <app-conversations-list
+            *ngIf="!isLoading && conversations.length > 0"
+            [conversations]="conversations"
+            [selectedConversationId]="selectedConversation?.id"
+            [currentUserId]="currentUserId"
+            (conversationSelected)="selectConversation($event)"
+          ></app-conversations-list>
+        </div>
+      </div>
+
+      <!-- Chat Area -->
+      <div class="chat-area" 
+           [class.mobile-visible]="isMobile && showMobileChat">
+        
+        <!-- Connection Status -->
+        <app-connection-status 
+          [status]="connectionStatus"
+        ></app-connection-status>
+        
+        <!-- Empty Chat State -->
+        <div class="empty-chat" *ngIf="!selectedConversation && !isLoadingMessages && !error">
+          <i class="fas fa-comment-dots"></i>
+          <h3>Select a conversation</h3>
+          <p>Choose a conversation from the sidebar to start messaging</p>
+        </div>
+
+        <!-- Loading Messages State -->
+        <div class="chat-loading" *ngIf="isLoadingMessages">
+          <div class="spinner"></div>
+          <span>Loading conversation...</span>
+        </div>
+
+        <!-- Error State -->
+        <div class="error-state" *ngIf="error && !isLoadingMessages">
+          <i class="fas fa-exclamation-triangle"></i>
+          <h3>{{ error.includes('log in') ? 'Authentication Required' : 'Connection Error' }}</h3>
+          <p>{{ error }}</p>
+          
+          <!-- Show appropriate button based on error type -->
+          <button class="retry-btn" 
+                  *ngIf="!error.includes('log in')"
+                  (click)="retryConnection()">
+            <i class="fas fa-redo"></i> Try Again
+          </button>
+          
+          <a href="/login" class="retry-btn" 
+             *ngIf="error.includes('log in')"
+             style="text-decoration: none;">
+            <i class="fas fa-sign-in-alt"></i> Go to Login
+          </a>
+        </div>
+
+        <!-- Chat Interface -->
+        <ng-container *ngIf="selectedConversation && !isLoadingMessages && !error">
+          <!-- Mobile Back Button -->
+          <div class="mobile-chat-back mobile-only" (click)="onBackToConversations()">
+            <i class="fas fa-arrow-left"></i>
+            <span>Back to conversations</span>
+          </div>
+
+          <!-- Chat Header -->
+          <app-chat-header
+            [conversation]="selectedConversation"
+            [otherUserRole]="selectedConversation.other_user.role"
+          ></app-chat-header>
+
+          <!-- Messages Area -->
+          <div class="messages-area">
+            <app-messages-area
+              [messages]="messages"
+              [currentUserId]="currentUserId"
+              [typingUsers]="typingUsers"
+            ></app-messages-area>
+            
+            <!-- Typing Indicator -->
+            <app-typing-indicator
+              *ngIf="typingUsers.size > 0"
+              [typingUsers]="typingUsers"
+              [conversations]="conversations"
+            ></app-typing-indicator>
+          </div>
+
+          <!-- Message Input -->
+          <app-message-input
+            (messageSent)="sendMessage($event)"
+            (typingStart)="handleTypingStart()"
+            (typingStop)="handleTypingStop()"
+          ></app-message-input>
+        </ng-container>
+      </div>
+    </div>
+  </main>
+
+  <!-- Cross Conversation Notifications -->
+  <app-cross-conversation-notification></app-cross-conversation-notification>
+</div>

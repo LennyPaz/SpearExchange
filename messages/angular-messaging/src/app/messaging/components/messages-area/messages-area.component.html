@@ -1,0 +1,33 @@
+<div class="messages-container" #scrollContainer>
+  <ng-container *ngFor="let message of messages; let i = index; trackBy: trackByMessageId">
+    <!-- Date Separator -->
+    <div class="date-separator" *ngIf="shouldShowDateSeparator(i)">
+      <span>{{ formatMessageDate(message.created_at) }}</span>
+    </div>
+    
+    <!-- Message -->
+    <div 
+      class="message"
+      [class.sent]="message.sender_id === currentUserId"
+      [class.received]="message.sender_id !== currentUserId"
+      [class.message-sending]="message.status === 'sending'"
+      [class.message-failed]="message.status === 'failed'"
+    >
+      <div class="message-content">{{ message.message }}</div>
+      <div class="message-meta">
+        <span class="message-time">{{ formatMessageTime(message.created_at) }}</span>
+        <i 
+          *ngIf="message.status && message.sender_id === currentUserId" 
+          [class]="getMessageStatusIcon(message.status)"
+          [title]="getMessageStatusTooltip(message.status)"
+          class="message-status-icon"
+        ></i>
+      </div>
+    </div>
+  </ng-container>
+  
+  <!-- Show typing indicator if users are typing -->
+  <div class="typing-indicator-placeholder" *ngIf="typingUsers.size > 0">
+    <!-- Typing indicator will be rendered here -->
+  </div>
+</div>
