@@ -1,4 +1,19 @@
 (function () {
+    const getPathPrefix = () => {
+        const path = window.location.pathname;
+        if (path.includes('/listings/') || 
+            path.includes('/messages/') || 
+            path.includes('/profile/') || 
+            path.includes('/listing-detail/') || 
+            path.includes('/my-listings/') ||
+            path.includes('/create-listing/')) {
+            return '../';
+        }
+        return '';
+    };
+
+    const mockupUrl = (filename) => `${getPathPrefix()}assets/mockups/${filename}`;
+
     const svgDataUrl = (label, accent, secondary) =>
         "data:image/svg+xml;utf8," +
         encodeURIComponent(
@@ -49,7 +64,7 @@
             contact_method: "both",
             phone_number: "(850) 555-0131",
             location: "Student Union pickup",
-            image_urls: [svgDataUrl("Desk Garnet Helmet Stand", "#8B2635", "#D97706")],
+            image_urls: [mockupUrl("helmet_stand.png")],
             created_at: "2026-03-22T14:00:00Z",
             status: "active",
             is_demo: true
@@ -84,7 +99,7 @@
             contact_method: "email",
             phone_number: "",
             location: "Dirac Library",
-            image_urls: [svgDataUrl("Seminole Keychain Set", "#7C2D12", "#B91C1C")],
+            image_urls: [mockupUrl("keychains.png")],
             created_at: "2026-03-21T11:30:00Z",
             status: "active",
             is_demo: true
@@ -119,7 +134,7 @@
             contact_method: "both",
             phone_number: "(850) 555-0131",
             location: "Landis Green",
-            image_urls: [svgDataUrl("Dorm Shelf Nameplate", "#6B1B2A", "#F59E0B")],
+            image_urls: [mockupUrl("nameplate.png")],
             created_at: "2026-03-20T16:45:00Z",
             status: "active",
             is_demo: true
@@ -167,7 +182,7 @@
             availability_start: "2026-05-10",
             availability_end: "2026-07-31",
             sublease_notes: "Summer showcase example with utilities included and direct messaging for timing details.",
-            image_urls: [svgDataUrl("Furnished 1x1 at Stadium Centre", "#1F2937", "#8B2635")],
+            image_urls: [mockupUrl("stadium_centre.png")],
             created_at: "2026-03-24T10:15:00Z",
             status: "active",
             is_demo: true
@@ -215,7 +230,7 @@
             availability_start: "2026-06-01",
             availability_end: "2026-12-20",
             sublease_notes: "Showcase example for a roommate setup with lease transfer details handled over messages.",
-            image_urls: [svgDataUrl("Private Room in Collegetown Townhome", "#0F766E", "#8B2635")],
+            image_urls: [mockupUrl("collegetown.png")],
             created_at: "2026-03-23T08:50:00Z",
             status: "active",
             is_demo: true
@@ -263,7 +278,7 @@
             availability_start: "2026-04-20",
             availability_end: "2026-08-15",
             sublease_notes: "Short-term showcase example for a studio layout with a direct phone-only contact preference.",
-            image_urls: [svgDataUrl("Studio Near Gaines Street", "#334155", "#D97706")],
+            image_urls: [mockupUrl("gaines_street.png")],
             created_at: "2026-03-19T19:05:00Z",
             status: "active",
             is_demo: true
@@ -294,7 +309,7 @@
             contact_method: "both",
             phone_number: "(850) 555-0110",
             location: "Strozier Library",
-            image_urls: [svgDataUrl("iPad Air for Notes and Classwork", "#1D4ED8", "#0F172A")],
+            image_urls: [mockupUrl("ipad_air.png")],
             created_at: "2026-03-18T13:20:00Z",
             status: "active",
             is_demo: true
@@ -325,7 +340,7 @@
             contact_method: "email",
             phone_number: "",
             location: "Dirac Library",
-            image_urls: [svgDataUrl("Organic Chemistry Textbook Bundle", "#7C3AED", "#312E81")],
+            image_urls: [mockupUrl("textbook_algos.png")],
             created_at: "2026-03-18T09:10:00Z",
             status: "active",
             is_demo: true
@@ -356,7 +371,7 @@
             contact_method: "both",
             phone_number: "(850) 555-0112",
             location: "West Pensacola pickup",
-            image_urls: [svgDataUrl("Compact Dorm Desk and Chair Set", "#92400E", "#451A03")],
+            image_urls: [mockupUrl("dorm_desk.png")],
             created_at: "2026-03-17T18:30:00Z",
             status: "active",
             is_demo: true
@@ -387,7 +402,7 @@
             contact_method: "both",
             phone_number: "(850) 555-0113",
             location: "CollegeTown",
-            image_urls: [svgDataUrl("Vintage FSU Hoodie", "#8B2635", "#111827")],
+            image_urls: [mockupUrl("fsu_hoodie.png")],
             created_at: "2026-03-17T12:15:00Z",
             status: "active",
             is_demo: true
@@ -418,7 +433,7 @@
             contact_method: "phone",
             phone_number: "(850) 555-0114",
             location: "Leach Recreation Center",
-            image_urls: [svgDataUrl("Campus Cruiser Longboard", "#059669", "#064E3B")],
+            image_urls: [mockupUrl("longboard.png")],
             created_at: "2026-03-16T17:20:00Z",
             status: "active",
             is_demo: true
@@ -480,7 +495,7 @@
             contact_method: "both",
             phone_number: "(850) 555-0116",
             location: "Southwood area",
-            image_urls: [svgDataUrl("Starter Apartment Kitchen Bundle", "#475569", "#0F172A")],
+            image_urls: [mockupUrl("kitchen_bundle.png")],
             created_at: "2026-03-15T15:00:00Z",
             status: "active",
             is_demo: true
