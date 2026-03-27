@@ -1610,11 +1610,7 @@
 
         // Handle start shopping button
         function handleStartShopping() {
-            if (isLoggedIn) {
-                window.location.href = 'listings/';
-            } else {
-                window.location.href = 'login/?redirect=listings/';
-            }
+            window.location.href = 'listings/';
         }
 
         // Handle create listing button
@@ -1628,29 +1624,17 @@
 
         // Handle view more listings button
         function handleViewMoreListings() {
-            if (isLoggedIn) {
-                window.location.href = 'listings/';
-            } else {
-                window.location.href = 'login/?redirect=listings/';
-            }
+            window.location.href = 'listings/';
         }
 
         // Handle direct marketplace discovery links from the homepage
         function handleBrowsePath(path) {
-            if (isLoggedIn) {
-                window.location.href = path;
-            } else {
-                window.location.href = `login/?redirect=${encodeURIComponent(path)}`;
-            }
+            window.location.href = path;
         }
 
         // Handle view details button
         function handleViewDetails(itemId) {
-            if (isLoggedIn) {
-                window.location.href = `listing-detail/?id=${itemId}`;
-            } else {
-                window.location.href = `login/?redirect=listing-detail/?id=${itemId}`;
-            }
+            window.location.href = `listing-detail/?id=${itemId}`;
         }
 
         // Handle message button

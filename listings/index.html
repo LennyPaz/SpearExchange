@@ -2146,8 +2146,12 @@
                 document.getElementById('mobile-user-avatar').textContent = (authResult.user.name || 'U').charAt(0).toUpperCase();
                 console.log('✅ Mobile auth check successful');
             } else {
-                console.log('❌ Not authenticated, redirecting to login...');
-                window.location.href = '../login';
+                currentUser = null;
+                document.getElementById('user-name').textContent = 'Guest';
+                document.getElementById('user-avatar').textContent = 'G';
+                document.getElementById('mobile-user-name').textContent = 'Guest';
+                document.getElementById('mobile-user-avatar').textContent = 'G';
+                console.log('👀 Guest browsing mode enabled');
             }
         }
 
