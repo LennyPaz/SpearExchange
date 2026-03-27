@@ -9,18 +9,22 @@
         :root {
             --primary-color: #8B2635;
             --primary-dark: #6B1B2A;
-            --accent-color: #FFD700;
-            --text-dark: #2C3E50;
-            --text-light: #5A6C7D;
-            --background-light: #F8FAFC;
-            --surface: #FFFFFF;
-            --success-color: #10B981;
-            --warning-color: #F59E0B;
-            --error-color: #EF4444;
-            --shadow-light: 0 2px 10px rgba(0,0,0,0.08);
-            --shadow-medium: 0 8px 30px rgba(0,0,0,0.12);
-            --border-radius: 12px;
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --secondary-color: #FFD700;
+            --accent-color: #F59E0B;
+            --text-dark: #0F172A;
+            --text-light: #64748B;
+            --background: #F8FAFC;
+            --surface: rgba(255, 255, 255, 0.8);
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --success: #10B981;
+            --error: #EF4444;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
+            --shadow-premium: 0 20px 25px -5px rgba(0,0,0,0.05), 0 10px 10px -5px rgba(0,0,0,0.02);
+            --shadow-lg: 0 25px 50px -12px rgba(0,0,0,0.15);
+            --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            --border-radius: 20px;
         }
 
         * {
@@ -30,24 +34,31 @@
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-family: 'Inter', sans-serif;
             line-height: 1.6;
             color: var(--text-dark);
-            background:
-                radial-gradient(circle at top left, rgba(255, 215, 0, 0.15), transparent 24%),
-                radial-gradient(circle at top right, rgba(139, 38, 53, 0.08), transparent 30%),
-                var(--background-light);
+            background: var(--background);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(139, 38, 53, 0.03) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(255, 215, 0, 0.03) 0px, transparent 50%);
             min-height: 100vh;
+            overflow-x: hidden;
         }
 
         .header {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(139, 38, 53, 0.1);
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
             position: sticky;
             top: 0;
             z-index: 1000;
-            box-shadow: var(--shadow-light);
+            transition: var(--transition);
+        }
+
+        .header.scrolled {
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: var(--shadow-premium);
         }
 
         .nav {
@@ -56,71 +67,59 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 1rem 2rem;
-            gap: 1rem;
+            padding: 1.25rem 2.5rem;
         }
 
         .logo {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
+            gap: 1rem;
             text-decoration: none;
-            color: var(--primary-color);
         }
 
         .logo-icon {
-            width: 48px;
-            height: 48px;
+            width: 44px;
+            height: 44px;
             background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
             border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-weight: 700;
+            font-weight: 800;
             font-size: 1.2rem;
-            box-shadow: var(--shadow-light);
+            box-shadow: var(--shadow-sm);
         }
 
         .logo-text {
             font-size: 1.5rem;
-            font-weight: 700;
+            font-weight: 800;
             background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
             -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
             background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.02em;
         }
 
         .nav-links {
             display: flex;
-            align-items: center;
-            gap: 2rem;
+            gap: 2.5rem;
             list-style: none;
-            flex-wrap: wrap;
+            align-items: center;
         }
 
         .nav-links a {
             text-decoration: none;
             color: var(--text-dark);
-            font-weight: 500;
+            font-weight: 600;
+            font-size: 0.95rem;
             transition: var(--transition);
-            position: relative;
+            opacity: 0.75;
         }
 
-        .nav-links a:hover,
-        .nav-links a.active {
+        .nav-links a:hover, .nav-links a.active {
             color: var(--primary-color);
-        }
-
-        .nav-links a.active::after {
-            content: '';
-            position: absolute;
-            bottom: -0.5rem;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: var(--primary-color);
-            border-radius: 1px;
+            opacity: 1;
         }
 
         .user-menu {
@@ -130,44 +129,47 @@
         .user-profile {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.75rem;
             cursor: pointer;
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
+            padding: 0.5rem 0.75rem;
+            border-radius: 12px;
             transition: var(--transition);
+            border: 1px solid transparent;
         }
 
         .user-profile:hover {
-            background: rgba(139, 38, 53, 0.05);
+            background: var(--surface);
+            border-color: var(--glass-border);
         }
 
         .user-avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
             background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-weight: 600;
+            font-weight: 700;
             font-size: 0.9rem;
         }
 
         .user-dropdown {
             position: absolute;
-            top: 100%;
+            top: calc(100% + 12px);
             right: 0;
             background: white;
-            border: 1px solid #E5E7EB;
-            border-radius: 8px;
-            box-shadow: var(--shadow-medium);
-            min-width: 220px;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: 16px;
+            box-shadow: var(--shadow-lg);
+            min-width: 240px;
             z-index: 1000;
             opacity: 0;
             visibility: hidden;
-            transform: translateY(-10px);
+            transform: translateY(10px);
             transition: var(--transition);
+            padding: 0.5rem;
         }
 
         .user-dropdown.show {
@@ -248,6 +250,23 @@
             display: flex;
             flex-direction: column;
             gap: 1rem;
+        }
+
+        .mobile-menu .mobile-logout-btn {
+            margin-top: auto;
+            width: 100%;
+            padding: 0.9rem 1rem;
+            border: 1px solid rgba(139, 38, 53, 0.18);
+            border-radius: 12px;
+            background: rgba(139, 38, 53, 0.04);
+            color: var(--primary-color);
+            font: inherit;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .mobile-menu .mobile-logout-btn:hover {
+            background: rgba(139, 38, 53, 0.08);
         }
 
         .mobile-menu.active {
@@ -747,50 +766,62 @@
 </head>
 <body>
     <header class="header">
-        <div class="nav">
+        <nav class="nav">
             <a href="../" class="logo">
                 <div class="logo-icon">SE</div>
-                <div class="logo-text">The Spear Exchange</div>
+                <span class="logo-text">The Spear Exchange</span>
             </a>
-
-            <nav class="nav-links" aria-label="Primary">
-                <a href="../">Home</a>
-                <a href="../listings/">Browse</a>
-                <a href="../messages/">Messages</a>
-                <a href="../my-listings/">My Listings</a>
-                <a href="../profile/" class="active">Profile</a>
-            </nav>
+            
+            <ul class="nav-links">
+                <li><a href="../">Home</a></li>
+                <li><a href="../listings/">Browse</a></li>
+                <li><a href="../messages/">Messages</a></li>
+                <li><a href="../my-listings/">My Listings</a></li>
+            </ul>
 
             <div class="user-menu">
-                <div class="user-profile" id="userMenuButton" role="button" tabindex="0" aria-haspopup="true" aria-expanded="false">
-                    <div class="user-avatar" id="topAvatar">LP</div>
-                    <span id="topName">Lake Park</span>
-                    <i class="fas fa-chevron-down" aria-hidden="true"></i>
+                <div class="user-profile" id="userMenuButton" aria-haspopup="true" aria-expanded="false">
+                    <div class="user-avatar">LP</div>
+                    <i class="fas fa-chevron-down"></i>
                 </div>
                 <div class="user-dropdown" id="userMenu">
-                    <a href="../messages/" class="dropdown-item"><i class="fas fa-comments"></i>Messages</a>
-                    <a href="../my-listings/" class="dropdown-item"><i class="fas fa-store"></i>My listings</a>
-                    <a href="../create-listing/" class="dropdown-item"><i class="fas fa-plus-circle"></i>Create listing</a>
-                    <a href="../login/" class="dropdown-item"><i class="fas fa-right-from-bracket"></i>Log out</a>
+                    <a href="../profile/" class="dropdown-item"><i class="fas fa-user"></i> Profile Settings</a>
+                    <a href="../messages/" class="dropdown-item"><i class="fas fa-comments"></i> Messages</a>
+                    <div style="height: 1px; background: #E2E8F0; margin: 0.5rem 0;"></div>
+                    <button class="dropdown-item" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
                 </div>
             </div>
 
             <button class="mobile-menu-btn" id="mobileMenuButton" aria-label="Open menu">
                 <i class="fas fa-bars"></i>
             </button>
-        </div>
+        </nav>
     </header>
 
     <div class="mobile-overlay" id="mobileOverlay"></div>
-    <aside class="mobile-menu" id="mobileMenu" aria-label="Mobile menu">
-        <a href="../">Home</a>
-        <a href="../listings/">Browse</a>
-        <a href="../messages/">Messages</a>
-        <a href="../my-listings/">My Listings</a>
-        <a href="../profile/" class="active">Profile</a>
-        <a href="../create-listing/">Create Listing</a>
-        <a href="../login/">Log out</a>
-    </aside>
+    <nav class="mobile-menu" id="mobileMenu">
+        <div class="mobile-menu-header">
+            <a href="../" class="logo">
+                <div class="logo-icon">SE</div>
+                <span class="logo-text">The Spear Exchange</span>
+            </a>
+            <button class="close-mobile-menu-btn" id="closeMobileMenuButton" aria-label="Close menu">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="mobile-nav-links">
+            <a href="../" class="mobile-nav-item"><i class="fas fa-home"></i> Home</a>
+            <a href="../listings/" class="mobile-nav-item"><i class="fas fa-search"></i> Browse</a>
+            <a href="../messages/" class="mobile-nav-item"><i class="fas fa-envelope"></i> Messages</a>
+            <a href="../my-listings/" class="mobile-nav-item"><i class="fas fa-list"></i> My Listings</a>
+            <a href="../profile/" class="mobile-nav-item active"><i class="fas fa-user"></i> Profile</a>
+            <button class="mobile-logout-btn" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+        </div>
+    </nav>
 
     <main class="page-shell">
         <section class="hero">
@@ -1054,10 +1085,46 @@
             const bio = document.getElementById('bio').value;
             const preview = initials(name || 'Lake Park');
             document.getElementById('heroName').textContent = name || 'Lake Park';
-            document.getElementById('topName').textContent = name || 'Lake Park';
             document.getElementById('heroBio').textContent = bio || 'Marketplace seller, FSU student, and frequent campus pickup coordinator.';
             document.getElementById('heroAvatar').textContent = preview;
-            document.getElementById('topAvatar').textContent = preview;
+        }
+
+        function loadProfile() {
+            try {
+                const saved = JSON.parse(localStorage.getItem('spearexchange.profile.mock') || '{}');
+                if (saved && typeof saved === 'object') {
+                    Object.entries(saved).forEach(([key, value]) => {
+                        if (fields.includes(key) && document.getElementById(key)) {
+                            document.getElementById(key).value = value;
+                        }
+                    });
+                }
+            } catch (error) {
+                console.warn('Could not read saved profile data', error);
+            }
+        }
+
+        function profilePayload() {
+            return fields.reduce((acc, id) => {
+                acc[id] = document.getElementById(id).value;
+                return acc;
+            }, {});
+        }
+
+        function saveProfile() {
+            const payload = profilePayload();
+            localStorage.setItem('spearexchange.profile.mock', JSON.stringify(payload));
+            saveBanner.textContent = 'Profile saved locally in this browser.';
+            saveBanner.style.display = 'flex';
+            window.clearTimeout(saveBanner.hideTimer);
+            saveBanner.hideTimer = window.setTimeout(() => {
+                saveBanner.style.display = 'none';
+            }, 2500);
+        }
+
+        function logout() {
+            localStorage.removeItem('user');
+            window.location.href = '../login/';
         }
 
         function setEditing(nextState) {
@@ -1076,10 +1143,7 @@
 
         saveButton.addEventListener('click', () => {
             syncPreview();
-            saveBanner.style.display = 'flex';
-            setTimeout(() => {
-                saveBanner.style.display = 'none';
-            }, 2600);
+            saveProfile();
             setEditing(false);
         });
 
@@ -1113,6 +1177,7 @@
         mobileOverlay.addEventListener('click', closeMobileMenu);
         mobileMenu.querySelectorAll('a').forEach((link) => link.addEventListener('click', closeMobileMenu));
 
+        loadProfile();
         syncPreview();
         setEditing(false);
     </script>
